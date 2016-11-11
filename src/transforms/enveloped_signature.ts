@@ -1,4 +1,4 @@
-import { XmlError, XE, select } from "xmljs";
+import { XmlError, XE } from "xmljs";
 import { Transform } from "../transform";
 
 /**

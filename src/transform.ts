@@ -1,4 +1,4 @@
-import { IXmlSerializable, XmlError, XE } from "xmljs";
+import { XmlError, XE } from "xmljs";
 import { XmlSignature } from "./xml";
 import { XmlSignatureObject } from "./xml_object";
 
