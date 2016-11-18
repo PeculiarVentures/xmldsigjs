@@ -1,9 +1,9 @@
 # XMLDSIGjs
 
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xadesjs/master/LICENSE.md)
-[![Build Status](https://travis-ci.org/PeculiarVentures/xadesjs.svg?branch=master)](https://travis-ci.org/PeculiarVentures/xadesjs)
-[![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xadesjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xadesjs?branch=master) 
-[![NPM version](https://badge.fury.io/js/xadesjs.png)](http://badge.fury.io/xadesjs)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xmldsigjs/master/LICENSE.md)
+[![Build Status](https://travis-ci.org/PeculiarVentures/xmldsigjs.svg?branch=master)](https://travis-ci.org/PeculiarVentures/xmldsigjs)
+[![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xmldsigjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xmldsigjs?branch=master) 
+[![NPM version](https://badge.fury.io/js/xmldsigjs.png)](http://badge.fury.io/xmldsigjs)
 
 [XMLDSIGjs](https://en.wikipedia.org/wiki/XML_Signature) is short for "XML Digital Signature". This library aims to provide an implementation of XMLDSIG in Typescript/Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
  
@@ -37,19 +37,19 @@ If you need to use a Hardware Security Module we have also created a polyfill fo
 To use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) you need to specify you want to use it, that looks like this:
 
 ```javascript
-var xadesjs = require("./built/xades.js");
+var xmldsigjs = require("./built/xmldsig.js");
 var WebCrypto = require("node-webcrypto-ossl").default;
 
-xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
+xmldsigjs.Application.setEngine("OpenSSL", new WebCrypto());
 ```
 
 The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) polyfill will work the same way. The only difference is that you have to specify the details about your PKCS #11 device when you instansiate it:
 
 ```javascript
-var xadesjs = require("./built/xades.js");
+var xmldsigjs = require("./built/xmldsig.js");
 var WebCrypto = require("node-webcrypto-p11").WebCrypto;
 
-xadesjs.Application.setEngine("PKCS11", new WebCrypto({
+xmldsigjs.Application.setEngine("PKCS11", new WebCrypto({
     library: "/path/to/pkcs11.so",
 	name: "Name of PKCS11 lib",
 	slot: 0,
@@ -72,16 +72,16 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 #### In Node
 
 ```javascript
-var xadesjs = require("./built/xades.js");
+var xmldsigjs = require("./built/xmldsig.js");
 var DOMParser = require("xmldom").DOMParser;
 var XMLSerializer = require("xmldom").XMLSerializer;
 var WebCrypto = require("node-webcrypto-ossl").default;
 
-xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
+xmldsigjs.Application.setEngine("OpenSSL", new WebCrypto());
 
 // Generate RSA key pair
 var privateKey, publicKey;
-xadesjs.Application.crypto.subtle.generateKey(
+xmldsigjs.Application.crypto.subtle.generateKey(
     {
         name: "RSASSA-PKCS1-v1_5",
         modulusLength: 1024, //can be 1024, 2048, or 4096,
@@ -111,24 +111,24 @@ xadesjs.Application.crypto.subtle.generateKey(
 function SignXml(xmlString, key, algorithm) {
     return new Promise(function (resolve, reject) {
         var xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml");
-        var signedXml = new xadesjs.SignedXml(xmlDoc);
+        var signedXml = new xmldsigjs.SignedXml(xmlDoc);
 
         // Add the key to the SignedXml document.
         signedXml.SigningKey = key;
 
         // Create a reference to be signed.
-        var reference = new xadesjs.Reference();
+        var reference = new xmldsigjs.Reference();
         reference.Uri = "";
 
         // Add an enveloped transformation to the reference.
-        reference.AddTransform(new xadesjs.XmlDsigEnvelopedSignatureTransform());
+        reference.AddTransform(new xmldsigjs.XmlDsigEnvelopedSignatureTransform());
 
         // Add the reference to the SignedXml object.
         signedXml.AddReference(reference);
 
         // Add KeyInfo
-        signedXml.KeyInfo = new xadesjs.KeyInfo();
-        var keyInfoClause = new xadesjs.RsaKeyValue();
+        signedXml.KeyInfo = new xmldsigjs.KeyInfo();
+        var keyInfoClause = new xmldsigjs.RsaKeyValue();
         signedXml.KeyInfo.AddClause(keyInfoClause);
 
         // Set prefix for Signature namespace
@@ -162,7 +162,7 @@ function SignXml(xmlString, key, algorithm) {
 
 <head>
     <meta charset="utf-8"/>
-    <title>XADESJS Signature Sample</title>
+    <title>XMLDSIGjs Signature Sample</title>
 </head>
 
 <body>
@@ -170,7 +170,7 @@ function SignXml(xmlString, key, algorithm) {
     <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xmldsigjs/master/built/xmldsig.js"></script>
     
     <script type="text/javascript">
         // Generate RSA key pair
@@ -205,24 +205,24 @@ function SignXml(xmlString, key, algorithm) {
         function SignXml(xmlString, key, algorithm) {
             return new Promise(function (resolve, reject) {
                 var xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml");
-                var signedXml = new xadesjs.SignedXml(xmlDoc);
+                var signedXml = new xmldsigjs.SignedXml(xmlDoc);
 
                 // Add the key to the SignedXml document.
                 signedXml.SigningKey = key;
 
                 // Create a reference to be signed.
-                var reference = new xadesjs.Reference();
+                var reference = new xmldsigjs.Reference();
                 reference.Uri = "";
 
                 // Add an enveloped transformation to the reference.
-                reference.AddTransform(new xadesjs.XmlDsigEnvelopedSignatureTransform());
+                reference.AddTransform(new xmldsigjs.XmlDsigEnvelopedSignatureTransform());
 
                 // Add the reference to the SignedXml object.
                 signedXml.AddReference(reference);
 
                 // Add KeyInfo
-                signedXml.KeyInfo = new xadesjs.KeyInfo();
-                var keyInfoClause = new xadesjs.RsaKeyValue();
+                signedXml.KeyInfo = new xmldsigjs.KeyInfo();
+                var keyInfoClause = new xmldsigjs.RsaKeyValue();
                 signedXml.KeyInfo.AddClause(keyInfoClause);
 
                 // Set prefix for Signature namespace
@@ -256,19 +256,19 @@ function SignXml(xmlString, key, algorithm) {
 #### In Node
 
 ```javascript
-var xadesjs = require("./built/xades.js");
+var xmldsigjs = require("./built/xmldsig.js");
 var DOMParser = require("xmldom").DOMParser;
 var WebCrypto = require("node-webcrypto-ossl").default;
 
-xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
+xmldsigjs.Application.setEngine("OpenSSL", new WebCrypto());
 
 var fs = require("fs");
-var xmlString = fs.readFileSync("./xadesjs/test/static/valid_signature.xml","utf8");
+var xmlString = fs.readFileSync("./xmldsigjs/test/static/valid_signature.xml","utf8");
 
 var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
 var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
-var signedXml = new xadesjs.SignedXml(signedDocument);
+var signedXml = new xmldsigjs.SignedXml(signedDocument);
 signedXml.LoadXml(xmlSignature[0]);
 signedXml.CheckSignature()
 .then(function (signedDocument) {
@@ -286,7 +286,7 @@ signedXml.CheckSignature()
 
 <head>
     <meta charset="utf-8"/>
-    <title>XADESJS Verify Sample</title>
+    <title>XMLDSIGjs Verify Sample</title>
 </head>
 
 <body>
@@ -294,10 +294,10 @@ signedXml.CheckSignature()
     <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xmldsigjs/master/built/xmldsig.js"></script>
     
     <script type="text/javascript">
-        fetch("https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/test/static/valid_signature.xml")
+        fetch("https://cdn.rawgit.com/PeculiarVentures/xmldsigjs/master/test/static/valid_signature.xml")
         .then(function(response) {
             return response.text()
         }).then(function(body) {
@@ -306,7 +306,7 @@ signedXml.CheckSignature()
             var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
             var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
-            var signedXml = new xadesjs.SignedXml(signedDocument);
+            var signedXml = new xmldsigjs.SignedXml(signedDocument);
             signedXml.LoadXml(xmlSignature[0]);
             signedXml.CheckSignature()
             .then(function (signedDocument) {
