@@ -5,7 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xadesjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xadesjs?branch=master) 
 [![NPM version](https://badge.fury.io/js/xadesjs.png)](http://badge.fury.io/xadesjs)
 
-[XMLDSIGjs](https://en.wikipedia.org/wiki/XML_Signature) is short for "XML Digital Signature". This library aims to provide an implementation of both XMLDSIG in Typescript/Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
+[XMLDSIGjs](https://en.wikipedia.org/wiki/XML_Signature) is short for "XML Digital Signature". This library aims to provide an implementation of XMLDSIG in Typescript/Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
  
 ## COMPATABILITY
 
