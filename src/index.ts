@@ -1,5 +1,10 @@
 // export { SignedXml } from "./signed_xml";
-// export { SignedInfo } from "./signed_info";
-export { Application } from "./application";
-export { XmlCanonicalizer } from "./canonicalizer";
+export * from "./application";
+export * from "./canonicalizer";
+export * from "./signed_xml";
+export * from "./signed_info";
+export * from "./reference";
+export * from "./transforms/index";
+export * from "./transform";
+export * from "./transforms";
 

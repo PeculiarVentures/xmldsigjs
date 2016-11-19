@@ -2,23 +2,24 @@ import { XmlError, XE } from "xmljs";
 import { Convert } from "xmljs";
 import { Application } from "../application";
 import Certificate from "pkijs/src/Certificate";
+import RelativeDistinguishedNames from "pkijs/src/RelativeDistinguishedNames";
 import RSAPublicKey from "pkijs/src/RSAPublicKey";
 import * as asn1js from "asn1js";
 
 declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
 
-declare type RDN = {
-    types_and_values: TypeAndValue[];
-}
+// declare type RDN = {
+//     types_and_values: TypeAndValue[];
+// }
 
-declare type TypeAndValue = {
-    type: string;
-    value: {
-        value_block: {
-            value: string;
-        }
-    };
-}
+// declare type TypeAndValue = {
+//     type: string;
+//     value: {
+//         value_block: {
+//             value: string;
+//         }
+//     };
+// }
 
 /**
  * List of OIDs
@@ -94,7 +95,7 @@ const OID: { [key: string]: { short?: string, long?: string } } = {
 export class X509Certificate {
 
     protected raw: Uint8Array;
-    protected cert_simpl: any;
+    protected simpl: Certificate;
     protected publicKey: CryptoKey | null = null;
 
     constructor(rawData?: Uint8Array) {
@@ -110,7 +111,7 @@ export class X509Certificate {
      * Gets a serial number of the certificate in HEX format  
      */
     public get SerialNumber(): string {
-        return Convert.ToHex(this.cert_simpl.serialNumber.value_block.value_hex);
+        return Convert.ToHex(new Uint8Array(this.simpl.serialNumber.valueBlock.valueHex));
     }
 
     /**
@@ -121,11 +122,11 @@ export class X509Certificate {
      * Example:
      * > C=Some name, O=Some organization name, C=RU
      */
-    protected NameToString(name: RDN, spliter: string = ","): string {
+    protected NameToString(name: RelativeDistinguishedNames, spliter: string = ","): string {
         let res: string[] = [];
-        for (let type_and_value of name.types_and_values) {
+        for (let type_and_value of name.typesAndValues) {
             let type = type_and_value.type;
-            let name = OID[type].short;
+            let name = OID[type.toString()].short;
             res.push(`${name ? name : type}=${type_and_value.value.value_block.value}`);
         }
         return res.join(spliter + " ");
@@ -135,14 +136,14 @@ export class X509Certificate {
      * Gets a issuer name of the certificate 
      */
     public get Issuer(): string {
-        return this.NameToString(this.cert_simpl.issuer);
+        return this.NameToString(this.simpl.issuer);
     }
 
     /**
      * Gets a subject name of the certificate 
      */
     public get Subject(): string {
-        return this.NameToString(this.cert_simpl.subject);
+        return this.NameToString(this.simpl.subject);
     }
 
     /**
@@ -161,7 +162,7 @@ export class X509Certificate {
     protected LoadFromRawData(rawData: Uint8Array) {
         this.raw = rawData;
         let asn1 = asn1js.fromBER(rawData.buffer);
-        this.cert_simpl = new Certificate({ schema: asn1.result });
+        this.simpl = new Certificate({ schema: asn1.result });
     }
 
     /**
@@ -174,7 +175,7 @@ export class X509Certificate {
     /**
      * Returns DER raw of X509Certificate
      */
-    GetRawCertData(): Uint8Array {
+    GetRaw(): Uint8Array {
         return this.raw;
     }
 
@@ -185,8 +186,8 @@ export class X509Certificate {
      */
     exportKey(algorithm: Algorithm) {
         return new Promise((resolve, reject) => {
-            let asn1_publicKey = asn1js.fromBER(this.cert_simpl.subjectPublicKeyInfo.subjectPublicKey.value_block.value_hex);
-            let alg_oid = this.cert_simpl.subjectPublicKeyInfo.algorithm.algorithm_id;
+            let asn1_publicKey = asn1js.fromBER(this.simpl.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex);
+            let alg_oid = this.simpl.subjectPublicKeyInfo.algorithm.algorithmId;
             let jwk: any = null;
             switch (alg_oid) {
                 // RSA

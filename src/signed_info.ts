@@ -226,7 +226,7 @@ export class SignedInfo extends XmlSignatureObject {
 
         this.id = this.GetAttribute(XmlSignature.AttributeNames.Id, null, false);
 
-        const canonMethod = this.GetElement(XmlSignature.ElementNames.CanonicalizationMethod, false);
+        const canonMethod = this.GetChild(XmlSignature.ElementNames.CanonicalizationMethod, false);
         if (canonMethod)
             this.c14nMethod = XmlSignatureObject.GetAttribute(canonMethod, XmlSignature.AttributeNames.Algorithm, null, true);
 

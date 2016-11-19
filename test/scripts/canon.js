@@ -1,10 +1,10 @@
 "use strict";
-var select, xadesjs, DOMParser, readXml, assert;
+var select, xmldsig, DOMParser, readXml, assert;
 
 if (typeof module !== "undefined") {
     var config = require("../config");
     var select = config.select;
-    var xadesjs = config.xadesjs;
+    var xmldsig = config.xmldsig;
     var DOMParser = config.DOMParser;
     var assert = config.assert;
     var readXml = config;
@@ -44,7 +44,7 @@ describe("Canonicalization", function () {
         comment = !!comment;
         var doc = new DOMParser().parseFromString(xml, "application/xml")
         var elem = select(doc, xpath)[0]
-        var xmlCanonicalizer = new xadesjs.XmlCanonicalizer(!!comment, exclusive);
+        var xmlCanonicalizer = new xmldsig.XmlCanonicalizer(!!comment, exclusive);
         if (inclusive)
             xmlCanonicalizer.InclusiveNamespacesPrefixList = inclusive;
         var res = xmlCanonicalizer.Canonicalize(elem);

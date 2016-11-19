@@ -234,7 +234,7 @@ export class KeyInfoX509Data extends XmlSignatureObject implements KeyInfoClause
         if ((this.X509CertificateList != null) && (this.X509CertificateList.length > 0)) {
             for (let x509 of this.X509CertificateList) {
                 let cert = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509Certificate);
-                cert.textContent = Convert.ToBase64(x509.GetRawCertData());
+                cert.textContent = Convert.ToBase64(x509.GetRaw());
                 xel.appendChild(cert);
             }
         }

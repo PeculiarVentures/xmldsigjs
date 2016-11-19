@@ -88,7 +88,7 @@ export class Transform extends XmlSignatureObject implements ITransform {
         super.LoadXml(element);
 
         this.Algorithm = this.GetAttribute(XmlSignature.AttributeNames.Algorithm, "", false) !;
-        let xpath = this.GetElement(XmlSignature.ElementNames.XPath, false);
+        let xpath = this.GetChild(XmlSignature.ElementNames.XPath, false);
         this.XPath = xpath && xpath.textContent ? xpath.textContent : "";
 
     }

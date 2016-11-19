@@ -217,7 +217,7 @@ export class SignedXml extends XmlSignatureObject {
      * Gets the SignedInfo object of the current SignedXml object.
      */
     get SignedInfo(): SignedInfo {
-        return this.SignedInfo;
+        return this.Signature.SignedInfo;
     }
 
     /**
@@ -636,9 +636,8 @@ export class SignedXml extends XmlSignatureObject {
     }
 
     protected ValidateReferences(doc: Node): PromiseLike<boolean> {
-        let that = this;
         return new Promise((resolve, reject) => {
-            let refs = that.SignedInfo.References;
+            let refs = this.SignedInfo.References;
             let promise = Promise.resolve(true);
             for (let ref of refs) {
 

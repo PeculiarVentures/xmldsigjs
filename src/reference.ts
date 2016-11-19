@@ -160,12 +160,13 @@ export class Reference extends XmlSignatureObject {
         this.uri = this.GetAttribute(XmlSignature.AttributeNames.URI, null, false);
         this.type = this.GetAttribute(XmlSignature.AttributeNames.Type, null, false);
 
-        const transforms = this.GetElement(XmlSignature.ElementNames.Transforms, false);
+        const transforms = this.GetChild(XmlSignature.ElementNames.Transforms, false);
         if (transforms) {
             this.transforms.LoadXml(transforms);
         }
         // get DigestMethod
-        this.DigestMethod = this.GetAttribute(XmlSignature.AttributeNames.Algorithm, XmlSignature.ElementNames.DigestMethod);
+        const digest = this.GetChild(XmlSignature.ElementNames.DigestMethod, true) !;
+        this.digestMethod = XmlSignatureObject.GetAttribute(digest, XmlSignature.AttributeNames.Algorithm, null, true) !;
         // get DigestValue
         let dig = this.GetChild(XmlSignature.ElementNames.DigestValue, false);
         if (dig)

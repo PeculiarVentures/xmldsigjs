@@ -5,11 +5,11 @@ var assert = require("assert");
 var select = require("xpath.js");
 var DOMParser = require("xmldom-alpha").DOMParser;
 var XMLSerializer = require("xmldom-alpha").XMLSerializer;
-xadesjs = require("../lib/index");
+xmldsig = require("../lib/index");
 
 var WebCrypto = require("node-webcrypto-ossl");
-xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
-console.log("WebCrypto:", xadesjs.Application.crypto.name);
+xmldsig.Application.setEngine("OpenSSL", new WebCrypto());
+console.log("WebCrypto:", xmldsig.Application.crypto.name);
 
 var readXml = function(path, cb) {
     fs.readFile(path, function(e, buf) {
@@ -24,7 +24,7 @@ var readXml = function(path, cb) {
 
 module.exports = {
     select: select,
-    xadesjs: xadesjs,
+    xmldsig: xmldsig,
     DOMParser: DOMParser,
     XMLSerializer: XMLSerializer,
     readXml: readXml,
