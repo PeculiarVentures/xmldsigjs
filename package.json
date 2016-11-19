@@ -2,12 +2,11 @@
   "name": "xadesjs",
   "version": "1.0.2",
   "description": "A pure Javascript implementation of XMLDSIG and XAdES based on WebCrypto ",
-  "main": "built/xades.js",
+  "main": "lib/src/index",
   "scripts": {
     "start": "node test/html/server.js",
     "pretest": "npm run build",
     "test": "mocha test/scripts",
-    "build": "",
     "build:npm": "tsc",
     "build:browser": "webpack",
     "pub": "npm version patch && npm publish && git push",
@@ -38,12 +37,14 @@
     "url": "https://github.com/PeculiarVentures/xadesjs/issues"
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
     "@types/node": "^6.0.46",
     "@types/pkijs": "0.0.1",
     "pkijs": "git+https://github.com/PeculiarVentures/pkijs-es6.git",
-    "ts-loader": "^1.1.0",
     "xmljs": "git+https://github.com/PeculiarVentures/xmljs.git"
+  },
+  "devDependencies": {
+    "node-webcrypto-ossl": "^1.0.10",
+    "ts-loader": "^1.1.0"
   }
 }

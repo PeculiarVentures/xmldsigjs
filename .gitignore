@@ -1,7 +1,9 @@
 /node_modules
-/typings
+/types
+/lib
 /.nyc_output/
 /coverage/
 /.vscode
 /test/test.js
+xmldsig.js
 npm-debug.log

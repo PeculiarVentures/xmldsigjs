@@ -10,6 +10,7 @@
         "typeRoots": [
             "node_modules/@types"
         ],
+        "rootDir": "src",
         "outDir": "lib",
         "noImplicitAny": true,
         "sourceMap": false,

@@ -1,4 +1,4 @@
-import { XmlObject, XmlNodeType, XmlError, XE, IXmlSerializable } from "xmljs";
+import { XmlObject, XmlNodeType, XmlError, XE } from "xmljs";
 import { XmlSignature } from "./xml";
 import { RsaKeyValue, EcdsaKeyValue } from "./key/index";
 import { KeyInfoX509Data } from "./key/index";

@@ -1,4 +1,4 @@
-import { XmlNodeType, XmlError, XE, NamespaceManager, XmlNamespace } from "xmljs";
+import { XmlNodeType, XmlError, XE, NamespaceManager } from "xmljs";
 
 export enum XmlCanonicalizerState {
     BeforeDocElement,
@@ -299,29 +299,27 @@ export class XmlCanonicalizer {
     }
 
     protected NormalizeString(input: string | null, type: XmlNodeType): string {
-        if (!input) {
-            throw new XmlError(XE.NULL_REFERENCE, "Parameter 'input' is null");
-        }
         let sb: string[] = [];
-        for (let i = 0; i < input.length; i++) {
-            let ch = input[i];
-            if (ch === "<" && (type === XmlNodeType.Attribute || this.IsTextNode(type)))
-                sb.push("&lt;");
-            else if (ch === ">" && this.IsTextNode(type))
-                sb.push("&gt;");
-            else if (ch === "&" && (type === XmlNodeType.Attribute || this.IsTextNode(type)))
-                sb.push("&amp;");
-            else if (ch === "\"" && type === XmlNodeType.Attribute)
-                sb.push("&quot;");
-            else if (ch === "\u0009" && type === XmlNodeType.Attribute)
-                sb.push("&#x9;");
-            else if (ch === "\u000A" && type === XmlNodeType.Attribute)
-                sb.push("&#xA;");
-            else if (ch === "\u000D")
-                sb.push("&#xD;");
-            else
-                sb.push(ch);
-        }
+        if (input)
+            for (let i = 0; i < input.length; i++) {
+                let ch = input[i];
+                if (ch === "<" && (type === XmlNodeType.Attribute || this.IsTextNode(type)))
+                    sb.push("&lt;");
+                else if (ch === ">" && this.IsTextNode(type))
+                    sb.push("&gt;");
+                else if (ch === "&" && (type === XmlNodeType.Attribute || this.IsTextNode(type)))
+                    sb.push("&amp;");
+                else if (ch === "\"" && type === XmlNodeType.Attribute)
+                    sb.push("&quot;");
+                else if (ch === "\u0009" && type === XmlNodeType.Attribute)
+                    sb.push("&#x9;");
+                else if (ch === "\u000A" && type === XmlNodeType.Attribute)
+                    sb.push("&#xA;");
+                else if (ch === "\u000D")
+                    sb.push("&#xD;");
+                else
+                    sb.push(ch);
+            }
 
         return sb.join("");
     }
