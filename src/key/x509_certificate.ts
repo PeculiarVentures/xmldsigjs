@@ -98,12 +98,13 @@ export class X509Certificate {
     protected simpl: Certificate;
     protected publicKey: CryptoKey | null = null;
 
-    constructor(rawData?: Uint8Array) {
+    constructor(rawData?: BufferSource) {
         this.publicKey;
 
         if (rawData) {
-            this.LoadFromRawData(rawData);
-            this.raw = rawData;
+            const buf = new Uint8Array(rawData as ArrayBuffer);
+            this.LoadRaw(buf);
+            this.raw = buf;
         }
     }
 
@@ -127,7 +128,7 @@ export class X509Certificate {
         for (let type_and_value of name.typesAndValues) {
             let type = type_and_value.type;
             let name = OID[type.toString()].short;
-            res.push(`${name ? name : type}=${type_and_value.value.value_block.value}`);
+            res.push(`${name ? name : type}=${type_and_value.value.valueBlock.value}`);
         }
         return res.join(spliter + " ");
     }
@@ -159,9 +160,9 @@ export class X509Certificate {
      * Loads X509Certificate from DER data
      * @param  {Uint8Array} rawData
      */
-    protected LoadFromRawData(rawData: Uint8Array) {
-        this.raw = rawData;
-        let asn1 = asn1js.fromBER(rawData.buffer);
+    protected LoadRaw(rawData: BufferSource) {
+        this.raw = new Uint8Array(rawData as ArrayBuffer);;
+        let asn1 = asn1js.fromBER(this.raw.buffer);
         this.simpl = new Certificate({ schema: asn1.result });
     }
 

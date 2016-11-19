@@ -7,4 +7,5 @@ export * from "./reference";
 export * from "./transforms/index";
 export * from "./transform";
 export * from "./transforms";
-
+// Key
+export * from "./key/x509_certificate";
