@@ -6,6 +6,11 @@ export interface CryptoEx extends Crypto {
 
 let _crypto: CryptoEx | null = null;
 
+if (typeof self !== "undefined") {
+    _crypto = self.crypto as any;
+    _crypto!.name = "Browser";
+}
+
 export class Application {
 
     /**
