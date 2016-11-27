@@ -16,7 +16,11 @@ var readXml = function(path, cb) {
         if (e)
             assert.equal(false, true, "Error on XML reading " + path);
         else {
-            var doc = new DOMParser().parseFromString(buf.toString(), "application/xml");
+            // var str = buf.toString().replace("\r", "");
+            buf = new Buffer(buf.slice(0, 100).toString("binary").replace("\r"), "binary");
+            var str = buf.slice(0, 100).toString("hex");
+            console.log(str);
+            var doc = new DOMParser().parseFromString(str, "application/xml");
             cb(doc);
         }
     })

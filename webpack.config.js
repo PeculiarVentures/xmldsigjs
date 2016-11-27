@@ -5,8 +5,9 @@ const path = require("path");
 module.exports = {  
   entry: "./src/index.ts",
   output: {
-    libraryTarget: "umd",
-    filename: "xmldsig.js"
+    libraryTarget: "var",
+    library: "xmldsig",
+    filename: "dist/xmldsig.js"
   },
   resolve: {
     extensions: ["", ".webpack.js", ".web.js", ".ts", ".js"]

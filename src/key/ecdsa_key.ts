@@ -77,7 +77,7 @@ export class EcdsaKeyValue extends XmlSignatureObject implements KeyInfoClause {
             this.m_key = key;
             Application.crypto.subtle.exportKey("jwk", key)
                 .then((jwk) => {
-                    this.m_jwk = jwk; console.log(jwk);
+                    this.m_jwk = jwk;
                     this.m_x = Convert.FromString(jwk.x!, "base64url");
                     this.m_y = Convert.FromString(jwk.y!, "base64url");
                     this.m_curve = jwk.crv! as any;

@@ -9,3 +9,4 @@ export * from "./transform";
 export * from "./transforms";
 // Key
 export * from "./key/x509_certificate";
+export * from "./key/rsa_key";

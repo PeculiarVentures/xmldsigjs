@@ -71,7 +71,8 @@ export class RsaKeyValue extends XmlSignatureObject implements KeyInfoClause {
      */
     importKey(key: CryptoKey) {
         return new Promise((resolve, reject) => {
-            if (key.algorithm.name!.toUpperCase() !== RSA_PKCS1.toUpperCase())
+            const algName = key.algorithm.name!.toUpperCase();
+            if (algName !== RSA_PKCS1.toUpperCase() && algName !== RSA_PSS.toUpperCase())
                 throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
             this.m_key = key;
             Application.crypto.subtle.exportKey("jwk", key)

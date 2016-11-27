@@ -1,12 +1,13 @@
-import { XmlObject, XmlNodeType, XmlError, XE } from "xmljs";
+import { XmlNodeType, XmlError, XE } from "xmljs";
 import { XmlSignature } from "./xml";
-import { RsaKeyValue, EcdsaKeyValue } from "./key/index";
-import { KeyInfoX509Data } from "./key/index";
+import { XmlSignatureObject } from "./xml_object";
+import { RsaKeyValue, EcdsaKeyValue } from "./key";
+import { KeyInfoX509Data, KeyValue } from "./key";
 
 /**
  * Represents an XML digital signature or XML encryption <KeyInfo> element.
  */
-export class KeyInfo extends XmlObject {
+export class KeyInfo extends XmlSignatureObject {
 
     protected name = XmlSignature.ElementNames.KeyInfo;
 
@@ -73,8 +74,11 @@ export class KeyInfo extends XmlObject {
         // we add References afterward so we don't end up with extraneous
         // xmlns="..." in each reference elements.
         for (let i in this.Info) {
-            let kic = this.Info[i];
+            let kic: IXmlSerializable = this.Info[i];
             kic.Prefix = this.Prefix;
+            if (kic instanceof RsaKeyValue || kic instanceof EcdsaKeyValue)
+                kic = new KeyValue(kic);
+
             let xn = kic.GetXml();
             xel.appendChild(xn);
         }

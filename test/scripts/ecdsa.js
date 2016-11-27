@@ -1,3 +1,4 @@
+"use strict"
 var select, xadesjs, DOMParser, XMLSerializer, readXml, assert;
 
 if (typeof module !== "undefined") {
@@ -39,7 +40,7 @@ describe("ECDSA", function () {
         );
     }
 
-    before(function (done) {
+    before(done => {
         generateRsaKey("P-256")
             .then(function (k) {
                 ecdsaKeyP256 = k;
@@ -100,43 +101,41 @@ describe("ECDSA", function () {
             .then(done, done);
     }
 
-    it("Sign/verify ECDSA-P256-SHA1", function (done) {
+    it("Sign/verify ECDSA-P256-SHA1", done => {
         Test(ecdsaKeyP256, "ECDSA-P256-SHA1", done, "SHA-1");
     })
-    it("Sign/verify ECDSA-P256-SHA256", function (done) {
+    it("Sign/verify ECDSA-P256-SHA256", done => {
         Test(ecdsaKeyP256, "ECDSA-P256-SHA256", done, "SHA-256");
     })
-    it("Sign/verify ECDSA-P256-SHA384", function (done) {
+    it("Sign/verify ECDSA-P256-SHA384", done => {
         Test(ecdsaKeyP256, "ECDSA-P256-SHA384", done, "SHA-384");
     })
-    it("Sign/verify ECDSA-P256-SHA512", function (done) {
+    it("Sign/verify ECDSA-P256-SHA512", done => {
         Test(ecdsaKeyP256, "ECDSA-P256-SHA512", done, "SHA-512");
     })
-    
-    it("Sign/verify ECDSA-P384-SHA1", function (done) {
+    it("Sign/verify ECDSA-P384-SHA1", done => {
         Test(ecdsaKeyP384, "ECDSA-P384-SHA1", done, "SHA-1");
     })
-    it("Sign/verify ECDSA-P384-SHA256", function (done) {
+    it("Sign/verify ECDSA-P384-SHA256", done => {
         Test(ecdsaKeyP384, "ECDSA-P384-SHA256", done, "SHA-256");
     })
-    it("Sign/verify ECDSA-P384-SHA384", function (done) {
+    it("Sign/verify ECDSA-P384-SHA384", done => {
         Test(ecdsaKeyP384, "ECDSA-P384-SHA384", done, "SHA-384");
     })
-    it("Sign/verify ECDSA-P384-SHA512", function (done) {
+    it("Sign/verify ECDSA-P384-SHA512", done => {
         Test(ecdsaKeyP384, "ECDSA-P384-SHA512", done, "SHA-512");
-    })
-    
-    it("Sign/verify ECDSA-P521-SHA1", function (done) {
+    });
+    it("Sign/verify ECDSA-P521-SHA1", done => {
         Test(ecdsaKeyP521, "ECDSA-P521-SHA1", done, "SHA-1");
-    })
-    it("Sign/verify ECDSA-P521-SHA256", function (done) {
+    });
+    it("Sign/verify ECDSA-P521-SHA256", done => {
         Test(ecdsaKeyP521, "ECDSA-P521-SHA256", done, "SHA-256");
-    })
-    it("Sign/verify ECDSA-P521-SHA384", function (done) {
+    });
+    it("Sign/verify ECDSA-P521-SHA384", done => {
         Test(ecdsaKeyP521, "ECDSA-P521-SHA384", done, "SHA-384");
-    })
-    it("Sign/verify ECDSA-P521-SHA512", function (done) {
+    });
+    it("Sign/verify ECDSA-P521-SHA512", done => {
         Test(ecdsaKeyP521, "ECDSA-P521-SHA512", done, "SHA-512");
-    })
+    });
 
-})
+});
