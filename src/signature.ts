@@ -123,7 +123,7 @@ export class Signature extends XmlSignatureObject {
         }
 
         // @Id
-        if (this.id != null)
+        if (this.id)
             xel.setAttribute(XmlSignature.AttributeNames.Id, this.id);
 
         // SignedInfo
@@ -132,7 +132,7 @@ export class Signature extends XmlSignatureObject {
         xel.appendChild(xn);
 
         // Signature
-        if (this.signature != null) {
+        if (this.signature) {
             let sv = document.createElementNS(XmlSignature.NamespaceURI, this.GetPrefix() + XmlSignature.ElementNames.SignatureValue);
             sv.textContent = Convert.ToString(this.signature, "base64");
             if (this.signature_id)
@@ -141,14 +141,14 @@ export class Signature extends XmlSignatureObject {
         }
 
         // KeyInfo
-        if (this.key != null) {
+        if (this.key) {
             this.key.Prefix = this.Prefix;
             xn = this.key.GetXml();
             xel.appendChild(xn);
         }
 
         // DataObject[]
-        if (this.list.length > 0) {
+        if (this.list.length) {
             for (let i in this.list) {
                 let obj = this.list[i];
                 obj.Prefix = this.Prefix;
