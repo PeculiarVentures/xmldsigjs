@@ -34,7 +34,7 @@ export class Application {
     }
 
     static isNodePlugin(): boolean {
-        return (typeof module !== "undefined");
+        return (typeof self === "undefined" && typeof window === "undefined");
     }
 }
 
