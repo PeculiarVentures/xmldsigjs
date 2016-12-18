@@ -45,6 +45,13 @@
   },
   "devDependencies": {
     "node-webcrypto-ossl": "^1.0.10",
-    "ts-loader": "^1.1.0"
+    "ts-loader": "^1.1.0",
+    "coveralls": "^2",
+    "live-server": "^1",
+    "mocha": "^3",
+    "npm-run-all": "^3",
+    "nyc": "^8",
+    "watch": "^0",
+    "typescript": "^2"
   }
 }
