@@ -1,7 +1,7 @@
 {
-  "name": "xadesjs",
+  "name": "xmldisgjs",
   "version": "1.0.2",
-  "description": "A pure Javascript implementation of XMLDSIG and XAdES based on WebCrypto ",
+  "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "lib/src/index",
   "scripts": {
     "start": "node test/html/server.js",
