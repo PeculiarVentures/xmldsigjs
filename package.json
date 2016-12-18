@@ -42,7 +42,7 @@
     "@types/node": "^6.0.46",
     "@types/pkijs": "0.0.1",
     "pkijs": "git+https://github.com/PeculiarVentures/pkijs-es6.git",
-    "xmljs": "git+https://github.com/PeculiarVentures/xmljs.git"
+    "xmljs": "git+https://github.com/PeculiarVentures/xml-core.git"
   },
   "devDependencies": {
     "node-webcrypto-ossl": "^1.0.10",
