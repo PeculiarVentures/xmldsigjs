@@ -37,14 +37,8 @@
   "dependencies": {
     "@types/asn1js": "latest",
     "@types/node": "^6.0.46",
-<<<<<<< HEAD
-    "@types/pkijs": "0.0.1",
-    "pkijs": "git+https://github.com/PeculiarVentures/pkijs-es6.git",
-    "xmljs": "git+https://github.com/PeculiarVentures/xml-core.git"
-=======
     "pkijs": "git+https://github.com/microshine/pkijs-es6",
     "xml-core": "^1"
->>>>>>> origin/decorators
   },
   "devDependencies": {
     "node-webcrypto-ossl": "^1.0.10",
@@ -55,10 +49,6 @@
     "npm-run-all": "^3",
     "nyc": "^8",
     "watch": "^0",
-<<<<<<< HEAD
     "typescript": "^2"
-=======
-    "typescript": "^2.1.4"
->>>>>>> origin/decorators
   }
 }
