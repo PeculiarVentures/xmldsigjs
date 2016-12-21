@@ -49,6 +49,6 @@
     "npm-run-all": "^3",
     "nyc": "^8",
     "watch": "^0",
-    "typescript": "^2"
+    "typescript": "^2.1.4"
   }
 }
