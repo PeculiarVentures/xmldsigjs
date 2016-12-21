@@ -3,16 +3,10 @@ machine:
     version: 6.9.1
 
 test:
-<<<<<<< HEAD
   override:
-    - npm run coverage
-=======
-  pre:
-    - tsc -v
     - npm run coverage
 
   post:
->>>>>>> origin/decorators
     - npm run coveralls
 
 general:
