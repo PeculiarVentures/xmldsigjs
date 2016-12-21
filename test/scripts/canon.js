@@ -8,6 +8,7 @@ if (typeof module !== "undefined") {
     var DOMParser = config.DOMParser;
     var assert = config.assert;
     var readXml = config;
+    var XmlCore = config.XmlCore;
 }
 
 describe("Canonicalization", function () {
@@ -43,7 +44,7 @@ describe("Canonicalization", function () {
     function canon(exclusive, xml, xpath, result, comment, inclusive) {
         comment = !!comment;
         var doc = new DOMParser().parseFromString(xml, "application/xml")
-        var elem = select(doc, xpath)[0]
+        var elem = XmlCore.Select(doc, xpath)[0]
         var xmlCanonicalizer = new xmldsig.XmlCanonicalizer(!!comment, exclusive);
         if (inclusive)
             xmlCanonicalizer.InclusiveNamespacesPrefixList = inclusive;

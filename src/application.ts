@@ -1,4 +1,4 @@
-import { XmlError, XE } from "xmljs";
+import { XmlError, XE } from "xml-core";
 
 export interface CryptoEx extends Crypto {
     name: string;

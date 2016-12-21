@@ -1,24 +1,20 @@
 {
   "name": "xmldisgjs",
-  "version": "1.0.2",
+  "version": "2.0.1",
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "lib/src/index",
   "scripts": {
     "start": "node test/html/server.js",
-    "pretest": "npm run build",
+    "pretest": "npm run build:map",
     "test": "mocha test/scripts",
+    "test:local": "nyc --reporter=lcov npm test",
     "build": "npm run build:npm",
     "build:npm": "tsc",
+    "build:map": "tsc --sourceMap",
     "build:browser": "webpack",
     "pub": "npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
     "coverage": "nyc npm test",
-    "precoveragehtml": "npm run coverage",
-    "coveragehtml": "nyc report -r html",
-    "watch": "watch 'npm run coveragehtml' lib/ src/ test/",
-    "live": "live-server -q --port=4005 --ignorePattern='(js|css|png)$' coverage",
-    "predev": "if [ ! -f coverage/index.html ]; then mkdir coverage; cp .waiting.html coverage/index.html; fi",
-    "dev": "npm-run-all -p --silent watch live",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
@@ -39,10 +35,16 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
+    "@types/asn1js": "latest",
     "@types/node": "^6.0.46",
+<<<<<<< HEAD
     "@types/pkijs": "0.0.1",
     "pkijs": "git+https://github.com/PeculiarVentures/pkijs-es6.git",
     "xmljs": "git+https://github.com/PeculiarVentures/xml-core.git"
+=======
+    "pkijs": "git+https://github.com/microshine/pkijs-es6",
+    "xml-core": "^1"
+>>>>>>> origin/decorators
   },
   "devDependencies": {
     "node-webcrypto-ossl": "^1.0.10",
@@ -53,6 +55,10 @@
     "npm-run-all": "^3",
     "nyc": "^8",
     "watch": "^0",
+<<<<<<< HEAD
     "typescript": "^2"
+=======
+    "typescript": "^2.1.4"
+>>>>>>> origin/decorators
   }
 }

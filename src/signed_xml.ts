@@ -1,815 +1,558 @@
-import { XmlNodeType, APPLICATION_XML } from "xmljs";
-import { SelectNamespaces } from "xmljs";
-import { XmlError, XE } from "xmljs";
-import { Convert } from "xmljs";
-import { XmlSignatureObject } from "./xml_object";
-import { Signature } from "./signature";
-import { Reference } from "./reference";
-import { KeyInfo } from "./key_info";
-import { SignedInfo } from "./signed_info";
+import * as XmlCore from "xml-core";
+import { Signature, SignedInfo, Reference, References, KeyInfo, KeyValue, KeyInfoX509Data, Transforms as XmlTransforms } from "./xml";
 import { CryptoConfig } from "./crypto_config";
 import { ISignatureAlgorithm } from "./algorithm";
-import {
-    RSA_PSS,
-    SHA1, SHA224, SHA256, SHA384, SHA512,
-    SHA1_NAMESPACE, SHA224_NAMESPACE, SHA256_NAMESPACE, SHA384_NAMESPACE, SHA512_NAMESPACE,
-    Sha1,
-    RSA_PSS_WITH_PARAMS_SHA1_MGF1_NAMESPACE,
-    RSA_PKCS1,
-    RsaPkcs1Sha1, RsaPkcs1Sha224, RsaPkcs1Sha256, RsaPkcs1Sha384, RsaPkcs1Sha512,
-    RsaPssSha1, RsaPssSha224, RsaPssSha256, RsaPssSha384, RsaPssSha512,
-    EcdsaSha1, EcdsaSha224, EcdsaSha256, EcdsaSha384, EcdsaSha512,
-    HMAC_ALGORITHM,
-    HmacSha1, HmacSha224, HmacSha256, HmacSha384, HmacSha512,
-    PssAlgorithmParams
-} from "./algorithm/index";
-import { KeyInfoX509Data, X509Certificate } from "./key/index";
-import { Transform } from "./transform";
-import {
-    XmlDsigEnvelopedSignatureTransform,
-    XmlDsigC14NTransform, XmlDsigC14NWithCommentsTransform,
-    XmlDsigExcC14NTransform, XmlDsigExcC14NWithCommentsTransform
-} from "./transforms/index";
+import * as Alg from "./algorithm/index";
+import * as Transforms from "./xml/transforms";
+import * as KeyInfos from "./xml/key_infos";
+
+type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
+
+interface OptionsSignReference {
+    /**
+     * Id of Reference
+     * 
+     * @type {string}
+     * @memberOf OptionsSignReference
+     */
+    id?: string;
+    uri?: string;
+    /**
+     * Hash algorithm
+     * 
+     * @type {AlgorithmIdentifier}
+     * @memberOf OptionsSignReference
+     */
+    hash: AlgorithmIdentifier;
+    /**
+     * List of transforms
+     * 
+     * @type {OptionsSignTransform[]}
+     * @memberOf OptionsSignReference
+     */
+    transforms?: OptionsSignTransform[];
+}
+
+interface OptionsSign {
+    /**
+     * Public key for KeyInfo block
+     * 
+     * @type {boolean}
+     * @memberOf OptionsSign
+     */
+    keyValue?: CryptoKey;
+    /**
+     * List of X509 Certificates
+     * 
+     * @type {string[]}
+     * @memberOf OptionsSign
+     */
+    x509?: string[];
+    /**
+     * List of Reference
+     * Default is Reference with hash alg SHA-256 and exc-c14n transform  
+     * 
+     * @type {OptionsSignReference[]}
+     * @memberOf OptionsSign
+     */
+    references?: OptionsSignReference[];
+}
 
 /**
 * Provides a wrapper on a core XML signature object to facilitate creating XML signatures.
 */
-export class SignedXml extends XmlSignatureObject {
+export class SignedXml implements XmlCore.IXmlSerializable {
 
-    protected name = "SignedXml";
 
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the standard canonicalization 
-     * algorithm for XML digital signatures. This field is constant.
-     */
-    protected static XmlDsigCanonicalizationUrl = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+    protected signature = new Signature();
+    protected document?: Document;
 
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the standard canonicalization algorithm 
-     * for XML digital signatures and includes comments. This field is constant.
-     */
-    protected static XmlDsigCanonicalizationWithCommentsUrl = SignedXml.XmlDsigCanonicalizationUrl + "#WithComments";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the standard namespace for XML digital signatures. 
-     * This field is constant.
-     */
-    protected static XmlDsigNamespaceUrl = "http://www.w3.org/2000/09/xmldsig#";
-    protected static XmlDsigDSAUrl = SignedXml.XmlDsigNamespaceUrl + "dsa-sha1";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the standard HMACSHA1 algorithm for XML digital signatures. 
-     * This field is constant.
-     */
-    protected static XmlDsigHMACSHA1Url = SignedXml.XmlDsigNamespaceUrl + "hmac-sha1";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the standard minimal canonicalization algorithm 
-     * for XML digital signatures. This field is constant.
-     */
-    protected static XmlDsigMinimalCanonicalizationUrl = SignedXml.XmlDsigNamespaceUrl + "minimal";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the standard RSA signature method 
-     * for XML digital signatures. This field is constant.
-     */
-    protected static XmlDsigRSASHA1Url = SignedXml.XmlDsigNamespaceUrl + "rsa-sha1";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the standard SHA1 digest method for 
-     * XML digital signatures. This field is constant.
-     */
-    protected static XmlDsigSHA1Url = SignedXml.XmlDsigNamespaceUrl + "sha1";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the XML mode 
-     * decryption transformation. This field is constant.
-     */
-    protected static XmlDecryptionTransformUrl = "http://www.w3.org/2002/07/decrypt#XML";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the base 64 transformation. This field is constant.
-     */
-    protected static XmlDsigBase64TransformUrl = SignedXml.XmlDsigNamespaceUrl + "base64";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) 
-     * for the Canonical XML transformation. This field is constant.
-     */
-    protected static XmlDsigC14NTransformUrl = SignedXml.XmlDsigCanonicalizationUrl;
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the Canonical XML transformation, 
-     * with comments. This field is constant.
-     */
-    protected static XmlDsigC14NWithCommentsTransformUrl = SignedXml.XmlDsigCanonicalizationWithCommentsUrl;
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for enveloped signature transformation. 
-     * This field is constant.
-     */
-    protected static XmlDsigEnvelopedSignatureTransformUrl = SignedXml.XmlDsigNamespaceUrl + "enveloped-signature";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for exclusive XML canonicalization. 
-     * This field is constant.
-     */
-    protected static XmlDsigExcC14NTransformUrl = "http://www.w3.org/2001/10/xml-exc-c14n#";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for exclusive XML canonicalization, with comments. 
-     * This field is constant.
-     */
-    protected static XmlDsigExcC14NWithCommentsTransformUrl = SignedXml.XmlDsigExcC14NTransformUrl + "WithComments";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the XML Path Language (XPath). 
-     * This field is constant.
-     */
-    protected static XmlDsigXPathTransformUrl = "http://www.w3.org/TR/1999/REC-xpath-19991116";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for XSLT transformations. 
-     * This field is constant.
-     */
-    protected static XmlDsigXsltTransformUrl = "http://www.w3.org/TR/1999/REC-xslt-19991116";
-
-    /**
-     * Represents the Uniform Resource Identifier (URI) for the license transform algorithm 
-     * used to normalize XrML licenses for signatures.
-     */
-    protected static XmlLicenseTransformUrl = "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform";
-
-    // Internal properties
-
-    protected m_element: Node | null = null;
-
-    /**
-     * Represents the Signature object of the current SignedXml object
-     */
-    protected m_signature: Signature;
-    protected m_signature_algorithm: ISignatureAlgorithm | null = null;
-    protected envdoc: Document | null = null;
-
-    protected validationErrors: string[] = [];
-    protected key: CryptoKey | null = null;
-
-    private static whitespaceChars = [` `, `\r`, `\n`, `\t`];
-
-    /**
-     * Gets or sets the KeyInfo object of the current SignedXml object.
-     */
-    get KeyInfo(): KeyInfo {
-        return this.m_signature.KeyInfo;
+    public get XmlSignature() {
+        return this.signature;
     }
-    set KeyInfo(value: KeyInfo) {
-        this.m_signature.KeyInfo = value;
+
+    public Key?: CryptoKey;
+    public Algorithm?: Algorithm | RsaPssParams | EcdsaParams;
+    public get Signature() {
+        return this.XmlSignature.SignatureValue;
     }
 
     /**
-     * Gets the Signature object of the current SignedXml object.
+     * Creates an instance of SignedXml.
+     * 
+     * @param {(Document | Element)} [node]
+     * 
+     * @memberOf SignedXml
      */
-    get Signature() {
-        return this.m_signature;
-    }
-
-    /**
-     * Gets or sets the prefix for the current SignedXml object.
-     */
-    set Prefix(value: string) {
-        this.prefix = value;
-        this.SignedInfo.Prefix = this.prefix;
-    }
-    get Prefix() {
-        return this.prefix;
-    }
-
-    /**
-     * Gets the length of the signature for the current SignedXml object.
-     */
-    get SignatureLength(): number {
-        return this.m_signature.SignatureValue.length;
-    }
-
-    get SignatureMethod(): string {
-        if (!this.SignedInfo.SignatureMethod)
-            throw new XmlError(XE.NULL_PARAM, "SignedXml.Signature.SignedInfo", "SignatureMethod");
-        return this.SignedInfo.SignatureMethod;
-    }
-
-    /**
-     * Gets the signature value of the current SignedXml object.
-     */
-    get SignatureValue(): ArrayBuffer {
-        return this.m_signature.SignatureValue;
-    }
-
-    /**
-     * Gets the CanonicalizationMethod of the current SignedXml object.
-     */
-    get CanonicalizationMethod(): string {
-        if (!this.SignedInfo.CanonicalizationMethod)
-            throw new XmlError(XE.NULL_PARAM, "SignedXml", "CanonicalizationMethod");
-        return this.SignedInfo.CanonicalizationMethod;
-    }
-
-    /**
-     * Gets the SignedInfo object of the current SignedXml object.
-     */
-    get SignedInfo(): SignedInfo {
-        return this.Signature.SignedInfo;
-    }
-
-    /**
-     * Gets or sets the asymmetric algorithm key used for signing a SignedXml object.
-     */
-    get SigningKey() {
-        return this.key;
-    }
-    set SigningKey(value: CryptoKey | null) {
-        this.key = value;
-    }
-
-    /**
-     * Gets or sets the name of the installed key to be used for signing the SignedXml object.
-     */
-    get SigningKeyName(): string {
-        throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-    }
-    set SigningKeyName(value: string) {
-        throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-    }
-
-    /**
-     * @param {string} idMode. Value of "wssecurity" will create/validate id's with the ws-security namespace
-     */
-    constructor();
-    constructor(node: Document);
-    constructor(node: Element);
-    constructor(node?: any) {
-        super();
+    constructor(node?: Document | Element) {
         // constructor();
-        this.m_signature = new Signature();
-        // this.hashes = new Hashtable(2); // 98% SHA1 for now
-        if (node && (node as Node).nodeType === XmlNodeType.Document) {
+        if (node && (node as Node).nodeType === XmlCore.XmlNodeType.Document) {
             // constructor(node: Document);
-            this.envdoc = node;
+            this.document = node as Document;
         }
-        else if (node && (node as Node).nodeType === XmlNodeType.Element) {
+        else if (node && (node as Node).nodeType === XmlCore.XmlNodeType.Element) {
             // constructor(node: Element);
             let xmlText = new XMLSerializer().serializeToString(node);
-            this.envdoc = new DOMParser().parseFromString(xmlText, APPLICATION_XML);
+            this.document = new DOMParser().parseFromString(xmlText, XmlCore.APPLICATION_XML);
         }
     }
 
+    // Protected methods
     /**
-     * Returns the public key of a signature.
-     */
+    * Returns the public key of a signature.
+    */
     protected GetPublicKeys(): PromiseLike<CryptoKey[]> {
-        return new Promise((resolve, reject) => {
-            if (this.key !== null)
-                return resolve([this.key]);
+        let keys: CryptoKey[] = [];
+        return Promise.resolve()
+            .then(() => {
+                let pkEnumerator = this.XmlSignature.KeyInfo.GetIterator();
 
-            let pkEnumerator = this.KeyInfo.GetEnumerator();
-
-            let keys: CryptoKey[] = [];
-            let chain = Promise.resolve();
-            for (let kic of pkEnumerator) {
-                let alg = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
-                if (kic instanceof KeyInfoX509Data) {
-                    for (let cert of (kic as KeyInfoX509Data).Certificates) {
-                        chain = chain.then(() => {
-                            return cert.exportKey(alg.algorithm);
-                        })
-                            .then((key: CryptoKey) => {
-                                keys.push(key);
-                                return Promise.resolve(keys);
-                            });
+                let promises: PromiseLike<void>[] = [];
+                for (let kic of pkEnumerator) {
+                    let alg = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
+                    if (kic instanceof KeyInfos.KeyInfoX509Data) {
+                        for (let cert of (kic as KeyInfos.KeyInfoX509Data).Certificates) {
+                            promises.push(
+                                cert.exportKey(alg.algorithm)
+                                    .then(key => { keys.push(key); })
+                            );
+                        }
+                    }
+                    else {
+                        promises.push(
+                            kic.exportKey(alg.algorithm)
+                                .then(key => { keys.push(key); })
+                        );
                     }
                 }
-                else {
-                    chain = chain.then(() => {
-                        return kic.exportKey(alg.algorithm);
-                    })
-                        .then((key: CryptoKey) => {
-                            keys.push(key);
-                            return Promise.resolve(keys);
-                        });
-                }
-            }
-            chain.then(resolve as any, reject);
-        });
+                return Promise.all(promises);
+            })
+            .then(() => keys);
     }
 
-
-    /**
-     * Adds a Reference object to the SignedXml object that describes a digest method, 
-     * digest value, and transform to use for creating an XML digital signature.
-     * @param  {Reference} reference The Reference object that describes a digest method, digest value, 
-     * and transform to use for creating an XML digital signature.
-     * @returns void
-     */
-    AddReference(reference: Reference): void {
-        if (reference == null)
-            throw new XmlError(XE.PARAM_REQUIRED, "reference");
-        this.SignedInfo.AddReference(reference);
-    }
-
-    private DigestReferences() {
-        return new Promise((resolve, reject) => {
-            let promise = Promise.resolve();
-            // we must tell each reference which hash algorithm to use 
-            // before asking for the SignedInfo XML !
-            for (let r of this.SignedInfo.References) {
-                // assume SHA-1 if nothing is specified
-                if (r.DigestMethod == null)
-                    r.DigestMethod = new Sha1().xmlNamespace;
-                promise = promise.then(() => {
-                    return this.GetReferenceHash(r, false);
-                })
-                    .then((hashValue: ArrayBuffer) => {
-                        r.DigestValue = hashValue;
-                        return Promise.resolve();
-                    });
-            }
-            promise.then(resolve as any, reject);
-        });
-    }
-
-    private FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
+    protected FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
         // add namespace nodes
-        let namespaces = SelectNamespaces(src);
+        let namespaces = XmlCore.SelectNamespaces(src);
         for (let i in namespaces) {
             let uri = namespaces[i];
             dst.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
         }
     }
 
-    protected findById(element: Element, id: string): Element | null {
-        if (element.nodeType !== XmlNodeType.Element)
-            return null;
-        if (element.hasAttribute("Id") && element.getAttribute("Id") === id)
-            return element;
-        if (element.childNodes && element.childNodes.length)
-            for (let i = 0; i < element.childNodes.length; i++) {
-                let el = this.findById(element.childNodes[i] as Element, id);
-                if (el)
-                    return el;
-            }
-        return null;
-    }
+    protected DigestReference(doc: Element, reference: Reference, check_hmac: boolean) {
+        return Promise.resolve()
+            .then(() => {
+                let canonOutput: any = null;
 
-    private GetReferenceHash(reference: Reference, check_hmac: boolean) {
-        return new Promise((resolve, reject) => {
-            let doc: Node | null = null;
-            let canonOutput: any = null;
-            if (!reference.Uri) { // Empty
-                doc = this.envdoc;
-            }
-            else {
-                doc = this.CreateDocument();
-                let objectName: string | null = null;
-
-                if (reference.Uri.indexOf("#xpointer") === 0) {
-                    let uri: string = reference.Uri;
-                    SignedXml.whitespaceChars.forEach((c) => {
-                        uri = uri.substring(9).split(c).join("");
-                    });
-                    if (uri.length < 2 || uri[0] !== `(` || uri[uri.length - 1] !== `)`)
-                        // FIXME: how to handle invalid xpointer?
-                        uri = ""; // String.Empty
-                    else
-                        uri = uri.substring(1, uri.length - 2);
-                    if (uri === "/")
-                        doc = this.envdoc;
-                    else if (uri.length > 6 && uri.indexOf(`id(`) === 0 && uri[uri.length - 1] === `)`)
-                        // id('foo'), id("foo")
-                        objectName = uri.substring(4, uri.length - 6);
-                }
-                else if (reference.Uri[0] === `#`) {
-                    objectName = reference.Uri.substring(1);
-                }
-                if (objectName) {
-                    let found: Element | null = null;
-                    if (this.m_signature) {
-                        for (let i in this.m_signature.ObjectList) {
-                            let obj = this.m_signature.ObjectList[i];
-                            found = this.findById((obj as any).element, objectName);
+                if (reference.Uri) {
+                    let objectName: string | undefined;
+                    if (!reference.Uri.indexOf("#xpointer")) {
+                        let uri: string = reference.Uri;
+                        uri = uri.substring(9).replace(/[\r\n\t\s]/g, "");
+                        if (uri.length < 2 || uri[0] !== `(` || uri[uri.length - 1] !== `)`)
+                            // FIXME: how to handle invalid xpointer?
+                            uri = ""; // String.Empty
+                        else
+                            uri = uri.substring(1, uri.length - 1);
+                        if (uri.length > 6 && uri.indexOf(`id(`) === 0 && uri[uri.length - 1] === `)`)
+                            // id('foo'), id("foo")
+                            objectName = uri.substring(4, uri.length - 2);
+                    }
+                    else if (reference.Uri[0] === `#`) {
+                        objectName = reference.Uri.substring(1);
+                    }
+                    if (objectName) {
+                        let found: Element | null = null;
+                        this.XmlSignature.ObjectList && this.XmlSignature.ObjectList.Some(obj => {
+                            found = findById(obj.Element!, objectName!);
                             if (found) {
-                                doc = (doc as Document).importNode(found, true);
+                                doc = found.cloneNode(true) as Element;
                                 // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
                                 for (let j = 0; j < found.childNodes.length; j++) {
                                     let n = found.childNodes[j];
                                     // Do not copy default namespace as it must be xmldsig namespace for "Object" element.
-                                    if (n.nodeType === XmlNodeType.Element)
+                                    if (n.nodeType === XmlCore.XmlNodeType.Element)
                                         this.FixupNamespaceNodes(n as Element, doc as Element, true);
                                 }
-                                break;
+                                return true;
+                            }
+                            return false;
+                        });
+                        if (!found && doc) {
+                            found = XmlCore.XmlObject.GetElementById(doc, objectName);
+                            if (found) {
+                                doc = found;
+                                this.FixupNamespaceNodes(found, doc, false);
                             }
                         }
+                        if (found == null)
+                            throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, `Malformed reference object: ${objectName}`);
                     }
-                    if (!found && this.envdoc) {
-                        found = this.GetElementById(this.envdoc, objectName);
-                        if (found != null) {
-                            doc = (doc as Document).importNode(found, true);
-                            this.FixupNamespaceNodes(found, doc as Element, false);
-                        }
+                }
+
+                if (reference.Transforms && reference.Transforms.Count) {
+                    // Sort transforms. Enveloped should be first transform
+                    reference.Transforms.Sort((a, b) => {
+                        if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
+                            return 1;
+                        return 0;
+                    }).ForEach(transform => {
+                        // Apply transforms
+                        if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform)
+                            transform = new Transforms.XmlDsigC14NTransform(); // TODO: Check RFC for it
+                        if (transform instanceof Transforms.XmlDsigExcC14NWithCommentsTransform)
+                            transform = new Transforms.XmlDsigExcC14NTransform(); // TODO: Check RFC for it
+                        transform.LoadInnerXml(doc);
+                        canonOutput = transform.GetOutput();
+                    });
+                    // Apply C14N transform if Reference has only one transform EnvelopdeSignature
+                    if (reference.Transforms.Count === 1 && reference.Transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+                        let c14n = new Transforms.XmlDsigC14NTransform();
+                        c14n.LoadInnerXml(doc);
+                        canonOutput = c14n.GetOutput();
                     }
-                    if (found == null)
-                        throw new XmlError(XE.CRYPTOGRAPHIC, `Malformed reference object: ${objectName}`);
-                }
-            }
-
-            // Create clone to save sorce element from transformations
-            doc = (doc as Document).cloneNode(true);
-
-            if (reference.TransformChain.Count > 0) {
-                // Sort transforms. Enveloped should be first transform
-                reference.TransformChain.Sort((a, b) => {
-                    if (b instanceof XmlDsigEnvelopedSignatureTransform)
-                        return 1;
-                    return 0;
-                });
-                for (let transform of reference.TransformChain.GetIterator()) {
-                    if (transform instanceof XmlDsigC14NWithCommentsTransform)
-                        transform = new XmlDsigC14NTransform(); // TODO: Check RFC for it
-                    if (transform instanceof XmlDsigExcC14NWithCommentsTransform)
-                        transform = new XmlDsigExcC14NTransform(); // TODO: Check RFC for it
-                    transform.LoadInnerXml(doc);
-                    canonOutput = transform.GetOutput();
-                }
-                // Apply C14N transform if Reference has only one transform EnvelopdeSignature
-                if (reference.TransformChain.Count === 1 && reference.TransformChain.Item(0) instanceof XmlDsigEnvelopedSignatureTransform) {
-                    let c14n = new XmlDsigC14NTransform();
-                    c14n.LoadInnerXml(doc);
-                    canonOutput = c14n.GetOutput();
-                }
-            }
-            else if (canonOutput == null) {
-                // we must not C14N references from outside the document
-                // e.g. non-xml documents
-                if (reference.Uri && reference.Uri[0] !== `#`) {
-                    canonOutput = new XMLSerializer().serializeToString(doc);
                 }
                 else {
-                    // apply default C14N transformation
-                    let excC14N = new XmlDsigC14NTransform();
-                    excC14N.LoadInnerXml(doc);
-                    canonOutput = excC14N.GetOutput();
+                    // we must not C14N references from outside the document
+                    // e.g. non-xml documents
+                    if (reference.Uri && reference.Uri[0] !== `#`) {
+                        canonOutput = new XMLSerializer().serializeToString(doc);
+                    }
+                    else {
+                        // apply default C14N transformation
+                        let excC14N = new Transforms.XmlDsigC14NTransform();
+                        excC14N.LoadInnerXml(doc);
+                        canonOutput = excC14N.GetOutput();
+                    }
                 }
-            }
-            if (!reference.DigestMethod) {
-                throw new XmlError(XE.NULL_PARAM, "Reference", "DigestMethod");
-            }
-            let digest = CryptoConfig.CreateHashAlgorithm(reference.DigestMethod);
-            digest.getHash(canonOutput)
-                .then(resolve, reject);
-        });
+                if (!reference.DigestMethod.Algorithm) {
+                    throw new XmlCore.XmlError(XmlCore.XE.NULL_PARAM, "Reference", "DigestMethod");
+                }
+                let digest = CryptoConfig.CreateHashAlgorithm(reference.DigestMethod.Algorithm);
+                return digest.Digest(canonOutput);
+            });
     }
 
-    private GetC14NMethod(): Transform {
-        return CryptoConfig.CreateFromName(this.CanonicalizationMethod);
+    protected DigestReferences(data: Element) {
+        return Promise.resolve()
+            .then(() => {
+                // we must tell each reference which hash algorithm to use 
+                // before asking for the SignedInfo XML !
+                let promises = this.XmlSignature.SignedInfo.References.Map(ref => {
+                    // assume SHA-256 if nothing is specified
+                    if (!ref.DigestMethod.Algorithm)
+                        ref.DigestMethod.Algorithm = new Alg.Sha256().namespaceURI;
+                    return this.DigestReference(data, ref, false)
+                        .then(hashValue => {
+                            ref.DigestValue = hashValue;
+                        });
+                }).GetIterator();
+
+                return Promise.all(promises);
+            });
     }
 
-    private SignedInfoTransformed(): string {
-        let t = this.GetC14NMethod();
+    protected TrunsformSignedInfo(): string {
+        let t = CryptoConfig.CreateFromName(this.XmlSignature.SignedInfo.CanonicalizationMethod.Algorithm);
 
-        let xml = new XMLSerializer().serializeToString(this.SignedInfo.GetXml());
-        let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
-        if (this.envdoc) {
-            let namespaces = SelectNamespaces(this.envdoc.documentElement);
+        const xml = this.XmlSignature.SignedInfo.GetXml();
+        if (!xml)
+            throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot get Xml element from SignedInfo");
+        let node = xml.cloneNode(true) as Element;
+        if (this.document) {
+            let namespaces = XmlCore.SelectNamespaces(this.document.documentElement);
             for (let i in namespaces) {
                 let uri = namespaces[i];
-                if (i === doc.documentElement.prefix)
+                if (i === node.prefix)
                     continue;
-                doc.documentElement.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
+                node.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
             }
         }
-        t.LoadInnerXml(doc);
+        t.LoadInnerXml(node);
         return t.GetOutput();
     }
 
-    /**
-     * Computes an XML digital signature using the specified algorithm.
-     * @param  {Algorithm} algorithm Specified WebCrypto Algoriithm
-     * @returns Promise
-     */
-    public ComputeSignature(algorithm: Algorithm) {
-        return new Promise((resolve, reject) => {
-            if (this.key) {
-                let alg = GetSignatureAlgorithm(this.key.algorithm ? this.key.algorithm as Algorithm : algorithm);
-                if (this.SignedInfo.SignatureMethod == null)
-                    // required before hashing
-                    this.SignedInfo.SignatureMethod = alg.xmlNamespace;
-                else if (this.SignedInfo.SignatureMethod !== alg.xmlNamespace)
-                    throw new XmlError(XE.CRYPTOGRAPHIC, "Specified SignatureAlgorithm is not supported by the signing key.");
-                if (this.key.algorithm.name!.toUpperCase() === RSA_PSS) {
-                    let pss = this.SignedInfo.SignatureParams = new PssAlgorithmParams();
-                    pss.SaltLength = (algorithm as any).saltLength;
-                    switch ((this.key.algorithm as any).hash.name.toUpperCase()) {
-                        case SHA1:
-                            pss.DigestMethod = SHA1_NAMESPACE;
-                            break;
-                        case SHA224:
-                            pss.DigestMethod = SHA224_NAMESPACE;
-                            break;
-                        case SHA256:
-                            pss.DigestMethod = SHA256_NAMESPACE;
-                            break;
-                        case SHA384:
-                            pss.DigestMethod = SHA384_NAMESPACE;
-                            break;
-                        case SHA512:
-                            pss.DigestMethod = SHA512_NAMESPACE;
-                            break;
+    protected ApplySignOptions(signature: Signature, key: CryptoKey, options: OptionsSign): PromiseLike<void> {
+        return Promise.resolve()
+            .then(() => {
+                // keyValue
+                if (options.keyValue && key.algorithm.name!.toUpperCase() !== Alg.HMAC) {
+                    if (!signature.KeyInfo)
+                        signature.KeyInfo = new KeyInfo();
+                    const keyInfo = signature.KeyInfo;
+                    const keyValue = new KeyValue();
+                    keyInfo.Add(keyValue);
+                    return keyValue.importKey(options.keyValue) as PromiseLike<any>;
+                }
+                else
+                    return Promise.resolve();
+            })
+            .then(() => {
+                // x509
+                if (options.x509) {
+                    if (!signature.KeyInfo)
+                        signature.KeyInfo = new KeyInfo();
+                    const keyInfo = signature.KeyInfo;
+                    for (let x509 of options.x509) {
+                        const raw = XmlCore.Convert.FromBase64(x509);
+                        const x509Data = new KeyInfoX509Data(raw);
+                        keyInfo.Add(x509Data);
                     }
                 }
-                this.DigestReferences()
-                    .then(() => {
-                        // let si = this.getCanonXml([this.SignedInfo.CanonicalizationMethodObject], this.SignedInfo.getXml());
-                        let si = this.SignedInfoTransformed();
-                        if (!this.SigningKey)
-                            throw new XmlError(XE.NULL_PARAM, "SignedXml", "SigningKey");
-                        alg.getSignature(si, this.SigningKey, algorithm)
-                            .then((signature: Uint8Array) => {
-                                this.m_signature.SignatureValue = signature;
-                                return Promise.resolve(signature);
-                            })
-                            .then(resolve, reject);
-                    })
-                    .catch(reject);
-            }
-            else
-                throw new XmlError(XE.CRYPTOGRAPHIC, "signing key is not specified");
-        });
+                return Promise.resolve();
+            })
+            .then(() => {
+                // references
+                if (options.references) {
+                    options.references.forEach(item => {
+                        const reference = new Reference();
+                        // Id
+                        if (item.id)
+                            reference.Id = item.id;
+                        // Uri
+                        if (item.uri)
+                            reference.Uri = item.uri;
+                        // DigestMethod
+                        let _alg: Algorithm = typeof item.hash === "string" ? { name: item.hash } : item.hash;
+                        const digestAlgorithm = CryptoConfig.GetHashAlgorithm(_alg);
+                        reference.DigestMethod.Algorithm = digestAlgorithm.namespaceURI;
+                        // transforms
+                        if (item.transforms && item.transforms.length) {
+                            let transforms = new XmlTransforms();
+                            item.transforms.forEach(transform => {
+                                switch (transform) {
+                                    case "enveloped":
+                                        transforms.Add(new Transforms.XmlDsigEnvelopedSignatureTransform());
+                                        break;
+                                    case "c14n":
+                                        transforms.Add(new Transforms.XmlDsigC14NTransform);
+                                        break;
+                                    case "c14n-com":
+                                        transforms.Add(new Transforms.XmlDsigC14NWithCommentsTransform);
+                                        break;
+                                    case "exc-c14n":
+                                        transforms.Add(new Transforms.XmlDsigExcC14NTransform);
+                                        break;
+                                    case "exc-c14n-com":
+                                        transforms.Add(new Transforms.XmlDsigExcC14NWithCommentsTransform);
+                                        break;
+                                    case "base64":
+                                        transforms.Add(new Transforms.XmlDsigBase64Transform);
+                                        break;
+                                    default:
+                                        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
+                                }
+                            });
+                            reference.Transforms = transforms;
+                        }
+                        if (!signature.SignedInfo.References)
+                            signature.SignedInfo.References = new References();
+                        signature.SignedInfo.References.Add(reference);
+                    });
+                }
+                return Promise.resolve();
+            });
     }
 
-    /**
-     * Determines whether the SignedXml.Signature property verifies using the public key in the signature. 
-     * @returns Promise
-     */
-    CheckSignature(): PromiseLike<boolean>;
-    CheckSignature(key: CryptoKey): PromiseLike<boolean>;
-    CheckSignature(cert: X509Certificate): PromiseLike<boolean>;
-    CheckSignature(param?: any): PromiseLike<boolean> {
-        return new Promise((resolve, reject) => {
-            this.validationErrors = [];
+    Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsSign): PromiseLike<Signature> {
+        let alg: ISignatureAlgorithm;
+        let signedInfo: SignedInfo;
+        return Promise.resolve()
+            .then(() => {
+                let signingAlg = assign({}, key.algorithm, algorithm);
+                alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);
+                if (options)
+                    return this.ApplySignOptions(this.XmlSignature, key, options);
+                else
+                    return Promise.resolve();
+            })
+            .then(() => {
+                signedInfo = this.XmlSignature.SignedInfo;
+                // Set default values
+                if (!signedInfo.References.Count) {
+                    // Add default Reference
+                    const reference = new Reference();
+                    signedInfo.References.Add(reference);
+                }
 
-            let xml = this.envdoc;
-            if (!xml)
-                throw new XmlError(XE.NULL_PARAM, "SignedXml", "envdoc");
-
-            this.ValidateReferences(xml)
-                .then(() => {
-                    if (param) {
-                        let signer = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
-                        if (!signer) {
-                            reject(new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.SignedInfo.SignatureMethod));
-                            return false;
-                        }
-                        let promise = Promise.resolve();
-                        let key: CryptoKey = param;
-                        if (param instanceof X509Certificate) {
-                            // certificate
-                            let cert = param as X509Certificate;
-                            promise = promise
-                                .then(() => {
-                                    return cert.exportKey(signer.algorithm);
-                                })
-                                .then((ckey: CryptoKey) => {
-                                    key = ckey;
-                                    return Promise.resolve();
-                                });
-                        }
-                        let signedInfoCanon: string;
-                        return promise.then(() => {
-                            signedInfoCanon = this.SignedInfoTransformed();
-                            let alg: any = null;
-                            if (this.SignedInfo.SignatureParams && this.SignatureMethod === RSA_PSS_WITH_PARAMS_SHA1_MGF1_NAMESPACE) {
-                                let sp = this.SignedInfo.SignatureParams as PssAlgorithmParams;
-                                alg = { name: RSA_PSS };
-                                if (sp.SaltLength)
-                                    alg.saltLength = sp.SaltLength;
-                            }
-                            return signer.verifySignature(signedInfoCanon, key, Convert.ToString(this.SignatureValue, "binary"), alg);
-                        });
+                return this.DigestReferences(data.documentElement);
+            })
+            .then(() => {
+                // Add signature method
+                signedInfo.SignatureMethod.Algorithm = alg.namespaceURI;
+                if (Alg.RSA_PSS.toUpperCase() === algorithm.name.toUpperCase()) {
+                    // Add RSA-PSS params
+                    let _alg = assign({}, key.algorithm, algorithm);
+                    if (typeof _alg.hash === "string")
+                        _alg.hash = { name: _alg.hash };
+                    const params = new KeyInfos.PssAlgorithmParams(_alg);
+                    this.XmlSignature.SignedInfo.SignatureMethod.Any.Add(params);
+                }
+                else if (Alg.HMAC.toUpperCase() === algorithm.name.toUpperCase()) {
+                    // Add HMAC params
+                    let outputLength = 0;
+                    let hmacAlg = key.algorithm as any;
+                    switch (hmacAlg.hash.name.toUpperCase()) {
+                        case Alg.SHA1:
+                            outputLength = hmacAlg.length || 160;
+                            break;
+                        case Alg.SHA256:
+                            outputLength = hmacAlg.length || 256;
+                            break;
+                        case Alg.SHA384:
+                            outputLength = hmacAlg.length || 384;
+                            break;
+                        case Alg.SHA512:
+                            outputLength = hmacAlg.length || 512;
+                            break;
                     }
-                    else
-                        return this.validateSignatureValue();
-                })
-                .then(resolve, reject);
-        });
+                    this.XmlSignature.SignedInfo.SignatureMethod.HMACOutputLength = outputLength;
+                }
+                let si = this.TrunsformSignedInfo();
+                return alg.Sign(si, key, algorithm);
+            })
+            .then((signature: Uint8Array) => {
+                this.Key = key;
+                this.XmlSignature.SignatureValue = signature;
+                this.document = data;
+                return this.XmlSignature;
+            });
     }
 
-    protected validateSignatureValue(): PromiseLike<boolean> {
+    protected ValidateReferences(doc: Element): PromiseLike<boolean> {
+        return Promise.resolve()
+            .then(() => {
+                return Promise.all(
+                    this.XmlSignature.SignedInfo.References.Map(ref => {
+                        return this.DigestReference(doc, ref, false)
+                            .then(digest => {
+                                let b64Digest = XmlCore.Convert.ToBase64(digest);
+                                let b64DigestValue = XmlCore.Convert.ToString(ref.DigestValue, "base64");
+                                if (b64Digest !== b64DigestValue) {
+                                    let err_text = `Invalid digest for uri '${ref.Uri}'. Calculated digest is ${b64Digest} but the xml to validate supplies digest ${b64DigestValue}`;
+                                    throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, err_text);
+                                }
+                                return Promise.resolve(true);
+                            });
+                    }).GetIterator()
+                );
+            })
+            .then(() => true);
+    }
+
+    protected ValidateSignatureValue(keys: CryptoKey[]): PromiseLike<boolean> {
         let signer: ISignatureAlgorithm;
         let signedInfoCanon: string;
-        return new Promise((resolve, reject) => {
-            signedInfoCanon = this.SignedInfoTransformed();
-            signer = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
-            this.GetPublicKeys()
+        return Promise.resolve()
+            .then(() => {
+                signedInfoCanon = this.TrunsformSignedInfo();
+                signer = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
                 // Verify signature for all exported keys
-                .then((keys: CryptoKey[]) => {
-                    return new Promise((resolve, reject) => {
-                        let chain = Promise.resolve(false);
-                        let signatureValue = Convert.ToString(this.SignatureValue, "binary");
-                        for (let key of keys) {
-                            chain = chain.then((v: boolean) => {
-                                if (!v) {
-                                    return signer.verifySignature(signedInfoCanon, key, signatureValue);
-                                }
-                                return Promise.resolve(v);
-                            });
+
+                let chain = Promise.resolve(false);
+                keys.forEach(key => {
+                    chain = chain.then((v: boolean) => {
+                        if (!v) {
+                            return signer.Verify(signedInfoCanon, key, this.Signature!);
                         }
-                        chain.then(resolve, reject);
+                        return Promise.resolve(v);
                     });
-                })
-                .then(resolve, reject);
-        });
+                });
+                return chain;
+            });
     }
 
-    protected findCanonicalizationAlgorithm(name: string): Transform {
-        let algo = (<any>SignedXml).CanonicalizationAlgorithms[name];
-        if (algo)
-            return new algo();
-        else throw new Error(`canonicalization algorithm '${name}' is not supported`);
-    }
+    Verify(key?: CryptoKey): PromiseLike<boolean> {
+        return Promise.resolve()
+            .then(() => {
+                let xml = this.document;
+                if (!(xml && xml.documentElement))
+                    throw new XmlCore.XmlError(XmlCore.XE.NULL_PARAM, "SignedXml", "document");
 
-    protected ValidateReferences(doc: Node): PromiseLike<boolean> {
-        return new Promise((resolve, reject) => {
-            let refs = this.SignedInfo.References;
-            let promise = Promise.resolve(true);
-            for (let ref of refs) {
-
-                promise = promise.then(() => {
-                    return this.GetReferenceHash(ref, false);
-                })
-                    .then((digest: Uint8Array) => {
-                        let b64Digest = Convert.ToBase64(digest);
-                        let b64DigestValue = Convert.ToString(ref.DigestValue, "base64");
-                        if (b64Digest !== b64DigestValue) {
-                            let err_text = `Invalid digest for uri '${ref.Uri}'. Calculated digest is ${b64Digest} but the xml to validate supplies digest ${b64DigestValue}`;
-                            this.validationErrors.push(err_text);
-                            throw new XmlError(XE.CRYPTOGRAPHIC, err_text);
-                        }
-                        return Promise.resolve(true);
+                return this.ValidateReferences(xml.documentElement);
+            })
+            .then(res => {
+                if (res) {
+                    let promise = Promise.resolve([]);
+                    if (key) {
+                        promise = promise.then(() =>
+                            [key]
+                        );
+                    }
+                    else {
+                        promise = promise.then(() =>
+                            this.GetPublicKeys()
+                        );
+                    }
+                    return promise.then((keys: CryptoKey[]) => {
+                        return this.ValidateSignatureValue(keys);
                     });
-
-            }
-            promise.then(resolve, reject);
-        });
+                }
+                else
+                    return false;
+            });
     }
 
-    protected getCanonXml(transforms: Transform[], node: Node): string {
-        let res = "";
-        let canonXml = node;
+    GetXml() {
+        return this.signature.GetXml();
+    }
 
-        for (let transform of transforms) {
-            if (res)
-                canonXml = new DOMParser().parseFromString(res, APPLICATION_XML);
+    LoadXml(element: Element) {
+        let signature = new Signature();
+        signature.LoadXml(element);
+        this.signature = signature;
+    }
 
-            transform.LoadInnerXml(canonXml);
-            res = transform.GetOutput();
+    toString() {
+        // Check for EnvelopedTransform
+        const signature = this.XmlSignature;
+        let enveloped = false;
+        if (signature.SignedInfo.References)
+            signature.SignedInfo.References.Some(ref => {
+                if (ref.Transforms)
+                    ref.Transforms.Some(transform => {
+                        if (transform instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
+                            enveloped = true;
+                        return enveloped;
+                    });
+                return enveloped;
+            });
+
+        if (enveloped) {
+            let doc = this.document!.documentElement.cloneNode(true);
+            let node = this.XmlSignature.GetXml();
+            if (!node)
+                throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot get Xml element from Signature");
+            let sig = node.cloneNode(true);
+            doc.appendChild(sig);
+            return new XMLSerializer().serializeToString(doc);
         }
-        if (!res)
-            res = new XMLSerializer().serializeToString(canonXml);
-        return res;
-    }
-
-    /**
-     * Loads a SignedXml state from an XML element.
-     * @param  {Element} value The XML element to load the SignedXml state from.
-     * @returns void
-     */
-    public LoadXml(value: Element): void {
-        if (value == null)
-            throw new XmlError(XE.PARAM_REQUIRED, "value");
-
-        this.m_element = value;
-        this.m_signature.LoadXml(value);
-        // Need to give the EncryptedXml object to the 
-        // XmlDecryptionTransform to give it a fighting 
-        // chance at decrypting the document.
-        // for (let r of this.SignedInfo.References) {
-        //     for (let t of r.TransformChain) {
-        //         if (t instanceof XmlDecryptionTransform)
-        //             (<XmlDecryptionTransform>t).EncryptedXml = this.EncryptedXml;
-        //     }
-        // }
-    }
-
-    /**
-     * Returns the XML representation of a SignedXml object.
-     * @returns Element
-     */
-    public GetXml(): Element {
-        this.m_signature.Prefix = this.Prefix;
-        if (this.m_element)
-            return this.m_element as Element;
-        else
-            return this.m_signature.GetXml();
+        return this.XmlSignature.toString();
     }
 
 }
 
-function GetSignatureAlgorithm(algorithm: Algorithm): ISignatureAlgorithm {
-    if (algorithm.name.toUpperCase() === RSA_PKCS1.toUpperCase()) {
-        let hashName: string = (algorithm as any).hash.name;
-        let alg: ISignatureAlgorithm;
-        switch (hashName.toUpperCase()) {
-            case SHA1:
-                alg = new RsaPkcs1Sha1();
-                break;
-            case SHA224:
-                alg = new RsaPkcs1Sha224();
-                break;
-            case SHA256:
-                alg = new RsaPkcs1Sha256();
-                break;
-            case SHA384:
-                alg = new RsaPkcs1Sha384();
-                break;
-            case SHA512:
-                alg = new RsaPkcs1Sha512();
-                break;
-            default:
-                throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+function findById(element: Element, id: string): Element | null {
+    if (element.nodeType !== XmlCore.XmlNodeType.Element)
+        return null;
+    if (element.hasAttribute("Id") && element.getAttribute("Id") === id)
+        return element;
+    if (element.childNodes && element.childNodes.length)
+        for (let i = 0; i < element.childNodes.length; i++) {
+            let el = findById(element.childNodes[i] as Element, id);
+            if (el)
+                return el;
         }
-        return alg;
-    }
-    else if (algorithm.name.toUpperCase() === RSA_PSS.toUpperCase()) {
-        let hashName: string = (algorithm as any).hash.name;
-        let alg: ISignatureAlgorithm;
-        switch (hashName.toUpperCase()) {
-            case SHA1:
-                alg = new RsaPssSha1();
-                break;
-            case SHA224:
-                alg = new RsaPssSha224();
-                break;
-            case SHA256:
-                alg = new RsaPssSha256();
-                break;
-            case SHA384:
-                alg = new RsaPssSha384();
-                break;
-            case SHA512:
-                alg = new RsaPssSha512();
-                break;
-            default:
-                throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+    return null;
+}
+
+function assign(target: any, ...sources: any[]) {
+    let res = arguments[0];
+    for (let i = 1; i < arguments.length; i++) {
+        let obj = arguments[i];
+        for (let prop in obj) {
+            res[prop] = obj[prop];
         }
-        return alg;
     }
-    else if (algorithm.name.toUpperCase() === "ECDSA") {
-        let hashName: string = (algorithm as any).hash.name;
-        let alg: ISignatureAlgorithm;
-        switch (hashName.toUpperCase()) {
-            case SHA1:
-                alg = new EcdsaSha1();
-                break;
-            case SHA224:
-                alg = new EcdsaSha224();
-                break;
-            case SHA256:
-                alg = new EcdsaSha256();
-                break;
-            case SHA384:
-                alg = new EcdsaSha384();
-                break;
-            case SHA512:
-                alg = new EcdsaSha512();
-                break;
-            default:
-                throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
-        }
-        return alg;
-    }
-    else if (algorithm.name.toUpperCase() === HMAC_ALGORITHM) {
-        let hashName: string = (algorithm as any).hash.name;
-        let alg: ISignatureAlgorithm;
-        switch (hashName.toUpperCase()) {
-            case SHA1:
-                alg = new HmacSha1();
-                break;
-            case SHA224:
-                alg = new HmacSha224();
-                break;
-            case SHA256:
-                alg = new HmacSha256();
-                break;
-            case SHA384:
-                alg = new HmacSha384();
-                break;
-            case SHA512:
-                alg = new HmacSha512();
-                break;
-            default:
-                throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
-        }
-        return alg;
-    }
-    else {
-        throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, algorithm.name);
-    }
+    return res;
 }

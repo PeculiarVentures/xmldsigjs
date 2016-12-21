@@ -1,16 +1,16 @@
-import { Convert } from "xmljs";
+import { Convert } from "xml-core";
 import { Application } from "./application";
 
 export type BASE64 = string;
 
 export interface IAlgorithm {
     algorithm: Algorithm;
-    xmlNamespace: string;
+    namespaceURI: string;
     getAlgorithmName(): string;
 }
 
 export interface IHashAlgorithm extends IAlgorithm {
-    getHash(xml: string): PromiseLike<ArrayBuffer>;
+    Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array>;
 }
 
 export interface IHashAlgorithmConstructable {
@@ -19,36 +19,42 @@ export interface IHashAlgorithmConstructable {
 
 export abstract class XmlAlgorithm implements IAlgorithm {
     algorithm: Algorithm;
-    xmlNamespace: string;
+    namespaceURI: string;
     getAlgorithmName(): string {
-        return this.xmlNamespace;
+        return this.namespaceURI;
     }
 }
 
 export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
-    getHash(xml: Uint8Array | string | Node) {
-        // console.log("HashedInfo:", xml);
-        let buf: ArrayBufferView;
-        if (typeof xml === "string") {
-            // C14N transforms
-            buf = Convert.FromString(xml, "utf8");
-        }
-        else if (xml instanceof Uint8Array) {
-            // base64 transform
-            buf = xml;
-        }
-        else {
-            // enveloped signature transform
-            let txt = new XMLSerializer().serializeToString(xml);
-            buf = Convert.FromString(txt, "utf8");
-        }
-        return Application.crypto.subtle.digest(this.algorithm, buf);
+    Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array> {
+        return Promise.resolve()
+            .then(() => {
+                // console.log("HashedInfo:", xml);
+                let buf: ArrayBufferView;
+                if (typeof xml === "string") {
+                    // C14N transforms
+                    buf = Convert.FromString(xml, "utf8");
+                }
+                else if (xml instanceof Uint8Array) {
+                    // base64 transform
+                    buf = xml;
+                }
+                else {
+                    // enveloped signature transform
+                    let txt = new XMLSerializer().serializeToString(xml);
+                    buf = Convert.FromString(txt, "utf8");
+                }
+                return Application.crypto.subtle.digest(this.algorithm, buf);
+            })
+            .then((hash) => {
+                return new Uint8Array(hash);
+            });
     }
 }
 
 export interface ISignatureAlgorithm extends IAlgorithm {
-    getSignature(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): PromiseLike<ArrayBuffer>;
-    verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string, algorithm?: Algorithm): PromiseLike<boolean>;
+    Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): PromiseLike<ArrayBuffer>;
+    Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, algorithm?: Algorithm): PromiseLike<boolean>;
 }
 
 export interface ISignatureAlgorithmConstructable {
@@ -59,18 +65,16 @@ export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignat
     /**
      * Sign the given string using the given key
      */
-    getSignature(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm) {
-        return Application.crypto.subtle.sign(algorithm as any, signingKey, Convert.FromString(signedInfo, "binary"));
+    Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm) {
+        let _signedInfo = Convert.FromString(signedInfo, "utf8");
+        return Application.crypto.subtle.sign(algorithm as any, signingKey, _signedInfo);
     }
 
     /**
     * Verify the given signature of the given string using key
     */
-    verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string, algorithm?: Algorithm) {
-        let _signatureValue = Convert.FromString(signatureValue, "binary");
-        // console.log("SignatureValue:", Convert.ToBase64String(Convert.FromBufferString(_signatureValue)));
+    Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, algorithm?: Algorithm) {
         let _signedInfo = Convert.FromString(signedInfo, "utf8");
-        // console.log("SignedInfo:", Convert.FromBufferString(_signedInfo));
-        return Application.crypto.subtle.verify((algorithm || this.algorithm) as any, key, _signatureValue, _signedInfo);
+        return Application.crypto.subtle.verify((algorithm || this.algorithm) as any, key, signatureValue, _signedInfo);
     }
 }

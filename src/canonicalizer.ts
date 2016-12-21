@@ -1,4 +1,4 @@
-import { XmlNodeType, XmlError, XE, NamespaceManager } from "xmljs";
+import * as XmlCore from "xml-core";
 
 export enum XmlCanonicalizerState {
     BeforeDocElement,
@@ -10,14 +10,14 @@ export class XmlCanonicalizer {
 
     protected withComments: boolean;
     protected exclusive: boolean;
-    protected propagatedNamespaces = new NamespaceManager();
+    protected propagatedNamespaces = new XmlCore.NamespaceManager();
     protected document: Document;
     protected result: string[] = [];
-    protected visibleNamespaces = new NamespaceManager();
+    protected visibleNamespaces = new XmlCore.NamespaceManager();
     protected inclusiveNamespacesPrefixList: string[] = [];
     protected state = XmlCanonicalizerState.BeforeDocElement;
 
-    constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: NamespaceManager = new NamespaceManager()) {
+    constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: XmlCore.NamespaceManager = new XmlCore.NamespaceManager()) {
         this.withComments = withComments;
         this.exclusive = excC14N;
         this.propagatedNamespaces = propagatedNamespaces;
@@ -33,9 +33,9 @@ export class XmlCanonicalizer {
 
     public Canonicalize(node: Node): string {
         if (!node)
-            throw new XmlError(XE.CRYPTOGRAPHIC, "Parameter 1 is not Node");
+            throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Parameter 1 is not Node");
         let _node: Node;
-        if (node.nodeType === XmlNodeType.Document) {
+        if (node.nodeType === XmlCore.XmlNodeType.Document) {
             this.document = node as Document;
             _node = this.document.documentElement;
         }
@@ -54,43 +54,43 @@ export class XmlCanonicalizer {
 
     protected WriteNode(node: Node) {
         switch (node.nodeType) {
-            case XmlNodeType.Document:
-            case XmlNodeType.DocumentFragment:
+            case XmlCore.XmlNodeType.Document:
+            case XmlCore.XmlNodeType.DocumentFragment:
                 this.WriteDocumentNode(node);
                 break;
-            case XmlNodeType.Element:
+            case XmlCore.XmlNodeType.Element:
                 this.WriteElementNode(node as Element);
                 break;
-            case XmlNodeType.CDATA:
-            case XmlNodeType.SignificantWhitespace:
-            case XmlNodeType.Text:
+            case XmlCore.XmlNodeType.CDATA:
+            case XmlCore.XmlNodeType.SignificantWhitespace:
+            case XmlCore.XmlNodeType.Text:
                 // CDATA sections are processed as text nodes
                 this.WriteTextNode(node);
                 break;
-            case XmlNodeType.Whitespace:
+            case XmlCore.XmlNodeType.Whitespace:
                 if (this.state === XmlCanonicalizerState.InsideDocElement)
                     this.WriteTextNode(node);
                 break;
-            case XmlNodeType.Comment:
+            case XmlCore.XmlNodeType.Comment:
                 this.WriteCommentNode(node);
                 break;
-            case XmlNodeType.ProcessingInstruction:
+            case XmlCore.XmlNodeType.ProcessingInstruction:
                 this.WriteProcessingInstructionNode(node);
                 break;
-            case XmlNodeType.EntityReference:
+            case XmlCore.XmlNodeType.EntityReference:
                 for (let i = 0; i < node.childNodes.length; i++)
                     this.WriteNode(node.childNodes[i]);
                 break;
-            case XmlNodeType.Attribute:
-                throw new XmlError(XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
-            case XmlNodeType.EndElement:
-                throw new XmlError(XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
-            case XmlNodeType.EndEntity:
-                throw new XmlError(XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
-            case XmlNodeType.DocumentType:
-            case XmlNodeType.Entity:
-            case XmlNodeType.Notation:
-            case XmlNodeType.XmlDeclaration:
+            case XmlCore.XmlNodeType.Attribute:
+                throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
+            case XmlCore.XmlNodeType.EndElement:
+                throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
+            case XmlCore.XmlNodeType.EndEntity:
+                throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
+            case XmlCore.XmlNodeType.DocumentType:
+            case XmlCore.XmlNodeType.Entity:
+            case XmlCore.XmlNodeType.Notation:
+            case XmlCore.XmlNodeType.XmlDeclaration:
                 // just do nothing
                 break;
         }
@@ -121,7 +121,7 @@ export class XmlCanonicalizer {
             else
                 this.result.push("<!--");
 
-            this.result.push(this.NormalizeString(node.nodeValue, XmlNodeType.Comment));
+            this.result.push(this.NormalizeString(node.nodeValue, XmlCore.XmlNodeType.Comment));
 
             if (this.state === XmlCanonicalizerState.BeforeDocElement)
                 this.result.push("-->" + String.fromCharCode(10));
@@ -151,7 +151,7 @@ export class XmlCanonicalizer {
         this.result.push(node.nodeName);
         if (node.nodeValue) {
             this.result.push(" ");
-            this.result.push(this.NormalizeString(node.nodeValue, XmlNodeType.ProcessingInstruction));
+            this.result.push(this.NormalizeString(node.nodeValue, XmlCore.XmlNodeType.ProcessingInstruction));
         }
 
         if (this.state === XmlCanonicalizerState.BeforeDocElement)
@@ -176,7 +176,7 @@ export class XmlCanonicalizer {
         this.result.push(">");
 
         for (let n = node.firstChild; n != null; n = n.nextSibling) {
-            // if (!(n.nodeType === XmlNodeType.Text && node.childNodes.length > 1))
+            // if (!(n.nodeType === XmlCore.XmlNodeType.Text && node.childNodes.length > 1))
             this.WriteNode(n);
         }
 
@@ -194,7 +194,7 @@ export class XmlCanonicalizer {
     }
 
     protected WriteNamespacesAxis(node: Element | Attr): number {
-        let list: XmlNamespace[] = [];
+        let list: XmlCore.XmlNamespace[] = [];
         let visibleNamespacesCount = 0;
         for (let i = 0; i < node.attributes.length; i++) {
             let attribute = node.attributes[i];
@@ -291,29 +291,29 @@ export class XmlCanonicalizer {
                 this.result.push(" ");
                 this.result.push(attribute.nodeName);
                 this.result.push("=\"");
-                this.result.push(this.NormalizeString(attribute.nodeValue, XmlNodeType.Attribute));
+                this.result.push(this.NormalizeString(attribute.nodeValue, XmlCore.XmlNodeType.Attribute));
                 this.result.push("\"");
             }
         }
 
     }
 
-    protected NormalizeString(input: string | null, type: XmlNodeType): string {
+    protected NormalizeString(input: string | null, type: XmlCore.XmlNodeType): string {
         let sb: string[] = [];
         if (input)
             for (let i = 0; i < input.length; i++) {
                 let ch = input[i];
-                if (ch === "<" && (type === XmlNodeType.Attribute || this.IsTextNode(type)))
+                if (ch === "<" && (type === XmlCore.XmlNodeType.Attribute || this.IsTextNode(type)))
                     sb.push("&lt;");
                 else if (ch === ">" && this.IsTextNode(type))
                     sb.push("&gt;");
-                else if (ch === "&" && (type === XmlNodeType.Attribute || this.IsTextNode(type)))
+                else if (ch === "&" && (type === XmlCore.XmlNodeType.Attribute || this.IsTextNode(type)))
                     sb.push("&amp;");
-                else if (ch === "\"" && type === XmlNodeType.Attribute)
+                else if (ch === "\"" && type === XmlCore.XmlNodeType.Attribute)
                     sb.push("&quot;");
-                else if (ch === "\u0009" && type === XmlNodeType.Attribute)
+                else if (ch === "\u0009" && type === XmlCore.XmlNodeType.Attribute)
                     sb.push("&#x9;");
-                else if (ch === "\u000A" && type === XmlNodeType.Attribute)
+                else if (ch === "\u000A" && type === XmlCore.XmlNodeType.Attribute)
                     sb.push("&#xA;");
                 else if (ch === "\u000D")
                     sb.push("&#xD;");
@@ -324,12 +324,12 @@ export class XmlCanonicalizer {
         return sb.join("");
     }
 
-    private IsTextNode(type: XmlNodeType): boolean {
+    private IsTextNode(type: XmlCore.XmlNodeType): boolean {
         switch (type) {
-            case XmlNodeType.Text:
-            case XmlNodeType.CDATA:
-            case XmlNodeType.SignificantWhitespace:
-            case XmlNodeType.Whitespace:
+            case XmlCore.XmlNodeType.Text:
+            case XmlCore.XmlNodeType.CDATA:
+            case XmlCore.XmlNodeType.SignificantWhitespace:
+            case XmlCore.XmlNodeType.Whitespace:
                 return true;
         }
         return false;
@@ -357,8 +357,9 @@ export class XmlCanonicalizer {
 
 }
 
-function XmlDsigC14NTransformNamespacesComparer(x: XmlNamespace, y: XmlNamespace) {
+function XmlDsigC14NTransformNamespacesComparer(x: XmlCore.XmlNamespace, y: XmlCore.XmlNamespace) {
     // simple cases
+    // tslint:disable-next-line:triple-equals
     if (x == y)
         return 0;
     else if (!x)
@@ -398,10 +399,10 @@ function IsNamespaceUsed(node: Element | Attr, prefix: string | null, result: nu
         }
     // check prefix of Element
     for (let n = node.firstChild; !!n; n = n.nextSibling) {
-        if (n.nodeType === XmlNodeType.Element) {
+        if (n.nodeType === XmlCore.XmlNodeType.Element) {
             const el = n as Element;
             let res = IsNamespaceUsed(el, prefix, result);
-            if (n.nodeType === XmlNodeType.Element && res)
+            if (n.nodeType === XmlCore.XmlNodeType.Element && res)
                 return ++result + res;
         }
     }
@@ -410,7 +411,7 @@ function IsNamespaceUsed(node: Element | Attr, prefix: string | null, result: nu
 
 function IsNamespaceNode(node: Node): boolean {
     let reg = /xmlns:/;
-    if (node !== null && node.nodeType === XmlNodeType.Attribute && (node.nodeName === "xmlns" || reg.test(node.nodeName)))
+    if (node !== null && node.nodeType === XmlCore.XmlNodeType.Attribute && (node.nodeName === "xmlns" || reg.test(node.nodeName)))
         return true;
     return false;
 }

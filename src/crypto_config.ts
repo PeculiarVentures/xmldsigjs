@@ -1,23 +1,33 @@
-import { XmlError, XE } from "xmljs";
+import { XmlError, XE } from "xml-core";
+import * as XmlCore from "xml-core";
+
+import { ISignatureAlgorithm, IHashAlgorithm } from "./algorithm";
+import { SignatureMethod } from "./xml/signature_method";
+import { PssAlgorithmParams } from "./xml/key_infos";
+
 import {
     // rsa pkcs1
-    RSA_PKCS1_SHA1_NAMESPACE, RSA_PKCS1_SHA224_NAMESPACE, RSA_PKCS1_SHA256_NAMESPACE, RSA_PKCS1_SHA384_NAMESPACE, RSA_PKCS1_SHA512_NAMESPACE,
-    RsaPkcs1Sha1, RsaPkcs1Sha224, RsaPkcs1Sha256, RsaPkcs1Sha384, RsaPkcs1Sha512,
+    RSA_PKCS1,
+    RSA_PKCS1_SHA1_NAMESPACE, RSA_PKCS1_SHA256_NAMESPACE, RSA_PKCS1_SHA384_NAMESPACE, RSA_PKCS1_SHA512_NAMESPACE,
+    RsaPkcs1Sha1, RsaPkcs1Sha256, RsaPkcs1Sha384, RsaPkcs1Sha512,
     // rsa pss
-    RSA_PSS_WITH_PARAMS_SHA1_MGF1_NAMESPACE, RSA_PSS_WITH_PARAMS_SHA224_MGF1_NAMESPACE, RSA_PSS_WITH_PARAMS_SHA256_MGF1_NAMESPACE, RSA_PSS_WITH_PARAMS_SHA384_MGF1_NAMESPACE, RSA_PSS_WITH_PARAMS_SHA512_MGF1_NAMESPACE,
-    RsaPssSha1, RsaPssSha224, RsaPssSha256, RsaPssSha384, RsaPssSha512,
+    RSA_PSS,
+    RSA_PSS_WITH_PARAMS_NAMESPACE,
+    RsaPssSha1, RsaPssSha256, RsaPssSha384, RsaPssSha512,
     // ec dsa
-    ECDSA_SHA1_NAMESPACE, ECDSA_SHA224_NAMESPACE, ECDSA_SHA256_NAMESPACE, ECDSA_SHA384_NAMESPACE, ECDSA_SHA512_NAMESPACE,
-    EcdsaSha1, EcdsaSha224, EcdsaSha256, EcdsaSha384, EcdsaSha512,
+    ECDSA,
+    ECDSA_SHA1_NAMESPACE, ECDSA_SHA256_NAMESPACE, ECDSA_SHA384_NAMESPACE, ECDSA_SHA512_NAMESPACE,
+    EcdsaSha1, EcdsaSha256, EcdsaSha384, EcdsaSha512,
     // hmac
-    HMAC_SHA1_NAMESPACE, HMAC_SHA224_NAMESPACE, HMAC_SHA256_NAMESPACE, HMAC_SHA384_NAMESPACE, HMAC_SHA512_NAMESPACE,
-    HmacSha1, HmacSha224, HmacSha256, HmacSha384, HmacSha512,
-    // sha
-    SHA1_NAMESPACE, SHA224_NAMESPACE, SHA256_NAMESPACE, SHA384_NAMESPACE, SHA512_NAMESPACE,
-    Sha1, Sha224, Sha256, Sha384, Sha512,
+    HMAC,
+    HMAC_SHA1_NAMESPACE, HMAC_SHA256_NAMESPACE, HMAC_SHA384_NAMESPACE, HMAC_SHA512_NAMESPACE,
+    HmacSha1, HmacSha256, HmacSha384, HmacSha512,
+    // Sha
+    SHA1, SHA256, SHA384, SHA512,
+    SHA1_NAMESPACE, SHA256_NAMESPACE, SHA384_NAMESPACE, SHA512_NAMESPACE,
+    Sha1, Sha256, Sha384, Sha512,
 } from "./algorithm/index";
-import { XmlSignature } from "./xml";
-import { Transform } from "./transform";
+import { XmlSignature, Transform } from "./xml";
 import {
     XmlDsigBase64Transform,
     XmlDsigC14NTransform,
@@ -25,34 +35,25 @@ import {
     XmlDsigEnvelopedSignatureTransform,
     XmlDsigExcC14NTransform,
     XmlDsigExcC14NWithCommentsTransform
-} from "./transforms/index";
+} from "./xml/transforms";
 import { ISignatureAlgorithmConstructable, IHashAlgorithmConstructable, SignatureAlgorithm, HashAlgorithm } from "./algorithm";
 
 let SignatureAlgorithms: { [index: string]: ISignatureAlgorithmConstructable } = {};
 SignatureAlgorithms[RSA_PKCS1_SHA1_NAMESPACE] = RsaPkcs1Sha1;
-SignatureAlgorithms[RSA_PKCS1_SHA224_NAMESPACE] = RsaPkcs1Sha224;
 SignatureAlgorithms[RSA_PKCS1_SHA256_NAMESPACE] = RsaPkcs1Sha256;
 SignatureAlgorithms[RSA_PKCS1_SHA384_NAMESPACE] = RsaPkcs1Sha384;
 SignatureAlgorithms[RSA_PKCS1_SHA512_NAMESPACE] = RsaPkcs1Sha512;
-SignatureAlgorithms[RSA_PSS_WITH_PARAMS_SHA1_MGF1_NAMESPACE] = RsaPssSha1;
-SignatureAlgorithms[RSA_PSS_WITH_PARAMS_SHA224_MGF1_NAMESPACE] = RsaPssSha224;
-SignatureAlgorithms[RSA_PSS_WITH_PARAMS_SHA256_MGF1_NAMESPACE] = RsaPssSha256;
-SignatureAlgorithms[RSA_PSS_WITH_PARAMS_SHA384_MGF1_NAMESPACE] = RsaPssSha384;
-SignatureAlgorithms[RSA_PSS_WITH_PARAMS_SHA512_MGF1_NAMESPACE] = RsaPssSha512;
 SignatureAlgorithms[ECDSA_SHA1_NAMESPACE] = EcdsaSha1;
-SignatureAlgorithms[ECDSA_SHA224_NAMESPACE] = EcdsaSha224;
 SignatureAlgorithms[ECDSA_SHA256_NAMESPACE] = EcdsaSha256;
 SignatureAlgorithms[ECDSA_SHA384_NAMESPACE] = EcdsaSha384;
 SignatureAlgorithms[ECDSA_SHA512_NAMESPACE] = EcdsaSha512;
 SignatureAlgorithms[HMAC_SHA1_NAMESPACE] = HmacSha1;
-SignatureAlgorithms[HMAC_SHA224_NAMESPACE] = HmacSha224;
 SignatureAlgorithms[HMAC_SHA256_NAMESPACE] = HmacSha256;
 SignatureAlgorithms[HMAC_SHA384_NAMESPACE] = HmacSha384;
 SignatureAlgorithms[HMAC_SHA512_NAMESPACE] = HmacSha512;
 
 let HashAlgorithms: { [namespace: string]: IHashAlgorithmConstructable } = {};
 HashAlgorithms[SHA1_NAMESPACE] = Sha1;
-HashAlgorithms[SHA224_NAMESPACE] = Sha224;
 HashAlgorithms[SHA256_NAMESPACE] = Sha256;
 HashAlgorithms[SHA384_NAMESPACE] = Sha384;
 HashAlgorithms[SHA512_NAMESPACE] = Sha512;
@@ -107,17 +108,142 @@ export class CryptoConfig {
         return transform;
     }
 
-    static CreateSignatureAlgorithm(namespace: string): SignatureAlgorithm {
-        let alg = SignatureAlgorithms[namespace] || null;
+    static CreateSignatureAlgorithm(method: SignatureMethod): SignatureAlgorithm {
+        let alg = SignatureAlgorithms[method.Algorithm] || null;
         if (alg)
             return new alg();
-        else throw new Error(`signature algorithm '${namespace}' is not supported`);
+        else if (method.Algorithm === RSA_PSS_WITH_PARAMS_NAMESPACE) {
+            let pssParams: PssAlgorithmParams | undefined;
+            method.Any.Some(item => {
+                if (item instanceof PssAlgorithmParams)
+                    pssParams = item;
+                return !!pssParams;
+            });
+            if (pssParams)
+                switch (pssParams.DigestMethod.Algorithm) {
+                    case SHA1_NAMESPACE:
+                        return new RsaPssSha1(pssParams.SaltLength);
+                    case SHA256_NAMESPACE:
+                        return new RsaPssSha256(pssParams.SaltLength);
+                    case SHA384_NAMESPACE:
+                        return new RsaPssSha384(pssParams.SaltLength);
+                    case SHA512_NAMESPACE:
+                        return new RsaPssSha512(pssParams.SaltLength);
+                }
+            throw new XmlError(XE.CRYPTOGRAPHIC, `Cannot get params for RSA-PSS algoriithm`);
+        }
+        throw new Error(`signature algorithm '${method.Algorithm}' is not supported`);
     };
 
     static CreateHashAlgorithm(namespace: string): HashAlgorithm {
-        let algo = HashAlgorithms[namespace];
-        if (algo)
-            return new algo();
+        let alg = HashAlgorithms[namespace];
+        if (alg)
+            return new alg();
         else throw new Error("hash algorithm '" + namespace + "' is not supported");
+    }
+
+    static GetHashAlgorithm(algorithm: AlgorithmIdentifier): IHashAlgorithm {
+        const alg = typeof algorithm === "string" ? { name: algorithm } : algorithm;
+        switch (alg.name.toUpperCase()) {
+            case SHA1:
+                return new Sha1();
+            case SHA256:
+                return new Sha256();
+            case SHA384:
+                return new Sha384();
+            case SHA512:
+                return new Sha512();
+            default:
+                throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, alg.name);
+        }
+    }
+
+    static GetSignatureAlgorithm(algorithm: Algorithm): ISignatureAlgorithm {
+        if (typeof (algorithm as any).hash === "string")
+            (algorithm as any).hash = {
+                name: (algorithm as any).hash
+            };
+        let hashName: string = (algorithm as any).hash.name;
+        if (!hashName)
+            throw new Error("Signing algorithm doesn't have name for hash");
+        let alg: ISignatureAlgorithm;
+        switch (algorithm.name.toUpperCase()) {
+            case RSA_PKCS1.toUpperCase():
+                switch (hashName.toUpperCase()) {
+                    case SHA1:
+                        alg = new RsaPkcs1Sha1();
+                        break;
+                    case SHA256:
+                        alg = new RsaPkcs1Sha256();
+                        break;
+                    case SHA384:
+                        alg = new RsaPkcs1Sha384();
+                        break;
+                    case SHA512:
+                        alg = new RsaPkcs1Sha512();
+                        break;
+                    default:
+                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+                }
+                break;
+            case RSA_PSS.toUpperCase():
+                const saltLength = (algorithm as any).saltLength;
+                switch (hashName.toUpperCase()) {
+                    case SHA1:
+                        alg = new RsaPssSha1(saltLength);
+                        break;
+                    case SHA256:
+                        alg = new RsaPssSha256(saltLength);
+                        break;
+                    case SHA384:
+                        alg = new RsaPssSha384(saltLength);
+                        break;
+                    case SHA512:
+                        alg = new RsaPssSha512(saltLength);
+                        break;
+                    default:
+                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+                }
+                break;
+            case ECDSA:
+                switch (hashName.toUpperCase()) {
+                    case SHA1:
+                        alg = new EcdsaSha1();
+                        break;
+                    case SHA256:
+                        alg = new EcdsaSha256();
+                        break;
+                    case SHA384:
+                        alg = new EcdsaSha384();
+                        break;
+                    case SHA512:
+                        alg = new EcdsaSha512();
+                        break;
+                    default:
+                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+                }
+                break;
+            case HMAC:
+                switch (hashName.toUpperCase()) {
+                    case SHA1:
+                        alg = new HmacSha1();
+                        break;
+                    case SHA256:
+                        alg = new HmacSha256();
+                        break;
+                    case SHA384:
+                        alg = new HmacSha384();
+                        break;
+                    case SHA512:
+                        alg = new HmacSha512();
+                        break;
+                    default:
+                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+                }
+                break;
+            default:
+                throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name);
+        }
+        return alg;
     }
 }

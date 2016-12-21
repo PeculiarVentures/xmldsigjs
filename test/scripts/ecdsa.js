@@ -1,141 +1,115 @@
 "use strict"
-var select, xadesjs, DOMParser, XMLSerializer, readXml, assert;
+var select, xmldsig, DOMParser, XMLSerializer, readXml, assert;
 
 if (typeof module !== "undefined") {
-    var config = require("./config");
+    var config = require("../config");
     select = config.select;
-    xadesjs = config.xadesjs;
+    xmldsig = config.xmldsig;
     DOMParser = config.DOMParser;
     XMLSerializer = config.XMLSerializer;
     assert = config.assert;
     readXml = config.readXml;
+    var XmlCore = config.XmlCore;
 }
 
 describe("ECDSA", function () {
 
-    function CheckSignature(xmlString, key) {
-        return new Promise(function (resolve, reject) {
-            var xml = new DOMParser().parseFromString(xmlString, "application/xml");
-            var signature = select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
-            var sig = new xadesjs.SignedXml(xml);
-            sig.LoadXml(signature);
-            sig.CheckSignature(key)
-                .then(resolve, reject);
-        })
-    }
+    // namedCurves
+    ["P-256", "P-384", "P-521"].forEach(namedCurve => {
+        context(namedCurve, () => {
+            // hash
+            ["SHA-1", "SHA-256", "SHA-384", "SHA-512"].forEach(hash => {
+                it(hash, done => {
 
-    var ecdsaKeyP256 = null;
-    var ecdsaKeyP384 = null;
-    var ecdsaKeyP521 = null;
+                    let signature = new xmldsig.SignedXml();
+                    let keys;
 
-    function generateRsaKey(namedCurve) {
-        var alg = {
-            name: "ECDSA",
-            namedCurve: namedCurve
-        };
-        return xadesjs.Application.crypto.subtle.generateKey(
-            alg,
-            false,
-            ["sign", "verify"]
-        );
-    }
+                    xmldsig.Application.crypto.subtle.generateKey({
+                        name: "ECDSA",
+                        namedCurve
+                    },
+                        true,
+                        ["sign", "verify"])
+                        .then(ks => {
+                            keys = ks;
+                            // Export key to JWK, to compare with KeyValue
+                            return xmldsig.Application.crypto.subtle.exportKey("jwk", keys.publicKey);
+                        })
+                        .then(jwk => {
+                            return signature.Sign(
+                                { name: "ECDSA", hash },                                        // algorithm 
+                                keys.privateKey,                                                // key 
+                                XmlCore.XmlObject.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`),          // document
+                                {                                                               // options
+                                    keyValue: keys.publicKey,
+                                    references: [
+                                        { hash, transforms: ["c14n"] },
+                                    ]
+                                });
+                        })
+                        .then(() => {
+                            // console.log(signature.toString());
 
-    before(done => {
-        generateRsaKey("P-256")
-            .then(function (k) {
-                ecdsaKeyP256 = k;
-                return generateRsaKey("P-384");
-            })
-            .then(function (k) {
-                ecdsaKeyP384 = k;
-                return generateRsaKey("P-521");
-            })
-            .then(function (k) {
-                ecdsaKeyP521 = k;
-                return Promise.resolve();
-            })
-            .then(done, done);
-    })
+                            let signature2 = new xmldsig.SignedXml(XmlCore.XmlObject.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`));
+                            signature2.LoadXml(signature.XmlSignature.GetXml());
 
-    function SignXml(xmlString, key, algorithm) {
-        return new Promise(function (resolve, reject) {
-            var xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml");
-            var signedXml = new xadesjs.SignedXml(xmlDoc);
-            // Add the key to the SignedXml document.
-            signedXml.SigningKey = key;
-            // Create a reference to be signed.
-            var reference = new xadesjs.Reference();
-            reference.Uri = "";
-            // Add an enveloped transformation to the reference.
-            reference.AddTransform(new xadesjs.XmlDsigEnvelopedSignatureTransform());
-            // Add the reference to the SignedXml object.
-            signedXml.AddReference(reference);
-            // Set prefix for Signature namespace
-            signedXml.Prefix = "ds";
+                            let si = signature2.XmlSignature.SignedInfo;
 
-            // Compute the signature.
-            signedXml.ComputeSignature(algorithm)
-                .then(function () {
-                    // Append signature
-                    var xmlDigitalSignature = signedXml.GetXml();
-                    xmlDoc.documentElement.appendChild(xmlDigitalSignature);
+                            // CanonicalizationMethod
+                            assert.equal(si.CanonicalizationMethod.Algorithm, "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
 
-                    // Serialize XML document
-                    var signedDocument = new XMLSerializer().serializeToString(xmlDoc);
-                    return Promise.resolve(signedDocument);
-                })
-                .then(resolve, reject);
-        })
-    }
+                            // SignatureMethod
+                            let signatureMethod;
+                            switch (hash) {
+                                case "SHA-1":
+                                    signatureMethod = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1";
+                                    break;
+                                case "SHA-224":
+                                    signatureMethod = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224";
+                                    break;
+                                case "SHA-256":
+                                    signatureMethod = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
+                                    break;
+                                case "SHA-384":
+                                    signatureMethod = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384";
+                                    break;
+                                case "SHA-512":
+                                    signatureMethod = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";
+                                    break;
+                            }
+                            assert.equal(si.SignatureMethod.Algorithm, signatureMethod);
 
-    function Test(key, keyName, done, hash) {
-        SignXml("<root><child1/><child2/><child3/></root>", key.privateKey, { name: "ECDSA", hash: { name: hash }, saltLength: 12 })
-            .then(function (xmlSig) {
-                assert.equal(!!xmlSig, true, "Empty XML signature string for " + keyName);
-                return CheckSignature(xmlSig, key.publicKey);
-            })
-            .then(function (v) {
-                assert.equal(v, true, "Wrong signature verification for " + keyName);
-                return Promise.resolve();
-            })
-            .then(done, done);
-    }
+                            // DigestMethod
+                            let digestMethod;
+                            switch (hash) {
+                                case "SHA-1":
+                                    digestMethod = "http://www.w3.org/2000/09/xmldsig#sha1";
+                                    break;
+                                case "SHA-224":
+                                    digestMethod = "http://www.w3.org/2001/04/xmlenc#sha224";
+                                    break;
+                                case "SHA-256":
+                                    digestMethod = "http://www.w3.org/2001/04/xmlenc#sha256";
+                                    break;
+                                case "SHA-384":
+                                    digestMethod = "http://www.w3.org/2001/04/xmldsig-more#sha384";
+                                    break;
+                                case "SHA-512":
+                                    digestMethod = "http://www.w3.org/2001/04/xmlenc#sha512";
+                                    break;
+                            }
+                            assert.equal(si.References.Item(0).DigestMethod.Algorithm, digestMethod);
 
-    it("Sign/verify ECDSA-P256-SHA1", done => {
-        Test(ecdsaKeyP256, "ECDSA-P256-SHA1", done, "SHA-1");
-    })
-    it("Sign/verify ECDSA-P256-SHA256", done => {
-        Test(ecdsaKeyP256, "ECDSA-P256-SHA256", done, "SHA-256");
-    })
-    it("Sign/verify ECDSA-P256-SHA384", done => {
-        Test(ecdsaKeyP256, "ECDSA-P256-SHA384", done, "SHA-384");
-    })
-    it("Sign/verify ECDSA-P256-SHA512", done => {
-        Test(ecdsaKeyP256, "ECDSA-P256-SHA512", done, "SHA-512");
-    })
-    it("Sign/verify ECDSA-P384-SHA1", done => {
-        Test(ecdsaKeyP384, "ECDSA-P384-SHA1", done, "SHA-1");
-    })
-    it("Sign/verify ECDSA-P384-SHA256", done => {
-        Test(ecdsaKeyP384, "ECDSA-P384-SHA256", done, "SHA-256");
-    })
-    it("Sign/verify ECDSA-P384-SHA384", done => {
-        Test(ecdsaKeyP384, "ECDSA-P384-SHA384", done, "SHA-384");
-    })
-    it("Sign/verify ECDSA-P384-SHA512", done => {
-        Test(ecdsaKeyP384, "ECDSA-P384-SHA512", done, "SHA-512");
+                            // return signature2.Verify(keys.publicKey)
+                            return signature2.Verify()
+                        })
+                        .then(res => {
+                            assert.equal(res, true);
+                            return Promise.resolve();
+                        })
+                        .then(done, done);
+                });
+            });
+        });
     });
-    it("Sign/verify ECDSA-P521-SHA1", done => {
-        Test(ecdsaKeyP521, "ECDSA-P521-SHA1", done, "SHA-1");
-    });
-    it("Sign/verify ECDSA-P521-SHA256", done => {
-        Test(ecdsaKeyP521, "ECDSA-P521-SHA256", done, "SHA-256");
-    });
-    it("Sign/verify ECDSA-P521-SHA384", done => {
-        Test(ecdsaKeyP521, "ECDSA-P521-SHA384", done, "SHA-384");
-    });
-    it("Sign/verify ECDSA-P521-SHA512", done => {
-        Test(ecdsaKeyP521, "ECDSA-P521-SHA512", done, "SHA-512");
-    });
-
 });

@@ -7,18 +7,16 @@
             "dom",
             "es2015.promise"
         ],
-        "typeRoots": [
-            "node_modules/@types"
-        ],
         "rootDir": "src",
         "outDir": "lib",
-        "noImplicitAny": true,
+        "noImplicitAny": false,
         "sourceMap": false,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
         "strictNullChecks": true,
         "pretty": true,
-        "noImplicitReturns": true
+        "noImplicitReturns": true,
+        "experimentalDecorators": true
     },
     "exclude": [
         "node_modules"

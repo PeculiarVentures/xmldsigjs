@@ -1,3 +1,4 @@
+"use strict"
 var select, xmldsig, DOMParser, XMLSerializer, readXml, assert;
 
 if (typeof module !== "undefined") {
@@ -8,138 +9,119 @@ if (typeof module !== "undefined") {
     XMLSerializer = config.XMLSerializer;
     assert = config.assert;
     readXml = config.readXml;
+    var XmlCore = config.XmlCore;
 }
 
 describe("HMAC", function () {
 
-    function isNode() {
-        if (typeof window === "undefined") {
-            warn("NodeJS");
-            return true;
-        }
-        return false;
-    }
+    console.warn("WARN: No check of SignatureLength. Issue node-webcrypto-ossl #85");
 
-    function warn(name) {
-        console.warn("    \x1b[33mWARN:\x1b[0m Test is not supported for %s. Ossl doesn't support HMAC algs", name);
-    }
+    // length
+    [0, 128].forEach(hmacLength => {
+        // hash
+        ["SHA-1", "SHA-256", "SHA-384", "SHA-512"].forEach(hash => {
+            it(`hash:${hash} length:${hmacLength}`, done => {
 
-    if (isNode()) return;
+                let signature = new xmldsig.SignedXml();
+                let key;
+                let alg = {
+                    name: "HMAC",
+                    hash,
+                }
+                if (hmacLength) alg.length = hmacLength;
 
-    function CheckSignature(xmlString, key) {
-        return new Promise(function (resolve, reject) {
-            var xml = new DOMParser().parseFromString(xmlString, "application/xml");
-            var signature = select(xml, "//*//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
-            var sig = new xmldsig.SignedXml(xml);
-            sig.LoadXml(signature);
-            sig.CheckSignature(key)
-                .then(resolve, reject);
-        })
-    }
+                xmldsig.Application.crypto.subtle.generateKey(
+                    alg,
+                    true,
+                    ["sign", "verify"])
+                    .then(k => {
+                        key = k;
+                        // Export key to JWK, to compare with KeyValue
+                        return xmldsig.Application.crypto.subtle.exportKey("jwk", key);
+                    })
+                    .then(jwk => {
+                        return signature.Sign(
+                            { name: "HMAC" },                                        // algorithm 
+                            key,                                                     // key 
+                            XmlCore.XmlObject.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`),          // document
+                            {                                                        // options
+                                references: [
+                                    { hash, transforms: ["c14n"] },
+                                ]
+                            });
+                    })
+                    .then(() => {
+                        // console.log(signature.toString());
 
-    var hmacKeySHA1 = null;
-    var hmacKeySHA256 = null;
-    var hmacKeySHA256Length128 = null;
-    var hmacKeySHA384 = null;
-    var hmacKeySHA512 = null;
+                        let signature2 = new xmldsig.SignedXml(XmlCore.XmlObject.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`));
+                        signature2.LoadXml(signature.XmlSignature.GetXml());
 
-    function generateHmacKey(hash, length) {
-        var alg = {
-            name: "HMAC",
-            hash: { name: hash },
-        };
-        if (length != void 0)
-            alg.length = length;
-        return xmldsig.Application.crypto.subtle.generateKey(
-            alg,
-            false,
-            ["sign", "verify"]
-        );
-    }
+                        let si = signature2.XmlSignature.SignedInfo;
 
-    before(function (done) {
-        generateHmacKey("SHA-1")
-            .then(function (k) {
-                hmacKeySHA1 = k;
-                return generateHmacKey("SHA-256")
-            })
-            .then(function (k) {
-                hmacKeySHA256 = k;
-                return generateHmacKey("SHA-384")
-            })
-            .then(function (k) {
-                hmacKeySHA384 = k;
-                return generateHmacKey("SHA-512")
-            })
-            .then(function (k) {
-                hmacKeySHA512 = k;
-                return generateHmacKey("SHA-256", 128)
-            })
-            .then(function (k) {
-                hmacKeySHA256Length128 = k;
-                return Promise.resolve();
-            })
-            .then(done, done);
-    })
+                        // CanonicalizationMethod
+                        assert.equal(si.CanonicalizationMethod.Algorithm, "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
 
-    function SignXml(xmlString, key, algorithm) {
-        return new Promise(function (resolve, reject) {
-            var xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml");
-            var signedXml = new xmldsig.SignedXml(xmlDoc);
-            // Add the key to the SignedXml document.
-            signedXml.SigningKey = key;
-            // Create a reference to be signed.
-            var reference = new xmldsig.Reference();
-            reference.Uri = "";
-            // Add an enveloped transformation to the reference.
-            reference.AddTransform(new xmldsig.XmlDsigEnvelopedSignatureTransform());
-            // Add the reference to the SignedXml object.
-            signedXml.AddReference(reference);
-            // Set prefix for Signature namespace
-            signedXml.Prefix = "ds";
+                        // SignatureMethod
+                        let signatureMethod;
+                        let sigLength;
+                        switch (hash) {
+                            case "SHA-1":
+                                signatureMethod = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
+                                sigLength = 160;
+                                break;
+                            case "SHA-256":
+                                signatureMethod = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
+                                sigLength = 256;
+                                break;
+                            case "SHA-384":
+                                signatureMethod = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
+                                sigLength = 384;
+                                break;
+                            case "SHA-512":
+                                signatureMethod = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
+                                sigLength = 512;
+                                break;
+                        }
+                        assert.equal(si.SignatureMethod.Algorithm, signatureMethod);
 
-            // Compute the signature.
-            signedXml.ComputeSignature(algorithm)
-                .then(function () {
-                    // Append signature
-                    var xmlDigitalSignature = signedXml.GetXml();
-                    xmlDoc.documentElement.appendChild(xmlDigitalSignature);
+                        // hmacLength
+                        if (hmacLength) {
+                            assert.equal(si.SignatureMethod.HMACOutputLength, hmacLength);
+                            sigLength = hmacLength;
+                        } else
+                            assert.equal(si.SignatureMethod.HMACOutputLength, sigLength);
 
-                    // Serialize XML document
-                    var signedDocument = new XMLSerializer().serializeToString(xmlDoc);
-                    return Promise.resolve(signedDocument);
-                })
-                .then(resolve, reject);
-        })
-    }
+                        // TODO: Check signature length. Issue #85
 
-    function Test(key, keyName, done, length) {
-        SignXml("<root><child1/><child2/><child3/></root>", key, { name: "HMAC" })
-            .then(function (xmlSig) {
-                assert.equal(!!xmlSig, true, "Empty XML signature string for " + keyName);
-                return CheckSignature(xmlSig, key);
-            })
-            .then(function (v) {
-                assert.equal(v, true, "Wrong signature verification for " + keyName);
-                return Promise.resolve();
-            })
-            .then(done, done);
-    }
+                        // DigestMethod
+                        let digestMethod;
+                        switch (hash) {
+                            case "SHA-1":
+                                digestMethod = "http://www.w3.org/2000/09/xmldsig#sha1";
+                                break;
+                            case "SHA-224":
+                                digestMethod = "http://www.w3.org/2001/04/xmlenc#sha224";
+                                break;
+                            case "SHA-256":
+                                digestMethod = "http://www.w3.org/2001/04/xmlenc#sha256";
+                                break;
+                            case "SHA-384":
+                                digestMethod = "http://www.w3.org/2001/04/xmldsig-more#sha384";
+                                break;
+                            case "SHA-512":
+                                digestMethod = "http://www.w3.org/2001/04/xmlenc#sha512";
+                                break;
+                        }
+                        assert.equal(si.References.Item(0).DigestMethod.Algorithm, digestMethod);
 
-    it("Sign/verify HMAC SHA1", function (done) {
-        Test(hmacKeySHA1, "HMAC-SHA1", done);
-    })
-    
-    it("Sign/verify HMAC SHA256", function (done) {
-        Test(hmacKeySHA1, "HMAC-SHA256", done);
-    })
-    
-    it("Sign/verify HMAC SHA384", function (done) {
-        Test(hmacKeySHA1, "HMAC-SHA384", done);
-    })
-    
-    it("Sign/verify HMAC SHA512", function (done) {
-        Test(hmacKeySHA1, "HMAC-SHA512", done);
-    })
-
-})
+                        return signature2.Verify(key)
+                    })
+                    .then(res => {
+                        assert.equal(res, true);
+                        return Promise.resolve();
+                    })
+                    .then(done, done);
+            });
+        });
+    });
+});
