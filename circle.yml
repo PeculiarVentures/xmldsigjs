@@ -3,7 +3,7 @@ machine:
     version: 6.9.1
 
 test:
-  override:
+  pre:
     - npm run coverage
 
   post:
