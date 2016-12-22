@@ -38,8 +38,8 @@ If you need to use a Hardware Security Module we have also created a polyfill fo
 To use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) you need to specify you want to use it, that looks like this:
 
 ```javascript
-var xmldsigjs = require("./built/xmldsig.js");
-var WebCrypto = require("node-webcrypto-ossl").default;
+var xmldsigjs = require("xmldsigjs");
+var WebCrypto = require("node-webcrypto-ossl");
 
 xmldsigjs.Application.setEngine("OpenSSL", new WebCrypto());
 ```
@@ -47,14 +47,14 @@ xmldsigjs.Application.setEngine("OpenSSL", new WebCrypto());
 The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) polyfill will work the same way. The only difference is that you have to specify the details about your PKCS #11 device when you instansiate it:
 
 ```javascript
-var xmldsigjs = require("./built/xmldsig.js");
-var WebCrypto = require("node-webcrypto-p11").WebCrypto;
+var xmldsigjs = require("xmldsigjs");
+var WebCrypto = require("node-webcrypto-p11");
 
 xmldsigjs.Application.setEngine("PKCS11", new WebCrypto({
     library: "/path/to/pkcs11.so",
 	name: "Name of PKCS11 lib",
 	slot: 0,
-    sessionFlags: 2 | 4, // RW_SESSION | SERIAL_SESSION
+    sessionFlags: 4, // SERIAL_SESSION
 	pin: "token pin"
 }));
 ```
@@ -65,6 +65,69 @@ xmldsigjs.Application.setEngine("PKCS11", new WebCrypto({
 
 **Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
 
+## Simple to use
+
+### Sign
+
+```typescript
+SignedXml.Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsSign): PromiseLike<Signature>;
+```
+
+__Parameters__
+| Name          | Description                                                             |
+|:--------------|:------------------------------------------------------------------------|
+| algorithm     | Signing [Algorithm](https://www.w3.org/TR/WebCryptoAPI/#algorithms)     |
+| key           | Signing [Key](https://www.w3.org/TR/WebCryptoAPI/#cryptokey-interface)  |
+| data          | XML document which must be signed                                       |
+| options       | Additional options                                                      |
+
+#### Options
+```typescript
+interface OptionsSign {
+    /**
+     * Public key for KeyInfo block
+     */
+    keyValue?: CryptoKey;
+    /**
+     * List of X509 Certificates
+     */
+    x509?: string[];
+    /**
+     * List of Reference
+     * Default is Reference with hash alg SHA-256 and exc-c14n transform  
+     */
+    references?: OptionsSignReference[];
+}
+
+interface OptionsSignReference {
+    /**
+     * Id of Reference
+     */
+    id?: string;
+    uri?: string;
+    /**
+     * Hash algorithm
+     */
+    hash: AlgorithmIdentifier;
+    /**
+     * List of transforms
+     */
+    transforms?: OptionsSignTransform[];
+}
+
+type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
+```
+
+### Verify
+
+```typescript
+Verify(key?: CryptoKey): PromiseLike<boolean>;
+```
+
+__Parameters__
+| Name          | Description                                                             |
+|:--------------|:------------------------------------------------------------------------|
+| key           | Verifying [Key](https://www.w3.org/TR/WebCryptoAPI/#cryptokey-interface). Optional. If key not set it looks for keys in KeyInfo element of Signature.  |
 
 ## EXAMPLES
 
@@ -73,86 +136,42 @@ xmldsigjs.Application.setEngine("PKCS11", new WebCrypto({
 #### In Node
 
 ```javascript
-var xmldsigjs = require("./built/xmldsig.js");
-var DOMParser = require("xmldom").DOMParser;
-var XMLSerializer = require("xmldom").XMLSerializer;
-var WebCrypto = require("node-webcrypto-ossl").default;
+"use strict";
 
-xmldsigjs.Application.setEngine("OpenSSL", new WebCrypto());
+const WebCrypto = require("node-webcrypto-ossl");
+const crypto = new WebCrypto();
+const XmlCore = require("xml-core");
+const XmlDSigJs = require("xmldsigjs");
 
-// Generate RSA key pair
-var privateKey, publicKey;
-xmldsigjs.Application.crypto.subtle.generateKey(
-    {
-        name: "RSASSA-PKCS1-v1_5",
-        modulusLength: 1024, //can be 1024, 2048, or 4096,
-        publicExponent: new Uint8Array([1, 0, 1]),
-        hash: { name: "SHA-1" }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
-    },
-    false, //whether the key is extractable (i.e. can be used in exportKey)
-    ["sign", "verify"] //can be any combination of "sign" and "verify"
-)
-    .then(function (keyPair) {
-        // Push ganerated keys to global variable
-        privateKey = keyPair.privateKey;
-        publicKey = keyPair.publicKey;
+XmlDSigJs.Application.setEngine("OpenSSL", crypto);
 
-        // Call sign function
-        var xmlString = '<player bats="left" id="10012" throws="right">\n\t<!-- Here\'s a comment -->\n\t<name>Alfonso Soriano</name>\n\t<position>2B</position>\n\t<team>New York Yankees</team>\n</player>';
-        return SignXml(xmlString, privateKey, { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } });
+let xml = `<root><first id="id1"><foo>hello</foo></first></root>`;
+let signature = new XmlDSigJs.SignedXml();
+
+crypto.subtle.generateKey({                      // Generating key
+    name: "RSASSA-PKCS1-v1_5",
+    hash: "SHA-256",
+    publicExponent: new Uint8Array([1, 0, 1]),     // 65537
+    modulusLength: 2048
+},
+    true,                                          // extractable
+    ["sign", "verify"])
+    .then(keys => {
+        return signature.Sign(                   // Signing document
+            { name: "RSASSA-PKCS1-v1_5" },         // algorithm 
+            keys.privateKey,                       // key 
+            XmlCore.XmlObject.Parse(xml),          // document
+            {                                      // options
+                keyValue: keys.publicKey,
+                references: [
+                    { hash: "SHA-512", transforms: ["enveloped", "c14n"] },
+                ]
+            });
     })
-    .then(function (signedDocument) {
-        console.log("Signed document:\n\n", signedDocument);
+    .then(() => {
+        console.log(signature.toString());       // <xml> document with signature
     })
-    .catch(function (e) {
-        console.error(e);
-    });
-
-
-function SignXml(xmlString, key, algorithm) {
-    return new Promise(function (resolve, reject) {
-        var xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml");
-        var signedXml = new xmldsigjs.SignedXml(xmlDoc);
-
-        // Add the key to the SignedXml document.
-        signedXml.SigningKey = key;
-
-        // Create a reference to be signed.
-        var reference = new xmldsigjs.Reference();
-        reference.Uri = "";
-
-        // Add an enveloped transformation to the reference.
-        reference.AddTransform(new xmldsigjs.XmlDsigEnvelopedSignatureTransform());
-
-        // Add the reference to the SignedXml object.
-        signedXml.AddReference(reference);
-
-        // Add KeyInfo
-        signedXml.KeyInfo = new xmldsigjs.KeyInfo();
-        var keyInfoClause = new xmldsigjs.RsaKeyValue();
-        signedXml.KeyInfo.AddClause(keyInfoClause);
-
-        // Set prefix for Signature namespace
-        signedXml.Prefix = "ds";
-
-        // Compute the signature.
-        signedXml.ComputeSignature(algorithm)
-            .then(function () {
-                return keyInfoClause.importKey(publicKey);
-            })
-            .then(function () {
-                // Append signature
-                var xmlDigitalSignature = signedXml.GetXml();
-                xmlDoc.documentElement.appendChild(xmlDigitalSignature);
-
-                // Serialize XML document
-                var signedDocument = new XMLSerializer().serializeToString(xmlDoc);
-
-                return Promise.resolve(signedDocument);
-            })
-            .then(resolve, reject);
-    })
-}
+    .catch(e => console.log(e));
 ```
 
 
