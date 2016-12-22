@@ -65,7 +65,7 @@ xmldsigjs.Application.setEngine("PKCS11", new WebCrypto({
 
 **Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
 
-## Simple to use
+## Easy to use
 
 ### Sign
 
