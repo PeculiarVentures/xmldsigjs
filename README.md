@@ -74,12 +74,14 @@ SignedXml.Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: O
 ```
 
 __Parameters__
+
 | Name          | Description                                                             |
 |:--------------|:------------------------------------------------------------------------|
 | algorithm     | Signing [Algorithm](https://www.w3.org/TR/WebCryptoAPI/#algorithms)     |
 | key           | Signing [Key](https://www.w3.org/TR/WebCryptoAPI/#cryptokey-interface)  |
 | data          | XML document which must be signed                                       |
 | options       | Additional options                                                      |
+
 
 #### Options
 ```typescript
@@ -125,6 +127,7 @@ Verify(key?: CryptoKey): PromiseLike<boolean>;
 ```
 
 __Parameters__
+
 | Name          | Description                                                             |
 |:--------------|:------------------------------------------------------------------------|
 | key           | Verifying [Key](https://www.w3.org/TR/WebCryptoAPI/#cryptokey-interface). Optional. If key not set it looks for keys in KeyInfo element of Signature.  |
