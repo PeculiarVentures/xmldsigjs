@@ -134,9 +134,9 @@ __Parameters__
 
 ## EXAMPLES
 
-### Create XMLDSIG Signature
+For Sign/Verify operations you need to use CryptoKey. You can use [examples](https://github.com/diafygi/webcrypto-examples#rsassa-pkcs1-v1_5---generatekey) for it
 
-#### In Node
+### Using in NodeJs
 
 ```javascript
 "use strict";
@@ -147,29 +147,33 @@ const XmlCore = require("xml-core");
 const XmlDSigJs = require("xmldsigjs");
 
 XmlDSigJs.Application.setEngine("OpenSSL", crypto);
+```
 
-let xml = `<root><first id="id1"><foo>hello</foo></first></root>`;
+### Using in Browser
+
+```html
+<script src="asn1js.js"></script>
+<script src="pkijs.js"></script>
+<script src="xml-core.js"></script>
+<script src="xmldsig.js"></script>
+```
+
+### Create XMLDSIG Signature
+
+```javascript
+"use strict";
+
 let signature = new XmlDSigJs.SignedXml();
 
-crypto.subtle.generateKey({                      // Generating key
-    name: "RSASSA-PKCS1-v1_5",
-    hash: "SHA-256",
-    publicExponent: new Uint8Array([1, 0, 1]),     // 65537
-    modulusLength: 2048
-},
-    true,                                          // extractable
-    ["sign", "verify"])
-    .then(keys => {
-        return signature.Sign(                   // Signing document
-            { name: "RSASSA-PKCS1-v1_5" },         // algorithm 
-            keys.privateKey,                       // key 
-            XmlCore.XmlObject.Parse(xml),          // document
-            {                                      // options
-                keyValue: keys.publicKey,
-                references: [
-                    { hash: "SHA-512", transforms: ["enveloped", "c14n"] },
-                ]
-            });
+signature.Sign(                                  // Signing document
+    { name: "RSASSA-PKCS1-v1_5" },                        // algorithm 
+    keys.privateKey,                                      // key 
+    XmlCore.XmlObject.Parse(xml),                         // document
+    {                                                     // options
+        keyValue: keys.publicKey,
+        references: [
+            { hash: "SHA-512", transforms: ["enveloped", "c14n"] },
+        ]
     })
     .then(() => {
         console.log(signature.toString());       // <xml> document with signature
@@ -177,129 +181,23 @@ crypto.subtle.generateKey({                      // Generating key
     .catch(e => console.log(e));
 ```
 
-
-#### In the browser
-````HTML
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8"/>
-    <title>XMLDSIGjs Signature Sample</title>
-</head>
-
-<body>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/common.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xmldsigjs/master/built/xmldsig.js"></script>
-    
-    <script type="text/javascript">
-        // Generate RSA key pair
-        var privateKey, publicKey;
-        window.crypto.subtle.generateKey(
-        {
-            name: "RSASSA-PKCS1-v1_5",
-            modulusLength: 2048, //can be 1024, 2048, or 4096
-            publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-            hash: {name: "SHA-1"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
-        },
-        false, //whether the key is extractable (i.e. can be used in exportKey)
-        ["sign", "verify"] //can be any combination of "sign" and "verify"
-        )
-        .then(function(keyPair){
-            // Push ganerated keys to global variable
-            privateKey = keyPair.privateKey;
-            publicKey = keyPair.publicKey;
-            console.log("Sucessfully generate key");
-            
-            // Call sign function
-            var xmlString = '<player bats="left" id="10012" throws="right">\n\t<!-- Here\'s a comment -->\n\t<name>Alfonso Soriano</name>\n\t<position>2B</position>\n\t<team>New York Yankees</team>\n</player>';
-            return SignXml(xmlString, privateKey, { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } });
-        })
-        .then(function (signedDocument) {
-            console.log("Successfully signed document:\n\n", signedDocument);
-        })
-        .catch(function (e) {
-            console.error(e);
-        });
-
-        function SignXml(xmlString, key, algorithm) {
-            return new Promise(function (resolve, reject) {
-                var xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml");
-                var signedXml = new xmldsigjs.SignedXml(xmlDoc);
-
-                // Add the key to the SignedXml document.
-                signedXml.SigningKey = key;
-
-                // Create a reference to be signed.
-                var reference = new xmldsigjs.Reference();
-                reference.Uri = "";
-
-                // Add an enveloped transformation to the reference.
-                reference.AddTransform(new xmldsigjs.XmlDsigEnvelopedSignatureTransform());
-
-                // Add the reference to the SignedXml object.
-                signedXml.AddReference(reference);
-
-                // Add KeyInfo
-                signedXml.KeyInfo = new xmldsigjs.KeyInfo();
-                var keyInfoClause = new xmldsigjs.RsaKeyValue();
-                signedXml.KeyInfo.AddClause(keyInfoClause);
-
-                // Set prefix for Signature namespace
-                signedXml.Prefix = "ds";
-
-                // Compute the signature.
-                signedXml.ComputeSignature(algorithm)
-                    .then(function () {
-                        return keyInfoClause.importKey(publicKey);
-                    })
-                    .then(function () {
-                        // Append signature
-                        var xmlDigitalSignature = signedXml.GetXml();
-                        xmlDoc.documentElement.appendChild(xmlDigitalSignature);
-
-                        // Serialize XML document
-                        var signedDocument = new XMLSerializer().serializeToString(xmlDoc);
-
-                        return Promise.resolve(signedDocument);
-                    })
-                    .then(resolve, reject);
-            })
-        }
-    </script>
-</body>
-</html>
-````
-
 ### Check XMLDSIG Signature 
 
-#### In Node
 
 ```javascript
-var xmldsigjs = require("./built/xmldsig.js");
-var DOMParser = require("xmldom").DOMParser;
-var WebCrypto = require("node-webcrypto-ossl").default;
+"use strict";
 
-xmldsigjs.Application.setEngine("OpenSSL", new WebCrypto());
+let doc = XmlCore.XmlObject.Parse(xml);
+let signature = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
-var fs = require("fs");
-var xmlString = fs.readFileSync("./xmldsigjs/test/static/valid_signature.xml","utf8");
+let signedXml = new XmlDSigJs.SignedXml(doc);
+signedXml.LoadXml(signature[0]);
 
-var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
-var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
-
-var signedXml = new xmldsigjs.SignedXml(signedDocument);
-signedXml.LoadXml(xmlSignature[0]);
-signedXml.CheckSignature()
-.then(function (signedDocument) {
-        console.log("Successfully Verified");
-})
-.catch(function (e) {
-        console.error(e);
-});
+signedXml.Verify()
+    .then(res => {
+        console.log("Signature status:", res);       // Signature status: true
+    })
+    .catch(e => console.log(e));
 ```
 
 #### In the browser

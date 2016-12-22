@@ -6,7 +6,7 @@ module.exports = {
   entry: "./src/index.ts",
   output: {
     libraryTarget: "var",
-    library: "xmldsig",
+    library: "XmlDSigJs",
     filename: "dist/xmldsig.js"
   },
   resolve: {
@@ -20,5 +20,10 @@ module.exports = {
   node: {
       Buffer: false,
       crypto: false,
+  },
+  externals: {
+    "xml-core": "XmlCore",
+    "asn1js": "Asn1Js",
+    "pkijs": "PkiJs",
   }
 }

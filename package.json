@@ -41,14 +41,14 @@
     "xml-core": "^1"
   },
   "devDependencies": {
-    "node-webcrypto-ossl": "^1.0.10",
-    "ts-loader": "^1.1.0",
     "coveralls": "^2",
     "live-server": "^1",
     "mocha": "^3",
+    "node-webcrypto-ossl": "^1.0.10",
     "npm-run-all": "^3",
     "nyc": "^8",
-    "watch": "^0",
-    "typescript": "^2.1.4"
+    "ts-loader": "^1.3.3",
+    "typescript": "^2.1.4",
+    "watch": "^0"
   }
 }
