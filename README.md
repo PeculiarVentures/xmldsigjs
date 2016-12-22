@@ -61,11 +61,9 @@ xmldsigjs.Application.setEngine("PKCS11", new WebCrypto({
 
 ## WARNING
 
-**Using XMLDSIG is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
+**Using XMLDSIG is a bit like running with scissors so use it cautiously. That said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
 
-**Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
-
-## Easy to use
+## Usage
 
 ### Sign
 
@@ -136,7 +134,7 @@ __Parameters__
 
 For Sign/Verify operations you need to use CryptoKey. You can use [examples](https://github.com/diafygi/webcrypto-examples#rsassa-pkcs1-v1_5---generatekey) for it
 
-### Using in NodeJs
+### Initiating in NodeJs
 
 ```javascript
 "use strict";
@@ -149,7 +147,7 @@ const XmlDSigJs = require("xmldsigjs");
 XmlDSigJs.Application.setEngine("OpenSSL", crypto);
 ```
 
-### Using in Browser
+### Initiating in Browser
 
 ```html
 <script src="asn1js.js"></script>
@@ -158,7 +156,7 @@ XmlDSigJs.Application.setEngine("OpenSSL", crypto);
 <script src="xmldsig.js"></script>
 ```
 
-### Create XMLDSIG Signature
+### Creating a XMLDSIG Signature
 
 ```javascript
 "use strict";
@@ -181,7 +179,7 @@ signature.Sign(                                  // Signing document
     .catch(e => console.log(e));
 ```
 
-### Check XMLDSIG Signature 
+### Checking a XMLDSIG Signature 
 
 
 ```javascript
@@ -200,7 +198,7 @@ signedXml.Verify()
     .catch(e => console.log(e));
 ```
 
-#### In the browser
+#### Browser Verify Example
 ```HTML
 <!DOCTYPE html>
 <html>
