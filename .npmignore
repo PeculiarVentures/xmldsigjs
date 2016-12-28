@@ -1,5 +1,7 @@
 /.vscode
 /node_modules
 /samples
-/src
+/lib
+/.nyc_output/
+/coverage/
 /typings

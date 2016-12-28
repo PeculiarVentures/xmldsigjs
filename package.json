@@ -4,6 +4,7 @@
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "lib/src/index",
   "scripts": {
+    "install": "npm run build",
     "start": "node test/html/server.js",
     "pretest": "npm run build:map",
     "test": "mocha test/scripts",
