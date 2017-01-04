@@ -1,899 +1,146 @@
-/// <reference types="xml-core" />
+import { XmlObject, XmlCollection } from "xml-core";
+import { RelativeDistinguishedNames, Certificate } from "pkijs";
 
 declare namespace XmlDSigJs {
 
-    // xml/canonicalization_method.ts
+    // algorithm/ecdsa_sign
 
-    /**
-     * 
-     * 
-     * @export
-     * @class CanonicalizationMethod
-     * @extends {XmlSignatureObject}
-     */
-    export class CanonicalizationMethod extends XmlSignatureObject {
-        public Algorithm: string;
+    export const ECDSA = "ECDSA";
+    export const ECDSA_SHA1_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1";
+    export const ECDSA_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
+    export const ECDSA_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384";
+    export const ECDSA_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";
+    export class EcdsaSha1 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
+    }
+    export class EcdsaSha256 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
+    }
+    export class EcdsaSha384 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
+    }
+    export class EcdsaSha512 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
     }
 
-    // algorithm.ts
-    export type BASE64 = string;
-    export interface IAlgorithm {
-        algorithm: Algorithm;
-        xmlNamespace: string;
-        getAlgorithmName(): string;
+    // algorithm/hmac_sign
+
+    export const HMAC = "HMAC";
+    export const HMAC_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
+    export const HMAC_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
+    export const HMAC_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
+    export const HMAC_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
+    export class HmacSha1 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
     }
-    export interface IHashAlgorithm extends IAlgorithm {
-        getHash(xml: string): PromiseLike<ArrayBuffer>;
+    export class HmacSha256 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
     }
-    export interface IHashAlgorithmConstructable {
-        new (): IHashAlgorithm;
+    export class HmacSha384 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
     }
-    export abstract class XmlAlgorithm implements IAlgorithm {
-        algorithm: Algorithm;
-        xmlNamespace: string;
-        getAlgorithmName(): string;
-    }
-    export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
-        getHash(xml: Uint8Array | string | Node): PromiseLike<ArrayBuffer>;
-    }
-    export interface ISignatureAlgorithm extends IAlgorithm {
-        getSignature(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): PromiseLike<ArrayBuffer>;
-        verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string, algorithm?: Algorithm): PromiseLike<boolean>;
-    }
-    export interface ISignatureAlgorithmConstructable {
-        new (): ISignatureAlgorithm;
-    }
-    export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignatureAlgorithm {
-        /**
-         * Sign the given string using the given key
-         */
-        getSignature(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): PromiseLike<ArrayBuffer>;
-        /**
-        * Verify the given signature of the given string using key
-        */
-        verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string, algorithm?: Algorithm): PromiseLike<boolean>;
+    export class HmacSha512 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
     }
 
-    export interface CryptoEx extends Crypto {
-        name: string;
-    }
-    // application.ts
-    export class Application {
-        /**
-         * Sets crypto engine for the current Application
-         * @param  {string} name
-         * @param  {Crypto} crypto
-         * @returns void
-         */
-        static setEngine(name: string, crypto: Crypto): void;
-        /**
-         * Gets the crypto module from the Application
-         */
-        static readonly crypto: CryptoEx;
-        static isNodePlugin(): boolean;
-    }
+    // algorithm/rsa_hash
 
-    // canonicalizer.ts
-
-    export enum XmlCanonicalizerState {
-        BeforeDocElement = 0,
-        InsideDocElement = 1,
-        AfterDocElement = 2,
-    }
-    export class XmlCanonicalizer {
-        protected withComments: boolean;
-        protected exclusive: boolean;
-        protected propagatedNamespaces: XmlCore.NamespaceManager;
-        protected document: Document;
-        protected result: string[];
-        protected visibleNamespaces: XmlCore.NamespaceManager;
-        protected inclusiveNamespacesPrefixList: string[];
-        protected state: XmlCanonicalizerState;
-        constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces?: XmlCore.NamespaceManager);
-        InclusiveNamespacesPrefixList: string;
-        Canonicalize(node: Node): string;
-        protected WriteNode(node: Node): void;
-        protected WriteDocumentNode(node: Node): void;
-        protected WriteCommentNode(node: Node): void;
-        protected WriteElementNode(node: Element): void;
-        protected WriteNamespacesAxis(node: Element | Attr): number;
-        protected NormalizeString(input: string | null, type: XmlCore.XmlNodeType): string;
-    }
-
-    // crypto_config.ts
-    export class CryptoConfig {
-        /**
-         * Creates Transform from given name
-         * if name is not exist then throws error
-         *
-         * @static
-         * @param {(string |)} [name=null]
-         * @returns
-         *
-         * @memberOf CryptoConfig
-         */
-        static CreateFromName(name: string | null): Transform;
-        static CreateSignatureAlgorithm(namespace: string): SignatureAlgorithm;
-        static CreateHashAlgorithm(namespace: string): HashAlgorithm;
-    }
-
-    // data_object.ts
-
-    /**
-     * Represents the object element of an XML signature that holds data to be signed.
-     */
-    export class DataObject extends XmlSignatureObject {
-        protected name: string;
-
-        constructor();
-        constructor(id: string | null, mimeType: string | null, encoding: string | null, data: Element | null);
-
-        /**
-         * Gets or sets the data value of the current DataObject object.
-         */
-        Data: NodeList;
-        /**
-         * Gets or sets the encoding of the current DataObject object.
-         */
-        Encoding: string | null;
-        /**
-         * Gets or sets the identification of the current DataObject object.
-         */
-        Id: string | null;
-        /**
-         * Gets or sets the MIME type of the current DataObject object.
-         */
-        MimeType: string | null;
-
-
-        /**
-         * Returns the XML representation of the DataObject object.
-         * @returns Element
-         */
-        GetXml(): Element;
-        /**
-         * Loads a DataObject state from an XML element.
-         * @param  {Element} value
-         * @returns void
-         */
-        LoadXml(value: Element): void;
-    }
-
-    // error.ts
-
-    export class XmlSignatureError extends XmlCore.XmlError {
-        protected readonly prefix: string;
-    }
-
-    // key_info
-
-    /**
-     * Represents an XML digital signature or XML encryption <KeyInfo> element.
-     */
-    export class KeyInfo extends XmlSignatureObject {
-        protected name: string;
-
-
-        constructor();
-        /**
-         * Gets the number of KeyInfoClause objects contained in the KeyInfo object.
-         */
-        readonly length: number;
-        /**
-         * Gets or sets the key information identity.
-         */
-        Id: string | null;
-        /**
-         * Returns an enumerator of the KeyInfoClause objects in the KeyInfo object.
-         * @param  {any} requestedObjectType?
-         */
-        GetEnumerator(): Array<KeyInfoClause>;
-        GetEnumerator(requestedObjectType: any): Array<KeyInfoClause>;
-        /**
-         * Returns an enumerator of the KeyInfoClause objects in the KeyInfo object.
-         * @param  {KeyInfoClause} clause The KeyInfoClause to add to the KeyInfo object.
-         * @returns void
-         */
-        AddClause(clause: KeyInfoClause): void;
-        /**
-         * Returns the XML representation of the KeyInfo object.
-         * @returns Node
-         */
-        GetXml(): Element;
-        /**
-         * Loads a KeyInfo state from an XML element.
-         * @param  {Element} value
-         * @returns void
-         */
-        LoadXml(value: Element): void;
-    }
-    export interface KeyInfoClause extends XmlCore.IXmlSerializable {
-        Key: CryptoKey | null;
-        importKey(key: CryptoKey): PromiseLike<this>;
-        exportKey(alg: Algorithm): PromiseLike<CryptoKey>;
-    }
-
-    // reference.ts
-
-    /**
-     * Represents the <reference> element of an XML signature.
-     */
-    export class Reference extends XmlSignatureObject {
-        protected name: string;
-
-        constructor(p?: string);
-        /**
-         * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
-         */
-        DigestMethod: string | null;
-        /**
-         * Gets or sets the digest value of the current Reference.
-         */
-        DigestValue: ArrayBuffer;
-        /**
-         * Gets or sets the ID of the current Reference.
-         */
-        Id: string | null;
-        /**
-         * Gets the transform chain of the current Reference.
-         */
-        readonly TransformChain: Transforms;
-        /**
-         * Gets or sets the type of the object being signed.
-         */
-        Type: string | null;
-        /**
-         * Gets or sets the Uri of the current Reference.
-         */
-        Uri: string | null;
-        /**
-         * Adds a Transform object to the list of transforms to be performed
-         * on the data before passing it to the digest algorithm.
-         * @param  {Transform} transform The transform to be added to the list of transforms.
-         * @returns void
-         */
-        AddTransform(transform: Transform): void;
-        /**
-         * Returns the XML representation of the Reference.
-         * @returns Element
-         */
-        GetXml(): Element;
-        /**
-         * Loads a Reference state from an XML element.
-         * @param  {Element} value
-         */
-        LoadXml(value: Element): void;
-    }
-
-    // signature.ts
-
-    /**
-     * Represents the <Signature> element of an XML signature.
-     */
-    export class Signature extends XmlSignatureObject {
-        protected name: string;
-
-        constructor();
-        /**
-         * Gets or sets the ID of the current Signature.
-         */
-        Id: string | null;
-        /**
-         * Gets or sets the KeyInfo of the current Signature.
-         */
-        KeyInfo: KeyInfo;
-        /**
-         * Gets or sets a list of objects to be signed.
-         */
-        ObjectList: Array<DataObject>;
-        /**
-         * Gets or sets the value of the digital signature.
-         */
-        SignatureValue: Uint8Array;
-        /**
-         * Gets or sets the Id of the SignatureValue.
-         */
-        SignatureValueId: string | null;
-        /**
-         * Gets or sets the SignedInfo of the current Signature.
-         */
-        SignedInfo: SignedInfo;
-        /**
-         * Adds a DataObject to the list of objects to be signed.
-         * @param  {DataObject} dataObject The DataObject to be added to the list of objects to be signed.
-         * @returns void
-         */
-        AddObject(dataObject: DataObject): void;
-        /**
-         * Returns the XML representation of the Signature.
-         * @returns Element
-         */
-        GetXml(): Element;
-        /**
-         * Loads a Signature state from an XML element.
-         * @param  {Element} value
-         */
-        LoadXml(element: Element): void;
-
-    }
-
-    // signed_info.ts
-
-    /**
-     * The SignedInfo class represents the <SignedInfo> element
-     * of an XML signature defined by the XML digital signature specification
-     */
-    export class SignedInfo extends XmlSignatureObject {
-        protected name: string;
-
-        constructor(signedXml?: SignedXml);
-        /**
-         * Gets or sets the canonicalization algorithm that is used before signing
-         * for the current SignedInfo object.
-         */
-        CanonicalizationMethod: string | null;
-        /**
-         * Gets a Transform object used for canonicalization.
-         * @returns Transform
-         */
-        readonly CanonicalizationMethodObject: Transform;
-        /**
-         * Gets the number of references in the current SignedInfo object.
-         */
-        readonly Count: number;
-        /**
-         * Gets or sets the ID of the current SignedInfo object.
-         */
-        Id: string | null;
-        /**
-         * Gets a value that indicates whether the collection is read-only.
-         * @returns boolean
-         */
-        readonly IsReadOnly: boolean;
-        /**
-         * Gets a value that indicates whether the collection is synchronized.
-         * @returns boolean
-         */
-        readonly IsSynchronized: boolean;
-        /**
-         * Gets a list of the Reference objects of the current SignedInfo object.
-         */
-        readonly References: Reference[];
-        /**
-         * Gets or sets the length of the signature for the current SignedInfo object.
-         */
-        SignatureLength: string;
-        /**
-         * Gets or sets the name of the algorithm used for signature generation
-         * and validation for the current SignedInfo object.
-         */
-        SignatureMethod: string | null;
-        SignatureParams: XmlCore.XmlObject;
-        /**
-         * Gets an object to use for synchronization.
-         */
-        readonly SyncRoot: any;
-        /**
-         * Adds a Reference object to the list of references to digest and sign.
-         * @param  {Reference} reference The reference to add to the list of references.
-         * @returns void
-         */
-        AddReference(reference: Reference): void;
-        /**
-         * Copies the elements of this instance into an Array object, starting at a specified index in the array.
-         * @param  {any[]} array
-         * @param  {number} index
-         * @returns void
-         */
-        CopyTo(array: any[], index: number): void;
-        /**
-         * Returns the XML representation of the SignedInfo object.
-         * @returns Node
-         */
-        GetXml(): Element;
-        /**
-         * Loads a SignedInfo state from an XML element.
-         * @param  {Element} value
-         * @returns void
-         */
-        LoadXml(value: Element): void;
-    }
-
-    // signed_xml.ts
-
-    /**
-    * Provides a wrapper on a core XML signature object to facilitate creating XML signatures.
-    */
-    export class SignedXml extends XmlSignatureObject {
-        protected name: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the standard canonicalization
-         * algorithm for XML digital signatures. This field is constant.
-         */
-        protected static XmlDsigCanonicalizationUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the standard canonicalization algorithm
-         * for XML digital signatures and includes comments. This field is constant.
-         */
-        protected static XmlDsigCanonicalizationWithCommentsUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the standard namespace for XML digital signatures.
-         * This field is constant.
-         */
-        protected static XmlDsigNamespaceUrl: string;
-        protected static XmlDsigDSAUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the standard HMACSHA1 algorithm for XML digital signatures.
-         * This field is constant.
-         */
-        protected static XmlDsigHMACSHA1Url: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the standard minimal canonicalization algorithm
-         * for XML digital signatures. This field is constant.
-         */
-        protected static XmlDsigMinimalCanonicalizationUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the standard RSA signature method
-         * for XML digital signatures. This field is constant.
-         */
-        protected static XmlDsigRSASHA1Url: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the standard SHA1 digest method for
-         * XML digital signatures. This field is constant.
-         */
-        protected static XmlDsigSHA1Url: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the XML mode
-         * decryption transformation. This field is constant.
-         */
-        protected static XmlDecryptionTransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the base 64 transformation. This field is constant.
-         */
-        protected static XmlDsigBase64TransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI)
-         * for the Canonical XML transformation. This field is constant.
-         */
-        protected static XmlDsigC14NTransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the Canonical XML transformation,
-         * with comments. This field is constant.
-         */
-        protected static XmlDsigC14NWithCommentsTransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for enveloped signature transformation.
-         * This field is constant.
-         */
-        protected static XmlDsigEnvelopedSignatureTransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for exclusive XML canonicalization.
-         * This field is constant.
-         */
-        protected static XmlDsigExcC14NTransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for exclusive XML canonicalization, with comments.
-         * This field is constant.
-         */
-        protected static XmlDsigExcC14NWithCommentsTransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the XML Path Language (XPath).
-         * This field is constant.
-         */
-        protected static XmlDsigXPathTransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for XSLT transformations.
-         * This field is constant.
-         */
-        protected static XmlDsigXsltTransformUrl: string;
-        /**
-         * Represents the Uniform Resource Identifier (URI) for the license transform algorithm
-         * used to normalize XrML licenses for signatures.
-         */
-        protected static XmlLicenseTransformUrl: string;
-        protected m_element: Node | null;
-        /**
-         * Represents the Signature object of the current SignedXml object
-         */
-        protected m_signature: Signature;
-        protected m_signature_algorithm: ISignatureAlgorithm | null;
-        protected envdoc: Document | null;
-        protected validationErrors: string[];
-        protected key: CryptoKey | null;
-
-        /**
-         * Gets or sets the KeyInfo object of the current SignedXml object.
-         */
-        KeyInfo: KeyInfo;
-        /**
-         * Gets the Signature object of the current SignedXml object.
-         */
-        readonly Signature: Signature;
-        /**
-         * Gets or sets the prefix for the current SignedXml object.
-         */
-        Prefix: string;
-        /**
-         * Gets the length of the signature for the current SignedXml object.
-         */
-        readonly SignatureLength: number;
-        readonly SignatureMethod: string;
-        /**
-         * Gets the signature value of the current SignedXml object.
-         */
-        readonly SignatureValue: ArrayBuffer;
-        /**
-         * Gets the CanonicalizationMethod of the current SignedXml object.
-         */
-        readonly CanonicalizationMethod: string;
-        /**
-         * Gets the SignedInfo object of the current SignedXml object.
-         */
-        readonly SignedInfo: SignedInfo;
-        /**
-         * Gets or sets the asymmetric algorithm key used for signing a SignedXml object.
-         */
-        SigningKey: CryptoKey | null;
-        /**
-         * Gets or sets the name of the installed key to be used for signing the SignedXml object.
-         */
-        SigningKeyName: string;
-        /**
-         * @param {string} idMode. Value of "wssecurity" will create/validate id's with the ws-security namespace
-         */
-        constructor();
-        constructor(node: Document);
-        constructor(node: Element);
-        /**
-         * Returns the public key of a signature.
-         */
-        protected GetPublicKeys(): PromiseLike<CryptoKey[]>;
-        /**
-         * Adds a Reference object to the SignedXml object that describes a digest method,
-         * digest value, and transform to use for creating an XML digital signature.
-         * @param  {Reference} reference The Reference object that describes a digest method, digest value,
-         * and transform to use for creating an XML digital signature.
-         * @returns void
-         */
-        AddReference(reference: Reference): void;
-
-
-        protected findById(element: Element, id: string): Element | null;
-
-
-
-        /**
-         * Computes an XML digital signature using the specified algorithm.
-         * @param  {Algorithm} algorithm Specified WebCrypto Algoriithm
-         * @returns Promise
-         */
-        ComputeSignature(algorithm: Algorithm): Promise<{}>;
-        /**
-         * Determines whether the SignedXml.Signature property verifies using the public key in the signature.
-         * @returns Promise
-         */
-        CheckSignature(): PromiseLike<boolean>;
-        CheckSignature(key: CryptoKey): PromiseLike<boolean>;
-        CheckSignature(cert: X509Certificate): PromiseLike<boolean>;
-        protected validateSignatureValue(): PromiseLike<boolean>;
-        protected findCanonicalizationAlgorithm(name: string): Transform;
-        protected ValidateReferences(doc: Node): PromiseLike<boolean>;
-        protected getCanonXml(transforms: Transform[], node: Node): string;
-        /**
-         * Loads a SignedXml state from an XML element.
-         * @param  {Element} value The XML to load the SignedXml state from.
-         * @returns void
-         */
-        LoadXml(value: Element | string): void;
-        /**
-         * Returns the XML representation of a SignedXml object.
-         * @returns Element
-         */
-        GetXml(): Element;
-    }
-
-    // transform.ts
-
-    export interface ITransform extends XmlCore.IXmlSerializable {
-        Algorithm: string;
-        LoadInnerXml(node: Node): void;
-        GetInnerXml(): Node | null;
-        GetOutput(): any;
-    }
-    export interface ITransformConstructable {
-        new (): Transform;
-    }
-    /**
-     * The Transform element contains a single transformation
-     */
-    export class Transform extends XmlSignatureObject implements ITransform {
-        protected name: string;
-        protected innerXml: Node | null;
-        Prefix: string;
-        /**
-         * Algorithm of the transformation
-         */
-        Algorithm: string;
-        /**
-         * XPath of the transformation
-         */
-        XPath: string;
-        /**
-         * Default constructor
-         */
-        constructor();
-        /**
-         * When overridden in a derived class, returns the output of the current Transform object.
-         */
-        GetOutput(): string;
-        LoadInnerXml(node: Node): void;
-        GetInnerXml(): Node | null;
-        /**
-         * Check to see if something has changed in this instance and needs to be serialized
-         * @returns Flag indicating if a member needs serialization
-         */
-        HasChanged(): boolean;
-        /**
-         * Load state from an XML element
-         * @param {Element} element XML element containing new state
-         */
-        LoadXml(element: Element): void;
-        /**
-         * Returns the XML representation of the this object
-         * @returns XML element containing the state of this object
-         */
-        GetXml(): Element;
-    }
-
-    // transforms.ts
-
-    /**
-     * The Transforms element contains a collection of transformations
-     */
-    export class Transforms extends XmlSignatureCollection<Transform> {
-        protected name: string;
-        protected OnLoadChildElement(element: Element): Transform;
-    }
-
-    // xml.ts
-
-    export const XmlSignature: {
-        DEFAULT_CANON_METHOD: string;
-        DefaultPrefix: string;
-        ElementNames: {
-            CanonicalizationMethod: string;
-            DigestMethod: string;
-            DigestValue: string;
-            DSAKeyValue: string;
-            EncryptedKey: string;
-            HMACOutputLength: string;
-            RSAPSSParams: string;
-            MaskGenerationFunction: string;
-            SaltLength: string;
-            KeyInfo: string;
-            KeyName: string;
-            KeyValue: string;
-            Modulus: string;
-            Exponent: string;
-            Manifest: string;
-            Object: string;
-            Reference: string;
-            RetrievalMethod: string;
-            RSAKeyValue: string;
-            ECKeyValue: string;
-            NamedCurve: string;
-            PublicKey: string;
-            Signature: string;
-            SignatureMethod: string;
-            SignatureValue: string;
-            SignedInfo: string;
-            Transform: string;
-            Transforms: string;
-            X509Data: string;
-            X509IssuerSerial: string;
-            X509IssuerName: string;
-            X509SerialNumber: string;
-            X509SKI: string;
-            X509SubjectName: string;
-            X509Certificate: string;
-            X509CRL: string;
-            XPath: string;
+    export const SHA1 = "SHA-1";
+    export const SHA256 = "SHA-256";
+    export const SHA384 = "SHA-384";
+    export const SHA512 = "SHA-512";
+    export const SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#sha1";
+    export const SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmlenc#sha256";
+    export const SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#sha384";
+    export const SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmlenc#sha512";
+    export class Sha1 extends HashAlgorithm {
+        algorithm: {
+            name: string;
         };
-        AttributeNames: {
-            Algorithm: string;
-            Encoding: string;
-            Id: string;
-            MimeType: string;
-            Type: string;
-            URI: string;
+        namespaceURI: string;
+    }
+    export class Sha256 extends HashAlgorithm {
+        algorithm: {
+            name: string;
         };
-        AlgorithmNamespaces: {
-            XmlDsigBase64Transform: string;
-            XmlDsigC14NTransform: string;
-            XmlDsigC14NWithCommentsTransform: string;
-            XmlDsigEnvelopedSignatureTransform: string;
-            XmlDsigXPathTransform: string;
-            XmlDsigXsltTransform: string;
-            XmlDsigExcC14NTransform: string;
-            XmlDsigExcC14NWithCommentsTransform: string;
-            XmlDecryptionTransform: string;
-            XmlLicenseTransform: string;
+        namespaceURI: string;
+    }
+    export class Sha384 extends HashAlgorithm {
+        algorithm: {
+            name: string;
         };
-        Uri: {
-            Manifest: string;
+        namespaceURI: string;
+    }
+    export class Sha512 extends HashAlgorithm {
+        algorithm: {
+            name: string;
         };
-        NamespaceURI: string;
-        NamespaceURIMore: string;
-        NamespaceURIPss: string;
-        Prefix: string;
-    };
-
-    // xml_object.ts
-
-    export abstract class XmlSignatureObject extends XmlCore.XmlObject {
-        protected prefix: string;
-        protected namespaceUri: string;
-    }
-    export abstract class XmlSignatureCollection<I extends XmlSignatureObject> extends XmlCore.XmlCollection<I> {
-        protected prefix: string;
-        protected namespaceUri: string;
+        namespaceURI: string;
     }
 
-    // key/ecdsa_key.ts
+    // algorithm/rsa_pkcs1_sign
 
-    export type NamedCurve = "P-256" | "P-384" | "P-521";
-    /**
-     * Represents the <ECKeyValue> element of an XML signature.
-     */
-    export class EcdsaKeyValue extends XmlSignatureObject implements KeyInfoClause {
-        protected name: string;
-        protected m_key: CryptoKey | null;
-        protected m_jwk: JsonWebKey | null;
-        protected m_algorithm: ISignatureAlgorithm | null;
-        protected m_x: Uint8Array | null;
-        protected m_y: Uint8Array | null;
-        protected m_curve: NamedCurve | null;
-        protected m_keyusage: string[] | null;
-        /**
-         * Gets or sets the instance of ECDSA that holds the public key.
-         */
-        Key: CryptoKey | null;
-        /**
-         * Gets the algorithm of the public key
-         */
-        readonly Algorithm: ISignatureAlgorithm | null;
-        /**
-         * Gets the X point value of then public key
-         */
-        readonly X: Uint8Array | null;
-        /**
-         * Gets the Y point value of then public key
-         */
-        readonly Y: Uint8Array | null;
-        /**
-         * Gets the NamedCurve value of then public key
-         */
-        readonly NamedCurve: "P-256" | "P-384" | "P-521" | null;
-        constructor();
-        /**
-         * Imports key to the ECKeyValue object
-         * @param  {CryptoKey} key
-         * @returns Promise
-         */
-        importKey(key: CryptoKey): PromiseLike<this>;
-        /**
-         * Exports key from the ECKeyValue object
-         * @param  {Algorithm} alg
-         * @returns Promise
-         */
-        exportKey(alg: Algorithm): PromiseLike<CryptoKey>;
-        /**
-         * Returns the XML representation of the ECDSA key clause.
-         * @returns Element
-         */
-        GetXml(): Element;
-        /**
-         * Loads an ECDSA key clause from an XML element.
-         * @param  {Element} element
-         * @returns void
-         */
-        LoadXml(element: Element): void;
+    export const RSA_PKCS1 = "RSASSA-PKCS1-v1_5";
+    export const RSA_PKCS1_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+    export const RSA_PKCS1_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    export const RSA_PKCS1_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
+    export const RSA_PKCS1_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
+    export class RsaPkcs1Sha1 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
+    }
+    export class RsaPkcs1Sha256 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
+    }
+    export class RsaPkcs1Sha384 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
+    }
+    export class RsaPkcs1Sha512 extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
     }
 
-    // key/key_value.ts
+    // algorithm/rsa_pss_sign
 
-    /**
-     * Represents the <KeyValue> element of an XML signature.
-     */
-    export class KeyValue extends XmlSignatureObject {
-        protected name: string;
-        protected value: KeyInfoClause;
-        Value: KeyInfoClause;
-        constructor(value?: KeyInfoClause);
-        /**
-         * Returns the XML representation of the KeyValue.
-         * @returns Element
-         */
-        GetXml(): Element;
-        /**
-         * Loads an KeyValue from an XML element.
-         * @param  {Element} element
-         * @returns void
-         */
-        LoadXml(element: Element): void;
+    export const RSA_PSS = "RSA-PSS";
+    export const RSA_PSS_WITH_PARAMS_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#rsa-pss";
+    export class RsaPssBase extends SignatureAlgorithm {
+        algorithm: any;
+        namespaceURI: string;
+        constructor(saltLength?: number);
+    }
+    export class RsaPssSha1 extends RsaPssBase {
+        constructor(saltLength?: number);
+    }
+    export class RsaPssSha256 extends RsaPssBase {
+        constructor(saltLength?: number);
+    }
+    export class RsaPssSha384 extends RsaPssBase {
+        constructor(saltLength?: number);
+    }
+    export class RsaPssSha512 extends RsaPssBase {
+        constructor(saltLength?: number);
     }
 
-    // key/rsa_key.ts
-
-    export interface IJwkRsa {
-        alg: string;
-        kty: string;
-        e: string;
-        n: string;
-        ext: boolean;
-    }
-    /**
-     * Represents the <RSAKeyValue> element of an XML signature.
-     */
-    export class RsaKeyValue extends XmlSignatureObject implements KeyInfoClause {
-        protected name: string;
-        protected m_key: CryptoKey | null;
-        protected m_jwk: JsonWebKey | null;
-        protected m_algorithm: ISignatureAlgorithm | null;
-        protected m_modulus: Uint8Array | null;
-        protected m_exponent: Uint8Array | null;
-        protected m_keyusage: string[];
-        /**
-         * Gets or sets the instance of RSA that holds the public key.
-         */
-        Key: CryptoKey | null;
-        /**
-         * Gets the algorithm of the public key
-         */
-        readonly Algorithm: ISignatureAlgorithm | null;
-        /**
-         * Gets the Modulus of the public key
-         */
-        readonly Modulus: Uint8Array | null;
-        /**
-         * Gets the Exponent of the public key
-         */
-        readonly Exponent: Uint8Array | null;
-        constructor();
-        /**
-         * Imports key to the RSAKeyValue object
-         * @param  {CryptoKey} key
-         * @returns Promise
-         */
-        importKey(key: CryptoKey): Promise<{}>;
-        /**
-         * Exports key from the RSAKeyValue object
-         * @param  {Algorithm} alg
-         * @returns Promise
-         */
-        exportKey(alg: Algorithm): Promise<{}>;
-        /**
-         * Returns the XML representation of the RSA key clause.
-         * @returns Element
-         */
-        GetXml(): Element;
-        /**
-         * Loads an RSA key clause from an XML element.
-         * @param  {Element} element
-         * @returns void
-         */
-        LoadXml(element: Element): void;
-    }
-
-    // key/x509_certificate.ts
+    // pki/x509
 
     export type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
-
     /**
      * Represents an <X509Certificate> element.
      */
     export class X509Certificate {
         protected raw: Uint8Array;
+        protected simpl: Certificate;
         protected publicKey: CryptoKey | null;
         constructor(rawData?: BufferSource);
         /**
@@ -908,7 +155,7 @@ declare namespace XmlDSigJs {
          * Example:
          * > C=Some name, O=Some organization name, C=RU
          */
-        protected NameToString(name: any, spliter?: string): string;
+        protected NameToString(name: RelativeDistinguishedNames, spliter?: string): string;
         /**
          * Gets a issuer name of the certificate
          */
@@ -941,16 +188,147 @@ declare namespace XmlDSigJs {
          * @param  {Algorithm} algorithm
          * @returns Promise
          */
-        exportKey(algorithm: Algorithm): Promise<{}>;
+        exportKey(algorithm: Algorithm): Promise<CryptoKey>;
     }
 
-    // key/x509_data.ts
+    // xml/key_info/ecdsa_key
+
+    export type NamedCurveType = string | "P-256" | "P-384" | "P-521";
+    export class EcdsaPublicKey extends XmlObject {
+        X: Uint8Array;
+        Y: Uint8Array;
+    }
+    export class NamedCurve extends XmlObject {
+        Uri: string;
+    }
+    export class DomainParameters extends XmlObject {
+        NamedCurve: NamedCurve;
+    }
+    /**
+     * Represents the <ECKeyValue> element of an XML signature.
+     */
+    export class EcdsaKeyValue extends KeyInfoClause {
+        protected name: string;
+        protected m_key: CryptoKey | null;
+        protected m_jwk: JsonWebKey | null;
+        protected m_keyusage: string[] | null;
+        DomainParameters: DomainParameters;
+        PublicKey: EcdsaPublicKey;
+        /**
+         * Gets the NamedCurve value of then public key
+         */
+        readonly NamedCurve: string;
+        /**
+         * Imports key to the ECKeyValue object
+         * @param  {CryptoKey} key
+         * @returns Promise
+         */
+        importKey(key: CryptoKey): PromiseLike<this>;
+        /**
+         * Exports key from the ECKeyValue object
+         * @param  {Algorithm} alg
+         * @returns Promise
+         */
+        exportKey(alg: Algorithm): PromiseLike<CryptoKey>;
+    }
+
+    // xml/key_info/key_info_clause
+
+    export abstract class KeyInfoClause extends XmlSignatureObject {
+        Key: CryptoKey | null;
+        abstract importKey(key: CryptoKey): PromiseLike<this>;
+        abstract exportKey(alg: Algorithm): PromiseLike<CryptoKey>;
+    }
+
+    // xml/key_info/key_value
+
+    /**
+ * Represents the <KeyValue> element of an XML signature.
+ */
+    export class KeyValue extends KeyInfoClause {
+        protected value: KeyInfoClause;
+        Value: KeyInfoClause;
+        constructor(value?: KeyInfoClause);
+        importKey(key: CryptoKey): PromiseLike<this>;
+        exportKey(alg: Algorithm): PromiseLike<CryptoKey>;
+        protected OnGetXml(element: Element): void;
+    }
+
+    // xml/key_info/rsa_key
+
+    export interface IJwkRsa {
+        alg: string;
+        kty: string;
+        e: string;
+        n: string;
+        ext: boolean;
+    }
+    export interface RsaPSSSignParams extends RsaPssParams, Algorithm {
+        hash: AlgorithmIdentifier;
+    }
+    /**
+     * Represents the <RSAKeyValue> element of an XML signature.
+     */
+    export class RsaKeyValue extends KeyInfoClause {
+        protected m_key: CryptoKey | null;
+        protected m_jwk: JsonWebKey | null;
+        protected m_keyusage: string[];
+        /**
+         * Gets the Modulus of the public key
+         */
+        Modulus: Uint8Array | null;
+        /**
+         * Gets the Exponent of the public key
+         */
+        Exponent: Uint8Array | null;
+        /**
+         * Imports key to the RSAKeyValue object
+         * @param  {CryptoKey} key
+         * @returns Promise
+         */
+        importKey(key: CryptoKey): Promise<{}>;
+        /**
+         * Exports key from the RSAKeyValue object
+         * @param  {Algorithm} alg
+         * @returns Promise
+         */
+        exportKey(alg: Algorithm): Promise<{}>;
+        /**
+         * Loads an RSA key clause from an XML element.
+         * @param  {Element | string} element
+         * @returns void
+         */
+        LoadXml(node: Element | string): void;
+    }
+    export class MaskGenerationFunction extends XmlObject {
+        DigestMethod: DigestMethod;
+        Algorithm: string;
+    }
+    export class PssAlgorithmParams extends XmlObject {
+        constructor(algorithm?: RsaPSSSignParams);
+        DigestMethod: DigestMethod;
+        MGF: MaskGenerationFunction;
+        SaltLength: number;
+        TrailerField: number;
+        FromAlgorithm(algorithm: RsaPSSSignParams): void;
+        static FromAlgorithm(algorithm: RsaPSSSignParams): PssAlgorithmParams;
+    }
+
+    // xml/key_info/spki_data
+
+    export class SPKIData extends KeyInfoClause {
+        Key: CryptoKey;
+        SPKIexp: Uint8Array | null;
+        importKey(key: CryptoKey): PromiseLike<this>;
+        exportKey(alg: Algorithm): PromiseLike<CryptoKey>;
+    }
+
+    // xml/key_info/x509_data
 
     export class X509IssuerSerial extends XmlSignatureObject {
         X509IssuerName: string;
         X509SerialNumber: string;
     }
-
     export enum X509IncludeOption {
         None = 0,
         EndCertOnly = 1,
@@ -964,14 +342,13 @@ declare namespace XmlDSigJs {
     /**
      * Represents an <X509Data> subelement of an XMLDSIG or XML Encryption <KeyInfo> element.
      */
-    export class KeyInfoX509Data extends XmlSignatureObject implements KeyInfoClause {
-        protected name: string;
-
-
-
-
-
-
+    export class KeyInfoX509Data extends KeyInfoClause {
+        private x509crl;
+        private IssuerSerialList;
+        private SubjectKeyIdList;
+        private SubjectNameList;
+        private X509CertificateList;
+        private key;
         constructor();
         constructor(rgbCert: Uint8Array);
         constructor(cert: X509Certificate);
@@ -985,8 +362,8 @@ declare namespace XmlDSigJs {
          * @param  {Algorithm} alg
          * @returns Promise
          */
-        exportKey(alg: Algorithm): Promise<{}>;
-
+        exportKey(alg: Algorithm): Promise<CryptoKey | null>;
+        private AddCertificatesChainFrom(cert, root);
         /**
          * Gets a list of the X.509v3 certificates contained in the KeyInfoX509Data object.
          */
@@ -998,7 +375,7 @@ declare namespace XmlDSigJs {
         /**
          * Gets a list of X509IssuerSerial structures that represent an issuer name and serial number pair.
          */
-        readonly IssuerSerials: X509IssuerSerial[];
+        readonly IssuerSerials: IX509IssuerSerial[];
         /**
          * Gets a list of the subject key identifiers (SKIs) contained in the KeyInfoX509Data object.
          */
@@ -1046,7 +423,7 @@ declare namespace XmlDSigJs {
         LoadXml(element: Element): void;
     }
 
-    // transforms/base64.ts
+    // xml/transforms/base64
 
     export class XmlDsigBase64Transform extends Transform {
         Algorithm: string;
@@ -1056,7 +433,7 @@ declare namespace XmlDSigJs {
         GetOutput(): any;
     }
 
-    // transforms/c14n.ts
+    // xml/transforms/c14n
 
     /**
      * Represents the C14N XML canonicalization transform for a digital signature
@@ -1080,7 +457,7 @@ declare namespace XmlDSigJs {
         protected xmlCanonicalizer: XmlCanonicalizer;
     }
 
-    // transforms/enveloped_signature.ts
+    // xml/transforms/enveloped_signature
 
     /**
      * Represents the enveloped signature transform for an XML digital signature as defined by the W3C.
@@ -1094,12 +471,12 @@ declare namespace XmlDSigJs {
         GetOutput(): any;
     }
 
-    // transforms/exc_c14n.ts
+    // xml/transforms/exc_c14n
 
     /**
-     * Represents the exclusive C14N XML canonicalization transform for a digital signature
-     * as defined by the World Wide Web Consortium (W3C), without comments.
-     */
+ * Represents the exclusive C14N XML canonicalization transform for a digital signature
+ * as defined by the World Wide Web Consortium (W3C), without comments.
+ */
     export class XmlDsigExcC14NTransform extends Transform {
         protected xmlCanonicalizer: XmlCanonicalizer;
         Algorithm: string;
@@ -1122,176 +499,479 @@ declare namespace XmlDSigJs {
         protected xmlCanonicalizer: XmlCanonicalizer;
     }
 
-    // algorithm/ecdsa_sign.ts
+    // xml/canonicalization_method
 
-    export const ECDSA_SIGN_ALGORITHM: string;
-    export const ECDSA_SHA1_NAMESPACE: string;
-    export const ECDSA_SHA224_NAMESPACE: string;
-    export const ECDSA_SHA256_NAMESPACE: string;
-    export const ECDSA_SHA384_NAMESPACE: string;
-    export const ECDSA_SHA512_NAMESPACE: string;
-    export class EcdsaSha1 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
-    }
-    export class EcdsaSha224 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
-    }
-    export class EcdsaSha256 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
-    }
-    export class EcdsaSha384 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
-    }
-    export class EcdsaSha512 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    /**
+ *
+ *
+ * @export
+ * @class CanonicalizationMethod
+ * @extends {XmlSignatureObject}
+ */
+    export class CanonicalizationMethod extends XmlSignatureObject {
+        Algorithm: string;
     }
 
-    // algorithm/hmac_sign
+    // xml/data_object
 
-    export const HMAC_ALGORITHM: string;
-    export const HMAC_SHA1_NAMESPACE: string;
-    export const HMAC_SHA256_NAMESPACE: string;
-    export const HMAC_SHA224_NAMESPACE: string;
-    export const HMAC_SHA384_NAMESPACE: string;
-    export const HMAC_SHA512_NAMESPACE: string;
-    export class HmacSha1 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    /**
+     * Represents the object element of an XML signature that holds data to be signed.
+     */
+    export class DataObject extends XmlSignatureObject {
+        Id: string;
+        MimeType: string;
+        Encoding: string;
     }
-    export class HmacSha224 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
-    }
-    export class HmacSha256 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
-    }
-    export class HmacSha384 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
-    }
-    export class HmacSha512 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export class DataObjects extends XmlSignatureCollection<DataObject> {
     }
 
-    // algorithm/rsa_hash.ts
+    // xml/digest_method
 
-    export const SHA1: string;
-    export const SHA224: string;
-    export const SHA256: string;
-    export const SHA384: string;
-    export const SHA512: string;
-    export const SHA1_NAMESPACE: string;
-    export const SHA224_NAMESPACE: string;
-    export const SHA256_NAMESPACE: string;
-    export const SHA384_NAMESPACE: string;
-    export const SHA512_NAMESPACE: string;
-    export class Sha1 extends HashAlgorithm {
-        algorithm: {
-            name: string;
+    export class DigestMethod extends XmlSignatureObject {
+        Algorithm: string;
+    }
+
+    // xml/key_info
+
+    /**
+     * Represents an XML digital signature or XML encryption <KeyInfo> element.
+     */
+    export class KeyInfo extends XmlSignatureCollection<KeyInfoClause> {
+        Id: string;
+        protected OnLoadXml(element: Element): void;
+    }
+
+    // xml/reference
+
+    /**
+     * Represents the <reference> element of an XML signature.
+     */
+    export class Reference extends XmlSignatureObject {
+        constructor(uri?: string);
+        /**
+         * Gets or sets the ID of the current Reference.
+         */
+        Id: string;
+        /**
+        * Gets or sets the Uri of the current Reference.
+        */
+        Uri: string;
+        /**
+         * Gets or sets the type of the object being signed.
+         */
+        Type: string;
+        Transforms: Transforms;
+        /**
+         * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
+         */
+        DigestMethod: DigestMethod;
+        /**
+         * Gets or sets the digest value of the current Reference.
+         */
+        DigestValue: Uint8Array;
+    }
+    export class References extends XmlSignatureCollection<Reference> {
+    }
+
+    // xml/signature
+
+    /**
+     * Represents the <Signature> element of an XML signature.
+     */
+    export class Signature extends XmlSignatureObject {
+        /**
+         * Gets or sets the ID of the current Signature.
+         */
+        Id: string;
+        /**
+         * Gets or sets the SignedInfo of the current Signature.
+         */
+        SignedInfo: SignedInfo;
+        /**
+         * Gets or sets the value of the digital signature.
+         */
+        SignatureValue: Uint8Array | null;
+        /**
+         * Gets or sets the KeyInfo of the current Signature.
+         */
+        KeyInfo: KeyInfo;
+        ObjectList: DataObjects;
+    }
+
+    // xml/signature_method
+
+    export class SignatureMethodOther extends XmlSignatureCollection<XmlObject> {
+        OnLoadXml(element: Element): void;
+    }
+    export class SignatureMethod extends XmlSignatureObject {
+        Algorithm: string;
+        /**
+         * Parameters for the XML Signature HMAC Algorithm.
+         * The parameters include an optional output length which specifies the MAC truncation length in bits.
+         *
+         * @type {number}
+         * @memberOf SignatureMethod
+         */
+        HMACOutputLength: number;
+        Any: SignatureMethodOther;
+    }
+
+    // xml/signed_info
+
+    /**
+     * The SignedInfo class represents the <SignedInfo> element
+     * of an XML signature defined by the XML digital signature specification
+     *
+     * @export
+     * @class SignedInfo
+     * @extends {XmlSignatureObject}
+     */
+    export class SignedInfo extends XmlSignatureObject {
+        /**
+         * Gets or sets the ID of the current SignedInfo object.
+         *
+         * @type {string}
+         * @memberOf SignedInfo
+         */
+        Id: string;
+        /**
+         * Gets or sets the canonicalization algorithm that is used before signing
+         * for the current SignedInfo object.
+         */
+        CanonicalizationMethod: CanonicalizationMethod;
+        /**
+         * Gets or sets the name of the algorithm used for signature generation
+         * and validation for the current SignedInfo object.
+         */
+        SignatureMethod: SignatureMethod;
+        References: References;
+    }
+
+    // xml/transform
+
+    export interface ITransform extends XmlCore.IXmlSerializable {
+        Algorithm: string;
+        LoadInnerXml(node: Node): void;
+        GetInnerXml(): Node | null;
+        GetOutput(): any;
+    }
+    export interface ITransformConstructable {
+        new (): Transform;
+    }
+    /**
+     * The Transform element contains a single transformation
+     */
+    export class Transform extends XmlSignatureObject implements ITransform {
+        protected innerXml: Node | null;
+        Algorithm: string;
+        /**
+         * XPath of the transformation
+         */
+        XPath: string;
+        /**
+         * When overridden in a derived class, returns the output of the current Transform object.
+         */
+        GetOutput(): string;
+        LoadInnerXml(node: Node): void;
+        GetInnerXml(): Node | null;
+    }
+    /**
+     * The Transforms element contains a collection of transformations
+     */
+    export class Transforms extends XmlSignatureCollection<Transform> {
+        protected OnLoadXml(element: Element): void;
+    }
+
+    // xml/xml_names
+
+    export const XmlSignature: {
+        DefaultCanonMethod: string;
+        DefaultDigestMethod: string;
+        DefaultPrefix: string;
+        ElementNames: {
+            CanonicalizationMethod: string;
+            DigestMethod: string;
+            DigestValue: string;
+            DSAKeyValue: string;
+            DomainParameters: string;
+            EncryptedKey: string;
+            HMACOutputLength: string;
+            RSAPSSParams: string;
+            MaskGenerationFunction: string;
+            SaltLength: string;
+            KeyInfo: string;
+            KeyName: string;
+            KeyValue: string;
+            Modulus: string;
+            Exponent: string;
+            Manifest: string;
+            Object: string;
+            Reference: string;
+            RetrievalMethod: string;
+            RSAKeyValue: string;
+            ECDSAKeyValue: string;
+            NamedCurve: string;
+            PublicKey: string;
+            Signature: string;
+            SignatureMethod: string;
+            SignatureValue: string;
+            SignedInfo: string;
+            Transform: string;
+            Transforms: string;
+            X509Data: string;
+            PGPData: string;
+            SPKIData: string;
+            SPKIexp: string;
+            MgmtData: string;
+            X509IssuerSerial: string;
+            X509IssuerName: string;
+            X509SerialNumber: string;
+            X509SKI: string;
+            X509SubjectName: string;
+            X509Certificate: string;
+            X509CRL: string;
+            XPath: string;
+            X: string;
+            Y: string;
         };
-        xmlNamespace: string;
-    }
-    export class Sha224 extends HashAlgorithm {
-        algorithm: {
-            name: string;
+        AttributeNames: {
+            Algorithm: string;
+            Encoding: string;
+            Id: string;
+            MimeType: string;
+            Type: string;
+            URI: string;
         };
-        xmlNamespace: string;
-    }
-    export class Sha256 extends HashAlgorithm {
-        algorithm: {
-            name: string;
+        AlgorithmNamespaces: {
+            XmlDsigBase64Transform: string;
+            XmlDsigC14NTransform: string;
+            XmlDsigC14NWithCommentsTransform: string;
+            XmlDsigEnvelopedSignatureTransform: string;
+            XmlDsigXPathTransform: string;
+            XmlDsigXsltTransform: string;
+            XmlDsigExcC14NTransform: string;
+            XmlDsigExcC14NWithCommentsTransform: string;
+            XmlDecryptionTransform: string;
+            XmlLicenseTransform: string;
         };
-        xmlNamespace: string;
-    }
-    export class Sha384 extends HashAlgorithm {
-        algorithm: {
-            name: string;
+        Uri: {
+            Manifest: string;
         };
-        xmlNamespace: string;
+        NamespaceURI: string;
+        NamespaceURIMore: string;
+        NamespaceURIPss: string;
+    };
+
+    // xml/xml_object
+
+    export abstract class XmlSignatureObject extends XmlObject {
     }
-    export class Sha512 extends HashAlgorithm {
-        algorithm: {
-            name: string;
-        };
-        xmlNamespace: string;
+    export abstract class XmlSignatureCollection<I extends XmlSignatureObject> extends XmlCollection<I> {
     }
 
-    // algorithm/rsa_pkcs1_sign.ts
+    // algorithm
 
-    export const RSA_PKCS1: string;
-    export const RSA_PKCS1_SHA1_NAMESPACE: string;
-    export const RSA_PKCS1_SHA224_NAMESPACE: string;
-    export const RSA_PKCS1_SHA256_NAMESPACE: string;
-    export const RSA_PKCS1_SHA384_NAMESPACE: string;
-    export const RSA_PKCS1_SHA512_NAMESPACE: string;
-    export class RsaPkcs1Sha1 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export type BASE64 = string;
+    export interface IAlgorithm {
+        algorithm: Algorithm;
+        namespaceURI: string;
+        getAlgorithmName(): string;
     }
-    export class RsaPkcs1Sha224 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export interface IHashAlgorithm extends IAlgorithm {
+        Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array>;
     }
-    export class RsaPkcs1Sha256 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export interface IHashAlgorithmConstructable {
+        new (): IHashAlgorithm;
     }
-    export class RsaPkcs1Sha384 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export abstract class XmlAlgorithm implements IAlgorithm {
+        algorithm: Algorithm;
+        namespaceURI: string;
+        getAlgorithmName(): string;
     }
-    export class RsaPkcs1Sha512 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
+        Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array>;
+    }
+    export interface ISignatureAlgorithm extends IAlgorithm {
+        Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): PromiseLike<ArrayBuffer>;
+        Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, algorithm?: Algorithm): PromiseLike<boolean>;
+    }
+    export interface ISignatureAlgorithmConstructable {
+        new (): ISignatureAlgorithm;
+    }
+    export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignatureAlgorithm {
+        /**
+         * Sign the given string using the given key
+         */
+        Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): PromiseLike<ArrayBuffer>;
+        /**
+        * Verify the given signature of the given string using key
+        */
+        Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, algorithm?: Algorithm): PromiseLike<boolean>;
     }
 
-    // algorithm/rsa_pss_sign.ts
+    // application
 
-    export const RSA_PSS: string;
-    export const RSA_PSS_WITH_PARAMS_NAMESPACE: string;
-    export const RSA_PSS_WITH_PARAMS_SHA1_MGF1_NAMESPACE: string;
-    export const RSA_PSS_WITH_PARAMS_SHA224_MGF1_NAMESPACE: string;
-    export const RSA_PSS_WITH_PARAMS_SHA256_MGF1_NAMESPACE: string;
-    export const RSA_PSS_WITH_PARAMS_SHA384_MGF1_NAMESPACE: string;
-    export const RSA_PSS_WITH_PARAMS_SHA512_MGF1_NAMESPACE: string;
-    export class RsaPssSha1 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export interface CryptoEx extends Crypto {
+        name: string;
     }
-    export class RsaPssSha224 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export class Application {
+        /**
+         * Sets crypto engine for the current Application
+         * @param  {string} name
+         * @param  {Crypto} crypto
+         * @returns void
+         */
+        static setEngine(name: string, crypto: Crypto): void;
+        /**
+         * Gets the crypto module from the Application
+         */
+        static readonly crypto: CryptoEx;
+        static isNodePlugin(): boolean;
     }
-    export class RsaPssSha256 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+
+    // canonicalizer
+
+    export enum XmlCanonicalizerState {
+        BeforeDocElement = 0,
+        InsideDocElement = 1,
+        AfterDocElement = 2,
     }
-    export class RsaPssSha384 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+    export class XmlCanonicalizer {
+        protected withComments: boolean;
+        protected exclusive: boolean;
+        protected propagatedNamespaces: XmlCore.NamespaceManager;
+        protected document: Document;
+        protected result: string[];
+        protected visibleNamespaces: XmlCore.NamespaceManager;
+        protected inclusiveNamespacesPrefixList: string[];
+        protected state: XmlCanonicalizerState;
+        constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces?: XmlCore.NamespaceManager);
+        InclusiveNamespacesPrefixList: string;
+        Canonicalize(node: Node): string;
+        protected WriteNode(node: Node): void;
+        protected WriteDocumentNode(node: Node): void;
+        private WriteTextNode(node);
+        protected WriteCommentNode(node: Node): void;
+        private WriteProcessingInstructionNode(node);
+        protected WriteElementNode(node: Element): void;
+        protected WriteNamespacesAxis(node: Element | Attr): number;
+        private WriteAttributesAxis(node);
+        protected NormalizeString(input: string | null, type: XmlCore.XmlNodeType): string;
+        private IsTextNode(type);
+        private IsNamespaceInclusive(node, prefix);
+        private IsNamespaceRendered(prefix, uri);
     }
-    export class RsaPssSha512 extends SignatureAlgorithm {
-        algorithm: any;
-        xmlNamespace: string;
+
+    // crypto_config
+
+    export class CryptoConfig {
+        /**
+         * Creates Transform from given name
+         * if name is not exist then throws error
+         *
+         * @static
+         * @param {(string |)} [name=null]
+         * @returns
+         *
+         * @memberOf CryptoConfig
+         */
+        static CreateFromName(name: string | null): Transform;
+        static CreateSignatureAlgorithm(method: SignatureMethod): SignatureAlgorithm;
+        static CreateHashAlgorithm(namespace: string): HashAlgorithm;
+        static GetHashAlgorithm(algorithm: AlgorithmIdentifier): IHashAlgorithm;
+        static GetSignatureAlgorithm(algorithm: Algorithm): ISignatureAlgorithm;
     }
-    export class PssAlgorithmParams extends XmlSignatureObject {
-        protected name: string;
-        private m_digest_method;
-        private m_salt_length;
-        private m_mgf;
-        dsPrefix: string;
-        DigestMethod: string | null;
-        SaltLength: number | null;
-        MGF: string | null;
-        GetXml(): Element;
-        LoadXml(value: Element): void;
+
+    // signed_xml
+
+    export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
+    export interface OptionsSignReference {
+        /**
+         * Id of Reference
+         *
+         * @type {string}
+         * @memberOf OptionsSignReference
+         */
+        id?: string;
+        uri?: string;
+        /**
+         * Hash algorithm
+         *
+         * @type {AlgorithmIdentifier}
+         * @memberOf OptionsSignReference
+         */
+        hash: AlgorithmIdentifier;
+        /**
+         * List of transforms
+         *
+         * @type {OptionsSignTransform[]}
+         * @memberOf OptionsSignReference
+         */
+        transforms?: OptionsSignTransform[];
+    }
+    export interface OptionsSign {
+        /**
+         * Public key for KeyInfo block
+         *
+         * @type {boolean}
+         * @memberOf OptionsSign
+         */
+        keyValue?: CryptoKey;
+        /**
+         * List of X509 Certificates
+         *
+         * @type {string[]}
+         * @memberOf OptionsSign
+         */
+        x509?: string[];
+        /**
+         * List of Reference
+         * Default is Reference with hash alg SHA-256 and exc-c14n transform
+         *
+         * @type {OptionsSignReference[]}
+         * @memberOf OptionsSign
+         */
+        references?: OptionsSignReference[];
+    }
+    /**
+    * Provides a wrapper on a core XML signature object to facilitate creating XML signatures.
+    */
+    export class SignedXml implements XmlCore.IXmlSerializable {
+        protected signature: Signature;
+        protected document?: Document;
+        readonly XmlSignature: Signature;
+        Key?: CryptoKey;
+        Algorithm?: Algorithm | RsaPssParams | EcdsaParams;
+        readonly Signature: Uint8Array | null;
+        /**
+         * Creates an instance of SignedXml.
+         *
+         * @param {(Document | Element)} [node]
+         *
+         * @memberOf SignedXml
+         */
+        constructor(node?: Document | Element);
+        /**
+        * Returns the public key of a signature.
+        */
+        protected GetPublicKeys(): PromiseLike<CryptoKey[]>;
+        protected FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void;
+        protected DigestReference(doc: Element, reference: Reference, check_hmac: boolean): Promise<Uint8Array>;
+        protected DigestReferences(data: Element): Promise<void[]>;
+        protected TrunsformSignedInfo(): string;
+        protected ApplySignOptions(signature: Signature, key: CryptoKey, options: OptionsSign): PromiseLike<void>;
+        Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsSign): PromiseLike<Signature>;
+        protected ValidateReferences(doc: Element): PromiseLike<boolean>;
+        protected ValidateSignatureValue(keys: CryptoKey[]): PromiseLike<boolean>;
+        Verify(key?: CryptoKey): PromiseLike<boolean>;
+        GetXml(): Element | null;
+        /**
+         * Loads a SignedXml state from an XML element.
+         * @param  {Element | string} value The XML to load the SignedXml state from.
+         * @returns void
+         */
+        LoadXml(value: Element | string): void;
+        toString(): string;
     }
 
 }

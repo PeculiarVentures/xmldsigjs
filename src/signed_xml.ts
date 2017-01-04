@@ -6,9 +6,9 @@ import * as Alg from "./algorithm/index";
 import * as Transforms from "./xml/transforms";
 import * as KeyInfos from "./xml/key_infos";
 
-type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
+export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
 
-interface OptionsSignReference {
+export interface OptionsSignReference {
     /**
      * Id of Reference
      * 
@@ -33,7 +33,7 @@ interface OptionsSignReference {
     transforms?: OptionsSignTransform[];
 }
 
-interface OptionsSign {
+export interface OptionsSign {
     /**
      * Public key for KeyInfo block
      * 

@@ -47,7 +47,7 @@ const PREFIX = "ecdsa";
     namespaceURI: NAMESPACE_URI,
     prefix: PREFIX
 })
-class EcdsaPublicKey extends XmlObject {
+export class EcdsaPublicKey extends XmlObject {
 
     @XmlChildElement({
         localName: XmlSignature.ElementNames.X,
@@ -73,7 +73,7 @@ class EcdsaPublicKey extends XmlObject {
     namespaceURI: NAMESPACE_URI,
     prefix: PREFIX
 })
-class NamedCurve extends XmlObject {
+export class NamedCurve extends XmlObject {
 
     @XmlAttribute({
         localName: XmlSignature.AttributeNames.URI,
@@ -88,7 +88,7 @@ class NamedCurve extends XmlObject {
     namespaceURI: NAMESPACE_URI,
     prefix: PREFIX
 })
-class DomainParameters extends XmlObject {
+export class DomainParameters extends XmlObject {
 
     @XmlChildElement({
         parser: NamedCurve,

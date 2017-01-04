@@ -13,6 +13,8 @@
         "sourceMap": false,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
+        "declaration": false,
+        "declarationDir": "types",
         "strictNullChecks": true,
         "pretty": true,
         "noImplicitReturns": true,

@@ -18,7 +18,7 @@ export interface IJwkRsa {
     ext: boolean;
 }
 
-interface RsaPSSSignParams extends RsaPssParams, Algorithm {
+export interface RsaPSSSignParams extends RsaPssParams, Algorithm {
     hash: AlgorithmIdentifier;
 }
 

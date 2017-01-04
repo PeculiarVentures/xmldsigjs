@@ -25,7 +25,7 @@ import { PssAlgorithmParams } from "./key_infos";
 @XmlElement({
     localName: "Other",
 })
-class SignatureMethodOther extends XmlSignatureCollection<XmlObject> {
+export class SignatureMethodOther extends XmlSignatureCollection<XmlObject> {
 
     OnLoadXml(element: Element) {
         for (let i = 0; i < element.childNodes.length; i++) {

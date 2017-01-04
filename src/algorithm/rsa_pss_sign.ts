@@ -5,7 +5,7 @@ export const RSA_PSS = "RSA-PSS";
 
 export const RSA_PSS_WITH_PARAMS_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#rsa-pss";
 
-class RsaPssBase extends SignatureAlgorithm {
+export class RsaPssBase extends SignatureAlgorithm {
     algorithm: any = {
         name: RSA_PSS,
         hash: {
