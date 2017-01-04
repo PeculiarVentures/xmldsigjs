@@ -12,7 +12,7 @@
     "build": "npm run build:npm",
     "build:npm": "tsc",
     "build:map": "tsc --sourceMap",
-    "build:source": "tsc --declaration",
+    "build:source": "tsc --declaration --declarationDir types",
     "build:browser": "webpack",
     "pub": "npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
