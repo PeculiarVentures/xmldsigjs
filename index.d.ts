@@ -581,16 +581,10 @@ declare namespace XmlDSigJs {
         protected getCanonXml(transforms: Transform[], node: Node): string;
         /**
          * Loads a SignedXml state from an XML element.
-         * @param  {Element} value The XML element to load the SignedXml state from.
+         * @param  {Element} value The XML to load the SignedXml state from.
          * @returns void
          */
-        LoadXml(element: Element): void;
-        /**
-         * Loads a SignedXml state from an XML element.
-         * @param  {string} value The XML string to load the SignedXml state from.
-         * @returns void
-         */
-        LoadXml(xmlString: string): void;
+        LoadXml(value: Element | string): void;
         /**
          * Returns the XML representation of a SignedXml object.
          * @returns Element
