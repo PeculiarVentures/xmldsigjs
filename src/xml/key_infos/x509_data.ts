@@ -1,6 +1,6 @@
 import { XmlError, XE } from "xml-core";
 import { Convert } from "xml-core";
-import { XmlElement } from "xml-core";
+import { XmlElement, XmlChildElement } from "xml-core";
 import { XmlSignature } from "../xml_names";
 import { XmlSignatureObject } from "../xml_object";
 import { KeyInfoClause } from "./key_info_clause";
@@ -31,6 +31,18 @@ import { X509Certificate } from "../../pki";
  * 
  */
 
+@XmlElement({ localName: XmlSignature.ElementNames.X509IssuerSerial })
+export class X509IssuerSerial extends XmlSignatureObject {
+
+    @XmlChildElement({ localName: XmlSignature.ElementNames.X509IssuerName, required: true })
+    X509IssuerName: string;
+
+
+    @XmlChildElement({ localName: XmlSignature.ElementNames.X509IssuerName, required: true })
+    X509SerialNumber: string;
+
+}
+
 export enum X509IncludeOption {
     None,
     EndCertOnly,
@@ -38,7 +50,7 @@ export enum X509IncludeOption {
     WholeChain
 }
 
-export interface X509IssuerSerial {
+export interface IX509IssuerSerial {
     issuerName: string;
     serialNumber: string;
 }
@@ -52,7 +64,7 @@ export interface X509IssuerSerial {
 export class KeyInfoX509Data extends KeyInfoClause {
 
     private x509crl: Uint8Array | null = null;
-    private IssuerSerialList: X509IssuerSerial[];
+    private IssuerSerialList: IX509IssuerSerial[];
     private SubjectKeyIdList: Uint8Array[] = [];
     private SubjectNameList: string[];
     private X509CertificateList: X509Certificate[];
@@ -140,7 +152,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
     /**
      * Gets a list of X509IssuerSerial structures that represent an issuer name and serial number pair.
      */
-    public get IssuerSerials(): X509IssuerSerial[] {
+    public get IssuerSerials(): IX509IssuerSerial[] {
         return this.IssuerSerialList;
     }
 

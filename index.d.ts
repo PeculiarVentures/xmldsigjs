@@ -2,6 +2,19 @@
 
 declare namespace XmlDSigJs {
 
+    // xml/canonicalization_method.ts
+
+    /**
+     * 
+     * 
+     * @export
+     * @class CanonicalizationMethod
+     * @extends {XmlSignatureObject}
+     */
+    export class CanonicalizationMethod extends XmlSignatureObject {
+        public Algorithm: string;
+    }
+
     // algorithm.ts
     export type BASE64 = string;
     export interface IAlgorithm {
@@ -208,11 +221,6 @@ declare namespace XmlDSigJs {
     export class Reference extends XmlSignatureObject {
         protected name: string;
 
-
-
-
-
-
         constructor(p?: string);
         /**
          * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
@@ -264,11 +272,6 @@ declare namespace XmlDSigJs {
      */
     export class Signature extends XmlSignatureObject {
         protected name: string;
-
-
-
-
-
 
         constructor();
         /**
@@ -322,12 +325,6 @@ declare namespace XmlDSigJs {
      */
     export class SignedInfo extends XmlSignatureObject {
         protected name: string;
-
-
-
-
-
-
 
         constructor(signedXml?: SignedXml);
         /**
@@ -949,13 +946,18 @@ declare namespace XmlDSigJs {
 
     // key/x509_data.ts
 
+    export class X509IssuerSerial extends XmlSignatureObject {
+        X509IssuerName: string;
+        X509SerialNumber: string;
+    }
+
     export enum X509IncludeOption {
         None = 0,
         EndCertOnly = 1,
         ExcludeRoot = 2,
         WholeChain = 3,
     }
-    export interface X509IssuerSerial {
+    export interface IX509IssuerSerial {
         issuerName: string;
         serialNumber: string;
     }
