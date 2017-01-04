@@ -497,10 +497,10 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         return this.signature.GetXml();
     }
 
-    LoadXml(element: Element) {
-        let signature = new Signature();
-        signature.LoadXml(element);
-        this.signature = signature;
+    LoadXml(element: Element): void;
+    LoadXml(xmlString: string): void;
+    LoadXml(param: Element | string) {
+        this.signature = Signature.LoadXml(param);
     }
 
     toString() {

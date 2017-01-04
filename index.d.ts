@@ -584,7 +584,13 @@ declare namespace XmlDSigJs {
          * @param  {Element} value The XML element to load the SignedXml state from.
          * @returns void
          */
-        LoadXml(value: Element): void;
+        LoadXml(element: Element): void;
+        /**
+         * Loads a SignedXml state from an XML element.
+         * @param  {string} value The XML string to load the SignedXml state from.
+         * @returns void
+         */
+        LoadXml(xmlString: string): void;
         /**
          * Returns the XML representation of a SignedXml object.
          * @returns Element
