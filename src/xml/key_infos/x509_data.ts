@@ -34,11 +34,10 @@ import { X509Certificate } from "../../pki";
 @XmlElement({ localName: XmlSignature.ElementNames.X509IssuerSerial })
 export class X509IssuerSerial extends XmlSignatureObject {
 
-    @XmlChildElement({ localName: XmlSignature.ElementNames.X509IssuerName, required: true })
+    @XmlChildElement({ localName: XmlSignature.ElementNames.X509IssuerName, namespaceURI: XmlSignature.NamespaceURI, prefix: XmlSignature.DefaultPrefix, required: true })
     X509IssuerName: string;
 
-
-    @XmlChildElement({ localName: XmlSignature.ElementNames.X509IssuerName, required: true })
+    @XmlChildElement({ localName: XmlSignature.ElementNames.X509SerialNumber, namespaceURI: XmlSignature.NamespaceURI, prefix: XmlSignature.DefaultPrefix, required: true })
     X509SerialNumber: string;
 
 }

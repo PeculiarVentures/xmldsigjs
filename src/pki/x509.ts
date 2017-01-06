@@ -1,22 +1,10 @@
 import { Convert } from "xml-core";
+import { ECDSA } from "../algorithm/index";
 import { Application } from "../application";
 import { Certificate, RelativeDistinguishedNames, setEngine, getCrypto } from "pkijs";
 import * as Asn1Js from "asn1js";
 
 export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
-
-// declare type RDN = {
-//     types_and_values: TypeAndValue[];
-// }
-
-// declare type TypeAndValue = {
-//     type: string;
-//     value: {
-//         value_block: {
-//             value: string;
-//         }
-//     };
-// }
 
 /**
  * List of OIDs
@@ -189,6 +177,10 @@ export class X509Certificate {
                     algorithm,
                     usages: ["verify"]
                 };
+                if (alg.algorithm.name.toUpperCase() === ECDSA) {
+                    // Set named curve
+                    (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
+                }
                 return this.simpl.getPublicKey({ algorithm: alg })
                     .then(key => {
                         this.publicKey = key;

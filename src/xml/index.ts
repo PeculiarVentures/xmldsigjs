@@ -4,7 +4,6 @@ export * from "./canonicalization_method";
 export * from "./data_object";
 export * from "./digest_method";
 export * from "./key_info";
-export * from "./key_infos";
 export * from "./reference";
 export * from "./signature";
 export * from "./signature_method";
