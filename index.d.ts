@@ -894,6 +894,7 @@ declare namespace XmlDSigJs {
          */
         id?: string;
         uri?: string;
+        type?: string;
         /**
          * Hash algorithm
          *
@@ -958,8 +959,8 @@ declare namespace XmlDSigJs {
         protected FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void;
         protected DigestReference(doc: Element, reference: Reference, check_hmac: boolean): Promise<Uint8Array>;
         protected DigestReferences(data: Element): Promise<void[]>;
-        protected TrunsformSignedInfo(): string;
-        protected ApplySignOptions(signature: Signature, key: CryptoKey, options: OptionsSign): PromiseLike<void>;
+        protected TransformSignedInfo(): string;
+        protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options?: OptionsSign): PromiseLike<void>;
         Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsSign): PromiseLike<Signature>;
         protected ValidateReferences(doc: Element): PromiseLike<boolean>;
         protected ValidateSignatureValue(keys: CryptoKey[]): PromiseLike<boolean>;
@@ -976,6 +977,5 @@ declare namespace XmlDSigJs {
 
 }
 
-declare module "xmldsigjs" {
-    export = XmlDSigJs;
-} 
+export = XmlDSigJs;
+export as namespace XmlDSigJs;
