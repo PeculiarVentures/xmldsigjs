@@ -74,17 +74,17 @@ describe("Key", function () {
                 }))
         });
 
-        it("Export key", () => {
+        it("Export key", done => {
             assert.equal(!!cert, true, "Certificate is null");
 
             assert.equal(!!cert.PublicKey, false);
             cert.exportKey({ name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" })
                 .then(key => {
                     assert.equal(!!key.algorithm, true);
-                    assert.equal(key.type, "publicKey");
+                    assert.equal(key.type, "public");
                     assert.equal(!!cert.PublicKey, true);
-                    done();
-                });
+                })
+                .then(done, done);
         });
 
     });
