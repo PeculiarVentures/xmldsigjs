@@ -36,6 +36,6 @@ export class Application {
 // set default w3 WebCrypto
 +function init() {
     if (!Application.isNodePlugin()) {
-        Application.setEngine("W3 WebCrypto module", window.crypto);
+        Application.setEngine("W3 WebCrypto module", self.crypto);
     }
 } ();

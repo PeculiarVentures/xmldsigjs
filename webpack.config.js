@@ -18,12 +18,12 @@ module.exports = {
     ]
   },
   node: {
-      Buffer: false,
-      crypto: false,
+    Buffer: false,
+    crypto: false,
   },
   externals: {
-    "xml-core": "XmlCore",
-    "asn1js": "Asn1Js",
-    "pkijs": "PkiJs",
+    "crypto": "require(\"crypto\");",
+    "xmldom-alpha": "require(\"xmldom-alpha\");",
+    "xpath.js": "require(\"xpath.js\");",
   }
 }

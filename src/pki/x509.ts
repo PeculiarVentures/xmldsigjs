@@ -1,7 +1,8 @@
 import { Convert } from "xml-core";
 import { ECDSA } from "../algorithm/index";
 import { Application } from "../application";
-import { Certificate, RelativeDistinguishedNames, setEngine, getCrypto } from "pkijs";
+const Certificate = require ("pkijs/build/Certificate");
+const { setEngine, getCrypto } = require("pkijs/build/common");
 import * as Asn1Js from "asn1js";
 
 export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
@@ -80,7 +81,7 @@ const OID: { [key: string]: { short?: string, long?: string } } = {
 export class X509Certificate {
 
     protected raw: Uint8Array;
-    protected simpl: Certificate;
+    protected simpl: PkiJs.Certificate;
     protected publicKey: CryptoKey | null = null;
 
     constructor(rawData?: BufferSource) {
@@ -106,7 +107,7 @@ export class X509Certificate {
      * Example:
      * > C=Some name, O=Some organization name, C=RU
      */
-    protected NameToString(name: RelativeDistinguishedNames, spliter: string = ","): string {
+    protected NameToString(name: PkiJs.RelativeDistinguishedNames, spliter: string = ","): string {
         let res: string[] = [];
         for (let type_and_value of name.typesAndValues) {
             let type = type_and_value.type;
@@ -168,7 +169,7 @@ export class X509Certificate {
      * @param  {Algorithm} algorithm
      * @returns Promise
      */
-    exportKey(algorithm: Algorithm) {
+    exportKey(algorithm: Algorithm): PromiseLike<CryptoKey> {
         return Promise.resolve()
             .then(() => {
                 if (!getCrypto())
