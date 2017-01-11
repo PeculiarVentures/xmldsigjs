@@ -117,7 +117,7 @@ function verify() {
     if (!$xml.value)
         return error(new Error("Unable to get XML"));
     var xml = XmlDSigJs.XmlSignatureObject.Parse($xml.value);
-    var signature = new XmlDSigJs.SignedXml();
+    var signature = new XmlDSigJs.SignedXml(xml);
     var xmlSignatures = XmlDSigJs.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']");
 
     if (!(xmlSignatures && xmlSignatures.length))
@@ -129,6 +129,20 @@ function verify() {
         .then(function (res) {
             var info = [];
             info.push("Signature valid: " + res.toString());
+            info.push("=================================");
+            var si = signature.XmlSignature.SignedInfo;
+            info.push("Signature method: " + si.SignatureMethod.Algorithm);
+            info.push("Canonicalization method: " + si.CanonicalizationMethod.Algorithm);
+            info.push("References:");
+            si.References.ForEach(function (ref, index) {
+                info.push("  Reference #" + index + 1);
+                ref.Type && info.push("    Type: " + ref.Type);
+                ref.Uri && info.push("    Uri: " + ref.Uri);
+                info.push("    Digest method: " + ref.DigestMethod.Algorithm);
+                ref.Transforms.ForEach(function (transform) {
+                    info.push("    Transform: " + transform.Algorithm);
+                });
+            });
             $info.textContent = info.join("\n");
         })
         .catch(function (e) {

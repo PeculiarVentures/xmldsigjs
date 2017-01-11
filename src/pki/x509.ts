@@ -1,7 +1,7 @@
 import { Convert } from "xml-core";
 import { ECDSA } from "../algorithm/index";
 import { Application } from "../application";
-const Certificate = require ("pkijs/build/Certificate");
+const Certificate = require ("pkijs/build/Certificate").default;
 const { setEngine, getCrypto } = require("pkijs/build/common");
 import * as Asn1Js from "asn1js";
 
