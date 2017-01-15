@@ -2,7 +2,7 @@ import { XmlElement, XmlAttribute, XmlChildElement, XmlBase64Converter } from "x
 
 import { XmlSignature } from "./xml_names";
 import { XmlSignatureObject, XmlSignatureCollection } from "./xml_object";
-import { Transforms } from "./transform";
+import { Transforms } from "./transform_collection";
 import { DigestMethod } from "./digest_method";
 
 /**

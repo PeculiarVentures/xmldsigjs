@@ -74,23 +74,23 @@ function sign() {
     var alg = getAlgorithm();
     var keys, signature, res = {};
     Promise.resolve()
-        .then(function () {
+        .then(function() {
             return generateKey(alg);
         })
-        .then(function (ks) {
+        .then(function(ks) {
             keys = ks;
             return exportKey(ks.publicKey)
         })
-        .then(function (jwk) {
+        .then(function(jwk) {
             res.jwk = jwk;
         })
-        .then(function () {
+        .then(function() {
             signature = new XmlDSigJs.SignedXml();
 
             return signature.Sign(                  // Signing document
                 alg,                                    // algorithm 
                 keys.privateKey,                        // key 
-                XmlDSigJs.XmlSignatureObject.Parse(getXml()),// document
+                XmlDSigJs.Parse(getXml()),// document
                 {                                       // options
                     keyValue: useKeyValue() ? keys.publicKey : void 0,
                     references: [
@@ -98,14 +98,14 @@ function sign() {
                     ]
                 });
         })
-        .then(function () {
+        .then(function() {
             var sig = signature.toString()
             res.signature = sig;
 
             document.getElementById("jwk").value = JSON.stringify(res.jwk);
             document.getElementById("signature").value = res.signature;
         })
-        .catch(function (e) {
+        .catch(function(e) {
             console.error(e);
         });
 
@@ -116,7 +116,7 @@ function verify() {
     var $info = document.getElementById("signature_info");
     if (!$xml.value)
         return error(new Error("Unable to get XML"));
-    var xml = XmlDSigJs.XmlSignatureObject.Parse($xml.value);
+    var xml = XmlDSigJs.Parse($xml.value);
     var signature = new XmlDSigJs.SignedXml(xml);
     var xmlSignatures = XmlDSigJs.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']");
 
@@ -126,7 +126,7 @@ function verify() {
     signature.LoadXml(xmlSignatures[0]);
 
     signature.Verify()
-        .then(function (res) {
+        .then(function(res) {
             var info = [];
             info.push("Signature valid: " + res.toString());
             info.push("=================================");
@@ -134,18 +134,18 @@ function verify() {
             info.push("Signature method: " + si.SignatureMethod.Algorithm);
             info.push("Canonicalization method: " + si.CanonicalizationMethod.Algorithm);
             info.push("References:");
-            si.References.ForEach(function (ref, index) {
-                info.push("  Reference #" + index + 1);
+            si.References.ForEach(function(ref, index) {
+                info.push("  Reference #" + (index + 1));
                 ref.Type && info.push("    Type: " + ref.Type);
                 ref.Uri && info.push("    Uri: " + ref.Uri);
                 info.push("    Digest method: " + ref.DigestMethod.Algorithm);
-                ref.Transforms.ForEach(function (transform) {
+                ref.Transforms.ForEach(function(transform) {
                     info.push("    Transform: " + transform.Algorithm);
                 });
             });
             $info.textContent = info.join("\n");
         })
-        .catch(function (e) {
+        .catch(function(e) {
             error(e);
         });
 }

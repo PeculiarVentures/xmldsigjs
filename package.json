@@ -2,18 +2,21 @@
   "name": "xmldsigjs",
   "version": "2.0.4",
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
-  "main": "lib/index",
+  "main": "dist/index.js",
+  "module": "lib/index.js",
+  "jsnext:main": "lib/index.js",
   "scripts": {
-    "install": "npm run build",
+    "prepublish": "npm run build",
     "start": "node test/html/server.js",
     "pretest": "npm run build:map",
     "test": "mocha test/scripts",
     "test:local": "nyc --reporter=lcov npm test",
-    "build": "npm run build:npm",
-    "build:npm": "tsc",
-    "build:map": "tsc --sourceMap",
+    "build": "npm run build:lib && npm run build:es5",
+    "build:es5": "rollup -c",
+    "build:lib": "rollup -c rollup.config.lib.js",
+    "build:map": "rollup -c --dev",
     "build:source": "tsc --declaration --declarationDir types",
-    "build:browser": "webpack",
+    "build:web": "rollup -c rollup.config.web.js && babel dist/xmldsig.js --comment=false --compact=false  --out-file dist/xmldsig.js",
     "pub": "npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
     "coverage": "nyc npm test",
@@ -43,14 +46,16 @@
     "xml-core": "^1"
   },
   "devDependencies": {
+    "babel-plugin-external-helpers": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babelrc-rollup": "^3.0.0",
     "coveralls": "^2",
-    "live-server": "^1",
     "mocha": "^3",
     "node-webcrypto-ossl": "^1.0.16",
-    "npm-run-all": "^3",
     "nyc": "^8",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-typescript": "^0.8.1",
     "ts-loader": "^1.3.3",
-    "typescript": "^2.1.4",
-    "watch": "^0"
+    "typescript": "^2"
   }
 }

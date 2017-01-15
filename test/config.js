@@ -6,7 +6,7 @@ var select = require("xpath.js");
 var DOMParser = require("xmldom-alpha").DOMParser;
 var XMLSerializer = require("xmldom-alpha").XMLSerializer;
 var XmlCore = require("xml-core");
-xmldsig = require("../lib/index");
+xmldsig = require("../");
 
 var WebCrypto = require("node-webcrypto-ossl");
 xmldsig.Application.setEngine("OpenSSL", new WebCrypto());

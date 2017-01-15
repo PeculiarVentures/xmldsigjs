@@ -1,16 +1,17 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "es5",
+        "module": "es2015",
+        "moduleResolution": "node",
+        "target": "es2015",
         "lib": [
             "es5",
             "dom",
             "es2015.promise"
         ],
         "rootDir": "src",
-        "outDir": "lib",
+        "outDir": "build",
         "noImplicitAny": false,
-        "sourceMap": false,
+        "sourceMap": true,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
         "strictNullChecks": true,
@@ -18,7 +19,7 @@
         "noImplicitReturns": true,
         "experimentalDecorators": true
     },
-    "exclude": [
-        "node_modules"
+    "files": [
+        "src/index.ts"
     ]
 }

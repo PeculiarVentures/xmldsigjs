@@ -246,7 +246,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
 
         // <X509IssuerSerial>
         if ((this.IssuerSerialList != null) && (this.IssuerSerialList.length > 0)) {
-            for (let iser of this.IssuerSerialList) {
+            this.IssuerSerialList.forEach(iser => {
                 let isl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerSerial);
                 let xin = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerName);
                 xin.textContent = iser.issuerName;
@@ -255,31 +255,31 @@ export class KeyInfoX509Data extends KeyInfoClause {
                 xsn.textContent = iser.serialNumber;
                 isl.appendChild(xsn);
                 xel.appendChild(isl);
-            }
+            });
         }
         // <X509SKI>
         if ((this.SubjectKeyIdList != null) && (this.SubjectKeyIdList.length > 0)) {
-            for (let skid of this.SubjectKeyIdList) {
+            this.SubjectKeyIdList.forEach(skid => {
                 let ski = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SKI);
                 ski.textContent = Convert.ToBase64(skid);
                 xel.appendChild(ski);
-            }
+            });
         }
         // <X509SubjectName>
         if ((this.SubjectNameList != null) && (this.SubjectNameList.length > 0)) {
-            for (let subject of this.SubjectNameList) {
+            this.SubjectNameList.forEach(subject => {
                 let sn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SubjectName);
                 sn.textContent = subject;
                 xel.appendChild(sn);
-            }
+            });
         }
         // <X509Certificate>
         if ((this.X509CertificateList != null) && (this.X509CertificateList.length > 0)) {
-            for (let x509 of this.X509CertificateList) {
+            this.X509CertificateList.forEach(x509 => {
                 let cert = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509Certificate);
                 cert.textContent = Convert.ToBase64(x509.GetRaw());
                 xel.appendChild(cert);
-            }
+            });
         }
         // only one <X509CRL> 
         if (this.x509crl != null) {
@@ -311,40 +311,40 @@ export class KeyInfoX509Data extends KeyInfoClause {
         // <X509IssuerSerial>
         let xnl = this.GetChildren(XmlSignature.ElementNames.X509IssuerSerial);
         if (xnl) {
-            for (let xel of xnl) {
+            xnl.forEach(xel => {
                 let issuer = XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509IssuerName, XmlSignature.NamespaceURI, true);
                 let serial = XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509SerialNumber, XmlSignature.NamespaceURI, true);
                 if (issuer && issuer.textContent && serial && serial.textContent)
                     this.AddIssuerSerial(issuer.textContent, serial.textContent);
-            }
+            });
         }
         // <X509SKI>
         xnl = this.GetChildren(XmlSignature.ElementNames.X509SKI);
         if (xnl) {
-            for (let xel of xnl) {
+            xnl.forEach(xel => {
                 if (xel.textContent) {
                     let skid = Convert.FromBase64(xel.textContent);
                     this.AddSubjectKeyId(skid);
                 }
-            }
+            });
         }
         // <X509SubjectName>
         xnl = this.GetChildren(XmlSignature.ElementNames.X509SubjectName);
         if (xnl != null) {
-            for (let xel of xnl) {
+            xnl.forEach(xel => {
                 if (xel.textContent)
                     this.AddSubjectName(xel.textContent);
-            }
+            });
         }
         // <X509Certificate>
         xnl = this.GetChildren(XmlSignature.ElementNames.X509Certificate);
         if (xnl) {
-            for (let xel of xnl) {
+            xnl.forEach(xel => {
                 if (xel.textContent) {
                     let cert = Convert.FromBase64(xel.textContent);
                     this.AddCertificate(new X509Certificate(cert));
                 }
-            }
+            });
         }
         // only one <X509CRL> 
         let x509el = this.GetChild(XmlSignature.ElementNames.X509CRL, false);

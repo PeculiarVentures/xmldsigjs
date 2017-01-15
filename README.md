@@ -141,7 +141,6 @@ For Sign/Verify operations you need to use CryptoKey. You can use [examples](htt
 
 const WebCrypto = require("node-webcrypto-ossl");
 const crypto = new WebCrypto();
-const XmlCore = require("xml-core");
 const XmlDSigJs = require("xmldsigjs");
 
 XmlDSigJs.Application.setEngine("OpenSSL", crypto);
@@ -166,7 +165,7 @@ let signature = new XmlDSigJs.SignedXml();
 signature.Sign(                                  // Signing document
     { name: "RSASSA-PKCS1-v1_5" },                        // algorithm 
     keys.privateKey,                                      // key 
-    XmlCore.XmlObject.Parse(xml),                         // document
+    XmlDSigJs.Parse(xml),                         // document
     {                                                     // options
         keyValue: keys.publicKey,
         references: [
@@ -185,7 +184,7 @@ signature.Sign(                                  // Signing document
 ```javascript
 "use strict";
 
-let doc = XmlCore.XmlObject.Parse(xml);
+let doc = XmlDSigJs.Parse(xml);
 let signature = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
 let signedXml = new XmlDSigJs.SignedXml(doc);

@@ -43,7 +43,7 @@ describe("HMAC", function () {
                         return signature.Sign(
                             { name: "HMAC" },                                        // algorithm 
                             key,                                                     // key 
-                            XmlCore.XmlObject.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`),          // document
+                            XmlCore.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`),          // document
                             {                                                        // options
                                 references: [
                                     { hash, transforms: ["c14n"] },
@@ -53,7 +53,7 @@ describe("HMAC", function () {
                     .then(() => {
                         // console.log(signature.toString());
 
-                        let signature2 = new xmldsig.SignedXml(XmlCore.XmlObject.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`));
+                        let signature2 = new xmldsig.SignedXml(XmlCore.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`));
                         signature2.LoadXml(signature.XmlSignature.GetXml());
 
                         let si = signature2.XmlSignature.SignedInfo;

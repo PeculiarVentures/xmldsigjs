@@ -1,8 +1,8 @@
 import { Convert } from "xml-core";
 import { ECDSA } from "../algorithm/index";
 import { Application } from "../application";
-const Certificate = require ("pkijs/build/Certificate").default;
-const { setEngine, getCrypto } = require("pkijs/build/common");
+import { Certificate } from "pkijs";
+import { setEngine, getCrypto } from "pkijs";
 import * as Asn1Js from "asn1js";
 
 export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
@@ -109,11 +109,11 @@ export class X509Certificate {
      */
     protected NameToString(name: PkiJs.RelativeDistinguishedNames, spliter: string = ","): string {
         let res: string[] = [];
-        for (let type_and_value of name.typesAndValues) {
+        name.typesAndValues.forEach(type_and_value => {
             let type = type_and_value.type;
             let name = OID[type.toString()].short;
             res.push(`${name ? name : type}=${type_and_value.value.valueBlock.value}`);
-        }
+        });
         return res.join(spliter + " ");
     }
 

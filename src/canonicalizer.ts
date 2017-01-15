@@ -258,9 +258,9 @@ export class XmlCanonicalizer {
         list.sort(XmlDsigC14NTransformNamespacesComparer);
 
         let prevPrefix: string | null = null;
-        for (let n of list) {
+        list.forEach(n => {
             if (n.prefix === prevPrefix) {
-                continue;
+                return;
             }
             prevPrefix = n.prefix;
             this.result.push(" xmlns");
@@ -269,7 +269,7 @@ export class XmlCanonicalizer {
             this.result.push("=\"");
             this.result.push(n.namespace!); // TODO namespace can be null
             this.result.push("\"");
-        }
+        });
 
         return visibleNamespacesCount;
     }
@@ -286,7 +286,7 @@ export class XmlCanonicalizer {
 
         // sort namespaces and write results	    
         list.sort(XmlDsigC14NTransformAttributesComparer);
-        for (let attribute of list) {
+        list.forEach(attribute => {
             if (attribute != null) {
                 this.result.push(" ");
                 this.result.push(attribute.nodeName);
@@ -294,7 +294,7 @@ export class XmlCanonicalizer {
                 this.result.push(this.NormalizeString(attribute.nodeValue, XmlCore.XmlNodeType.Attribute));
                 this.result.push("\"");
             }
-        }
+        });
 
     }
 

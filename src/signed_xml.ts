@@ -110,15 +110,15 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 let pkEnumerator = this.XmlSignature.KeyInfo.GetIterator();
 
                 let promises: PromiseLike<void>[] = [];
-                for (let kic of pkEnumerator) {
+                pkEnumerator.forEach(kic => {
                     let alg = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
                     if (kic instanceof KeyInfos.KeyInfoX509Data) {
-                        for (let cert of (kic as KeyInfos.KeyInfoX509Data).Certificates) {
+                        kic.Certificates.forEach(cert => {
                             promises.push(
                                 cert.exportKey(alg.algorithm)
                                     .then(key => { keys.push(key); })
                             );
-                        }
+                        });
                     }
                     else {
                         promises.push(
@@ -126,7 +126,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                                 .then(key => { keys.push(key); })
                         );
                     }
-                }
+                });
                 return Promise.all(promises);
             })
             .then(() => keys);
@@ -292,11 +292,11 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     if (!signature.KeyInfo)
                         signature.KeyInfo = new KeyInfo();
                     const keyInfo = signature.KeyInfo;
-                    for (let x509 of options.x509) {
+                    options.x509.forEach(x509 => {
                         const raw = XmlCore.Convert.FromBase64(x509);
                         const x509Data = new KeyInfoX509Data(raw);
                         keyInfo.Add(x509Data);
-                    }
+                    });
                 }
                 return Promise.resolve();
             })

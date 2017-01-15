@@ -27,7 +27,7 @@ describe("Transforms", () => {
 
         it("GetOutput with content", () => {
             let transform = new xmldsig.XmlDsigBase64Transform();
-            let node = XmlCore.XmlObject.Parse("<test>AQAB</test>").documentElement;
+            let node = XmlCore.Parse("<test>AQAB</test>").documentElement;
 
             transform.LoadInnerXml(node);
 
@@ -41,7 +41,7 @@ describe("Transforms", () => {
         });
         it("GetOutput without content", () => {
             let transform = new xmldsig.XmlDsigBase64Transform();
-            let node = XmlCore.XmlObject.Parse("<test></test>").documentElement;
+            let node = XmlCore.Parse("<test></test>").documentElement;
 
             transform.LoadInnerXml(node);
 
@@ -72,7 +72,7 @@ describe("Transforms", () => {
 
         it("GetOutput with content", () => {
             let transform = new xmldsig.XmlDsigC14NTransform();
-            let node = XmlCore.XmlObject.Parse(`<root xmlns:p="ns"><p:child xmlns:inclusive="ns2"><inclusive:inner xmlns:inclusive="ns2">123</inclusive:inner></p:child></root>`).documentElement;
+            let node = XmlCore.Parse(`<root xmlns:p="ns"><p:child xmlns:inclusive="ns2"><inclusive:inner xmlns:inclusive="ns2">123</inclusive:inner></p:child></root>`).documentElement;
 
             transform.LoadInnerXml(node);
 
@@ -83,7 +83,7 @@ describe("Transforms", () => {
 
         it("GetOutput without content", () => {
             let transform = new xmldsig.XmlDsigC14NTransform();
-            let node = XmlCore.XmlObject.Parse("<test/>").documentElement;
+            let node = XmlCore.Parse("<test/>").documentElement;
 
             transform.LoadInnerXml(node);
 
@@ -116,7 +116,7 @@ describe("Transforms", () => {
 
         it("GetOutput with content", () => {
             let transform = new xmldsig.XmlDsigExcC14NTransform();
-            let node = XmlCore.XmlObject.Parse(`<root xmlns:p="ns"><p:child xmlns:inclusive="ns2"><inclusive:inner xmlns:inclusive="ns2">123</inclusive:inner></p:child></root>`).documentElement;
+            let node = XmlCore.Parse(`<root xmlns:p="ns"><p:child xmlns:inclusive="ns2"><inclusive:inner xmlns:inclusive="ns2">123</inclusive:inner></p:child></root>`).documentElement;
 
             transform.LoadInnerXml(node);
 
@@ -127,7 +127,7 @@ describe("Transforms", () => {
 
         it("GetOutput without content", () => {
             let transform = new xmldsig.XmlDsigExcC14NTransform();
-            let node = XmlCore.XmlObject.Parse("<test/>").documentElement;
+            let node = XmlCore.Parse("<test/>").documentElement;
 
             transform.LoadInnerXml(node);
 
@@ -159,7 +159,7 @@ describe("Transforms", () => {
 
         it("GetOutput with signature", () => {
             let transform = new xmldsig.XmlDsigEnvelopedSignatureTransform();
-            let node = XmlCore.XmlObject.Parse(`<root><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></root>`).documentElement;
+            let node = XmlCore.Parse(`<root><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></root>`).documentElement;
 
             transform.LoadInnerXml(node);
 
@@ -170,7 +170,7 @@ describe("Transforms", () => {
 
         it("GetOutput without signature", () => {
             let transform = new xmldsig.XmlDsigEnvelopedSignatureTransform();
-            let node = XmlCore.XmlObject.Parse(`<root></root>`).documentElement;
+            let node = XmlCore.Parse(`<root></root>`).documentElement;
 
             transform.LoadInnerXml(node);
 

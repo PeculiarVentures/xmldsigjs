@@ -43,7 +43,7 @@ describe("RSA-SSA", function () {
                                 return signature.Sign(
                                     { name: "RSASSA-PKCS1-v1_5" },                                        // algorithm 
                                     keys.privateKey,                                                // key 
-                                    XmlCore.XmlObject.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`),          // document
+                                    XmlCore.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`),          // document
                                     {                                                               // options
                                         keyValue: keys.publicKey,
                                         references: [
@@ -54,7 +54,7 @@ describe("RSA-SSA", function () {
                             .then(() => {
                                 // console.log(signature.toString());
 
-                                let signature2 = new xmldsig.SignedXml(XmlCore.XmlObject.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`));
+                                let signature2 = new xmldsig.SignedXml(XmlCore.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`));
                                 signature2.LoadXml(signature.XmlSignature.GetXml());
 
                                 let si = signature2.XmlSignature.SignedInfo;

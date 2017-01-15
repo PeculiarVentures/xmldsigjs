@@ -8,5 +8,6 @@ export * from "./reference";
 export * from "./signature";
 export * from "./signature_method";
 export * from "./signed_info";
-export * from "./transform";
 export * from "./transforms";
+export * from "./transform";
+export * from "./transform_collection";
