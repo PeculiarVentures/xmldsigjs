@@ -14,7 +14,7 @@
 npm install xmldsigjs
 ```
 
-npm module has `dist` foldder with files
+The npm module has `dist` foldder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
