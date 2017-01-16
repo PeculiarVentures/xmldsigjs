@@ -17,7 +17,8 @@
         "strictNullChecks": true,
         "pretty": true,
         "noImplicitReturns": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "importHelpers": true
     },
     "files": [
         "src/index.ts"

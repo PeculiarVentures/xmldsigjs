@@ -7,6 +7,22 @@
 [![NPM](https://nodei.co/npm-dl/xmldsigjs.png?months=2&height=2)](https://nodei.co/npm/xmldsigjs/)
 
 [XMLDSIG](https://en.wikipedia.org/wiki/XML_Signature) is short for "XML Digital Signature". This library aims to provide an implementation of XMLDSIG in Typescript/Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
+
+## INSTALLING
+
+```
+npm install xmldsigjs
+```
+
+npm module has `dist` foldder with files
+
+| Name            | Size   | Description                                    |
+|-----------------|--------|------------------------------------------------|
+| index.js        | 126 Kb | UMD module with external modules. Has comments | 
+| xmldsig.js      | 696 Kb | UMD bundle module. Has comments                | 
+| xmldsig.min.js  | 253 Kb | minified UMD bundle module                     |
+
+There is `lib` folder with ES2015 JS file which you can use with `rollup` compiler
  
 ## COMPATABILITY
 
@@ -149,9 +165,6 @@ XmlDSigJs.Application.setEngine("OpenSSL", crypto);
 ### Initiating in Browser
 
 ```html
-<script src="asn1js.js"></script>
-<script src="pkijs.js"></script>
-<script src="xml-core.js"></script>
 <script src="xmldsig.js"></script>
 ```
 
@@ -165,7 +178,7 @@ let signature = new XmlDSigJs.SignedXml();
 signature.Sign(                                  // Signing document
     { name: "RSASSA-PKCS1-v1_5" },                        // algorithm 
     keys.privateKey,                                      // key 
-    XmlDSigJs.Parse(xml),                         // document
+    XmlDSigJs.Parse(xml),                                 // document
     {                                                     // options
         keyValue: keys.publicKey,
         references: [
@@ -208,30 +221,29 @@ signedXml.Verify()
 </head>
 
 <body>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/common.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xmldsigjs/master/built/xmldsig.js"></script>
-    
+    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
+    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
+    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
+    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
+    <script type="text/javascript" src="xmldsig.js"></script>
     <script type="text/javascript">
-        fetch("https://cdn.rawgit.com/PeculiarVentures/xmldsigjs/master/test/static/valid_signature.xml")
+        fetch("signature.xml")
         .then(function(response) {
-            return response.text()
+            return response.text();
         }).then(function(body) {
             var xmlString = body;
-            
-            var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
+
+            var signedDocument = XmlDSigJs.Parse(xmlString);
             var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
-            var signedXml = new xmldsigjs.SignedXml(signedDocument);
+            var signedXml = new XmlDSigJs.SignedXml(signedDocument);
             signedXml.LoadXml(xmlSignature[0]);
-            signedXml.CheckSignature()
-            .then(function (signedDocument) {
-                    console.log("Successfully Verified");
+            signedXml.Verify()
+            .then(function (res) {
+                console.log((res ? "Valid" : "Invalid") + " signature");
             })
             .catch(function (e) {
-                    console.error(e);
+                console.error(e);
             });
         })
     </script>

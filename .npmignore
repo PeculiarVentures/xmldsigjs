@@ -13,3 +13,4 @@
 /tsconfig.json
 /tslint.json
 **/*.map
+*.log

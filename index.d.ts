@@ -975,6 +975,10 @@ declare namespace XmlDSigJs {
         toString(): string;
     }
 
+    // Methods from xml-core
+    export const Select: XmlCore.SelectNodes;
+    export function Parse(xmlstring: string): Document;
+
 }
 
 export = XmlDSigJs;

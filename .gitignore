@@ -6,4 +6,5 @@
 /coverage/
 /.vscode
 /test/test*.js
-npm-debug.log
+**/*.map
+*.log

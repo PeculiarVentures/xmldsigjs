@@ -11,7 +11,7 @@ let sourceMap = process.argv.some(item => item.toLowerCase() === "--dev");
 export default {
     entry: "src/index.ts",
     plugins: [
-        typescript({ typescript: require("typescript") }),
+        typescript({ typescript: require("typescript"), target: "es5" }),
         nodeResolve({ jsnext: true, main: true }),
         // babel(babelrc()),
     ],
