@@ -20,9 +20,9 @@ npm module has `dist` foldder with files
 |-----------------|--------|------------------------------------------------|
 | index.js        | 126 Kb | UMD module with external modules. Has comments | 
 | xmldsig.js      | 696 Kb | UMD bundle module. Has comments                | 
-| xmldsig.min.js  | 253 Kb | minified UMD bundle module                     |
+| xmldsig.min.js  | 253 Kb | minified UMD bundled module. No comments       |
 
-There is `lib` folder with ES2015 JS file which you can use with `rollup` compiler
+There is `lib` folder with ES2015 JS file which you can use with the `rollup` bundler.
  
 ## COMPATABILITY
 
@@ -148,7 +148,7 @@ __Parameters__
 
 ## EXAMPLES
 
-For Sign/Verify operations you need to use CryptoKey. You can use [examples](https://github.com/diafygi/webcrypto-examples#rsassa-pkcs1-v1_5---generatekey) for it
+For Sign/Verify operations you will need to use a Web Crypto CryptoKey. You can see [examples](https://github.com/diafygi/webcrypto-examples#rsassa-pkcs1-v1_5---generatekey) for an example of how to do that.
 
 ### Initiating in NodeJs
 
@@ -260,7 +260,7 @@ npm test
 ```
 
 ### In the browser
-To run the browser test you need to run the server, from the test directory run: 
+To run the browser test you need to run a test server, from the test directory run: 
 ```
 npm start
 ```
