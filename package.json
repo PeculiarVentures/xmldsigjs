@@ -11,7 +11,7 @@
     "pretest": "npm run build:map",
     "test": "mocha test/scripts",
     "test:local": "nyc --reporter=lcov npm test",
-    "build": "npm run build:lib && npm run build:es5 && && npm run build:web",
+    "build": "npm run build:lib && npm run build:es5 && npm run build:web",
     "build:es5": "rollup -c",
     "build:lib": "rollup -c rollup.config.lib.js",
     "build:map": "rollup -c --dev",
