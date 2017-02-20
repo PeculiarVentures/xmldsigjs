@@ -1,7 +1,5 @@
 import nodeResolve from "rollup-plugin-node-resolve";
 import typescript from "rollup-plugin-typescript";
-import babel from "rollup-plugin-babel";
-import babelrc from "babelrc-rollup";
 
 let pkg = require("./package.json");
 let external = Object.keys(pkg.dependencies);
@@ -13,7 +11,6 @@ export default {
     plugins: [
         typescript({ typescript: require("typescript"), target: "es5" }),
         nodeResolve({ jsnext: true, main: true }),
-        // babel(babelrc()),
     ],
     targets: [
         {

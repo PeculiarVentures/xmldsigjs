@@ -1,5 +1,4 @@
 import { XmlObject, XmlCollection } from "xml-core";
-import { RelativeDistinguishedNames, Certificate } from "pkijs";
 
 declare namespace XmlDSigJs {
 
@@ -140,22 +139,12 @@ declare namespace XmlDSigJs {
      */
     export class X509Certificate {
         protected raw: Uint8Array;
-        protected simpl: Certificate;
         protected publicKey: CryptoKey | null;
         constructor(rawData?: BufferSource);
         /**
          * Gets a serial number of the certificate in HEX format
          */
         readonly SerialNumber: string;
-        /**
-         * Converts X500Name to string
-         * @param  {RDN} name X500Name
-         * @param  {string} spliter Splitter char. Default ','
-         * @returns string Formated string
-         * Example:
-         * > C=Some name, O=Some organization name, C=RU
-         */
-        protected NameToString(name: RelativeDistinguishedNames, spliter?: string): string;
         /**
          * Gets a issuer name of the certificate
          */

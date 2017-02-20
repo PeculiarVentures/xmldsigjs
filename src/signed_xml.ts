@@ -412,9 +412,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 let si = this.TransformSignedInfo();
                 return alg.Sign(si, key, algorithm);
             })
-            .then((signature: Uint8Array) => {
+            .then((signature) => {
                 this.Key = key;
-                this.XmlSignature.SignatureValue = signature;
+                this.XmlSignature.SignatureValue = new Uint8Array(signature);
                 this.document = data;
                 return this.XmlSignature;
             });

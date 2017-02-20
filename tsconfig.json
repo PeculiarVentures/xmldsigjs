@@ -4,9 +4,8 @@
         "moduleResolution": "node",
         "target": "es2015",
         "lib": [
-            "es5",
             "dom",
-            "es2015.promise"
+            "es2015"
         ],
         "rootDir": "src",
         "outDir": "build",

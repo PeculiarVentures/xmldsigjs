@@ -4,6 +4,7 @@ import babelrc from "babelrc-rollup";
 
 let pkg = require("./package.json");
 let external = Object.keys(pkg.dependencies);
+external.push("asn1js");
 
 let sourceMap = process.argv.some(item => item.toLowerCase() === "--dev");
 
@@ -17,7 +18,7 @@ export default {
     targets: [
         {
             dest: pkg.main,
-            format: "umd",
+            format: "cjs",
             moduleName: "XmlDSigJs",
             sourceMap
         }

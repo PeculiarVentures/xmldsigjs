@@ -1,3 +1,5 @@
+/// <reference path="../../types/pkijs.d.ts" />
+
 import { Convert } from "xml-core";
 import { ECDSA } from "../algorithm/index";
 import { Application } from "../application";
@@ -102,19 +104,19 @@ export class X509Certificate {
     /**
      * Converts X500Name to string 
      * @param  {RDN} name X500Name
-     * @param  {string} spliter Splitter char. Default ','
+     * @param  {string} splitter Splitter char. Default ','
      * @returns string Formated string
      * Example:
      * > C=Some name, O=Some organization name, C=RU
      */
-    protected NameToString(name: PkiJs.RelativeDistinguishedNames, spliter: string = ","): string {
+    protected NameToString(name: PkiJs.RelativeDistinguishedNames, splitter: string = ","): string {
         let res: string[] = [];
         name.typesAndValues.forEach(type_and_value => {
             let type = type_and_value.type;
             let name = OID[type.toString()].short;
             res.push(`${name ? name : type}=${type_and_value.value.valueBlock.value}`);
         });
-        return res.join(spliter + " ");
+        return res.join(splitter + " ");
     }
 
     /**
@@ -132,7 +134,7 @@ export class X509Certificate {
     }
 
     /**
-     * Returns a thumbrint of the certififcate
+     * Returns a thumbprint of the certificate
      * @param  {DigestAlgorithm="SHA-1"} algName Digest algorithm name
      * @returns PromiseLike
      */

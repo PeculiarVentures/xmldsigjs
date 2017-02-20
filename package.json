@@ -11,12 +11,12 @@
     "pretest": "npm run build:map",
     "test": "mocha test/scripts",
     "test:local": "nyc --reporter=lcov npm test",
-    "build": "npm run build:lib && npm run build:es5",
+    "build": "npm run build:lib && npm run build:es5 && && npm run build:web",
     "build:es5": "rollup -c",
     "build:lib": "rollup -c rollup.config.lib.js",
     "build:map": "rollup -c --dev",
     "build:source": "tsc --declaration --declarationDir types",
-    "build:web": "rollup -c rollup.config.web.js && babel dist/xmldsig.js --comment=false --compact=false  --out-file dist/xmldsig.js",
+    "build:web": "rollup -c rollup.config.web.js && babel dist/xmldsig.js --comment=false --out-file dist/xmldsig.js",
     "pub": "npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
     "coverage": "nyc npm test",
@@ -43,7 +43,7 @@
   "dependencies": {
     "@types/asn1js": "latest",
     "@types/node": "^6.0.46",
-    "pkijs": "git+https://github.com/microshine/pkijs-es6",
+    "pkijs": "^2.0.48",
     "tslib": "^1.5.0",
     "xml-core": "^1"
   },
