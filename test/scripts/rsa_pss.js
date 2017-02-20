@@ -22,7 +22,7 @@ describe("RSA-PSS", function () {
                 // hash
                 ["SHA-1", "SHA-256", "SHA-384", "SHA-512"].forEach(hash => {
                     // salt length
-                    [0, 32, 64].forEach(saltLength => {
+                    [void 0, 32, 64].forEach(saltLength => {
                         // exclude saltLength=64 for SHA-512
                         if (hash === "SHA-512" && saltLength === 64)
                             return;
