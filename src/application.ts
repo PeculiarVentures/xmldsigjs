@@ -15,8 +15,11 @@ export class Application {
      * @returns void
      */
     static setEngine(name: string, crypto: Crypto): void {
-        _crypto = crypto as CryptoEx;
-        _crypto.name = name;
+        _crypto = {
+            getRandomValues: crypto.getRandomValues,
+            subtle: crypto.subtle,
+            name,
+        };
     }
 
     /**
@@ -38,4 +41,4 @@ export class Application {
     if (!Application.isNodePlugin()) {
         Application.setEngine("W3 WebCrypto module", self.crypto);
     }
-} ();
+}();
