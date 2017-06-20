@@ -45,7 +45,7 @@ describe("Key", function () {
         it("Serial number", () => {
             assert.equal(!!cert, true, "Certificate is null");
 
-            assert.equal(cert.SerialNumber, "00a3fcc4b7b76e646d");
+            assert.equal(cert.SerialNumber, "11816535815648863341");
         });
 
         it("Issue/Subject names", () => {
