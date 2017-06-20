@@ -1,6 +1,5 @@
 /// <reference path="../../types/pkijs.d.ts" />
 
-import { Convert } from "xml-core";
 import { ECDSA } from "../algorithm/index";
 import { Application } from "../application";
 import { Certificate } from "pkijs";
@@ -11,7 +10,7 @@ export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512
 
 /**
  * List of OIDs
- * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx 
+ * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx
  */
 const OID: { [key: string]: { short?: string, long?: string } } = {
     "2.5.4.3": {
@@ -95,14 +94,14 @@ export class X509Certificate {
     }
 
     /**
-     * Gets a serial number of the certificate in HEX format  
+     * Gets a serial number of the certificate in BIG INTEGER string format
      */
     public get SerialNumber(): string {
-        return Convert.ToHex(new Uint8Array(this.simpl.serialNumber.valueBlock.valueHex));
+        return this.simpl.serialNumber.valueBlock.toString();
     }
 
     /**
-     * Converts X500Name to string 
+     * Converts X500Name to string
      * @param  {RDN} name X500Name
      * @param  {string} splitter Splitter char. Default ','
      * @returns string Formated string
@@ -120,14 +119,14 @@ export class X509Certificate {
     }
 
     /**
-     * Gets a issuer name of the certificate 
+     * Gets a issuer name of the certificate
      */
     public get Issuer(): string {
         return this.NameToString(this.simpl.issuer);
     }
 
     /**
-     * Gets a subject name of the certificate 
+     * Gets a subject name of the certificate
      */
     public get Subject(): string {
         return this.NameToString(this.simpl.subject);

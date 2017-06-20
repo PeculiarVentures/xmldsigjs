@@ -6,7 +6,6 @@
   "module": "lib/index.js",
   "jsnext:main": "lib/index.js",
   "scripts": {
-    "prepublish": "npm run build",
     "start": "node test/html/server.js",
     "pretest": "npm run build:map",
     "test": "mocha test/scripts",
@@ -17,6 +16,7 @@
     "build:map": "rollup -c --dev",
     "build:source": "tsc --declaration --declarationDir types",
     "build:web": "rollup -c rollup.config.web.js && babel dist/xmldsig.js --comment=false --out-file dist/xmldsig.js",
+    "prepub": "npm run build",
     "pub": "npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
     "coverage": "nyc npm test",
@@ -43,7 +43,9 @@
   "dependencies": {
     "@types/asn1js": "latest",
     "@types/node": "^6.0.63",
-    "pkijs": "^2.0.48",
+    "asn1js": "^2.0.15",
+    "pkijs": "^2.0.56",
+    "pvutils": "^1.0.8",
     "tslib": "^1.5.0",
     "xml-core": "^1"
   },

@@ -23,7 +23,7 @@ describe("PKI X509", () => {
         const x509 = new XmlDSigJs.X509Certificate(x509_rsa);
 
         assert.equal(!!x509.simpl, true);
-        assert.equal(x509.SerialNumber, "00a3fcc4b7b76e646c");
+        assert.equal(x509.SerialNumber, "11816535815648863340");
         assert.equal(x509.Issuer, "C=AT, O=Rundfunk und Telekom Regulierungs-GmbH, CN=Trusted List CA 1");
         assert.equal(x509.Subject, "C=AT, O=Rundfunk und Telekom Regulierungs-GmbH, CN=Trusted List 4");
         assert.equal(x509.PublicKey, null);
