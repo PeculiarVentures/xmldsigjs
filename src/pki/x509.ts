@@ -3,7 +3,7 @@
 import { ECDSA } from "../algorithm/index";
 import { Application } from "../application";
 import { Certificate } from "pkijs";
-import { setEngine, getCrypto } from "pkijs";
+import { setEngine, getCrypto, CryptoEngine } from "pkijs";
 import * as Asn1Js from "asn1js";
 
 export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
@@ -173,8 +173,9 @@ export class X509Certificate {
     exportKey(algorithm: Algorithm): PromiseLike<CryptoKey> {
         return Promise.resolve()
             .then(() => {
-                if (!getCrypto())
-                    setEngine(Application.crypto.name, Application.crypto, Application.crypto.subtle);
+                if (!getCrypto()) {
+                    setEngine(Application.crypto.name, new CryptoEngine({ name: Application.crypto.name, crypto: Application.crypto }), Application.crypto.subtle);
+                }
                 let alg = {
                     algorithm,
                     usages: ["verify"]

@@ -41,26 +41,26 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
-    "@types/asn1js": "latest",
-    "@types/node": "^6.0.63",
     "asn1js": "^2.0.15",
-    "pkijs": "^2.0.56",
+    "pkijs": "^2.1.5",
     "pvutils": "^1.0.8",
     "tslib": "^1.5.0",
     "xml-core": "^1"
   },
   "devDependencies": {
+    "@types/asn1js": "latest",
+    "@types/node": "^6.0.89",
     "babel-plugin-external-helpers": "^6.18.0",
     "babel-preset-es2015": "^6.18.0",
     "babelrc-rollup": "^3.0.0",
-    "coveralls": "^2",
-    "mocha": "^3",
-    "node-webcrypto-ossl": "^1.0.19",
+    "coveralls": "^2.13.3",
+    "mocha": "^3.5.3",
+    "node-webcrypto-ossl": "^1.0.31",
     "nyc": "^8",
     "rollup": "^0.41.4",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-typescript": "^0.8.1",
-    "typescript": "^2"
+    "typescript": "^2.5.3"
   }
 }
