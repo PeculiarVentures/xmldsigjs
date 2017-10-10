@@ -223,8 +223,9 @@ export class XmlCanonicalizer {
             // get namespace prefix
             let prefix: string | null = null;
             let matches: RegExpExecArray | null;
-            if (matches = /xmlns:(\w+)/.exec(attribute.nodeName))
+            if (matches = /xmlns:([\w\.]+)/.exec(attribute.nodeName)) {
                 prefix = matches[1];
+            }
 
             let printable = true;
             if (this.exclusive && !this.IsNamespaceInclusive(node, prefix)) {
