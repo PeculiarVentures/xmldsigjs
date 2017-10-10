@@ -134,7 +134,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
     protected FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
         // add namespace nodes
-        let namespaces = XmlCore.SelectNamespaces(src);
+        let namespaces = XmlCore.SelectNamespaces(dst);
         for (let i in namespaces) {
             let uri = namespaces[i];
             if (ignoreDefault && i === "")
