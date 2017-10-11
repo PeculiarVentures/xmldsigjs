@@ -379,8 +379,8 @@ function XmlDsigC14NTransformAttributesComparer(x: Node, y: Node): number {
     if (!x.namespaceURI && y.namespaceURI) { return -1; }
     if (!y.namespaceURI && x.namespaceURI) { return 1; }
 
-    let left = x.namespaceURI + x.localName;
-    let right = y.namespaceURI + y.localName;
+    let left = x.namespaceURI! + x.localName;
+    let right = y.namespaceURI! + y.localName;
 
     if (left === right) return 0;
     else if (left < right) return -1;

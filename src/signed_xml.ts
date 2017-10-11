@@ -6,6 +6,7 @@ import { ISignatureAlgorithm } from "./algorithm";
 import * as Alg from "./algorithm/index";
 import * as Transforms from "./xml/transforms";
 import * as KeyInfos from "./xml/key_infos";
+import { XmlNodeType } from "xml-core";
 
 export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
 
@@ -168,7 +169,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     if (objectName) {
                         let found: Element | null = null;
                         this.XmlSignature.ObjectList && this.XmlSignature.ObjectList.Some(obj => {
-                            found = findById(obj.GetXml() !, objectName!);
+                            found = findById(obj.GetXml()!, objectName!);
                             if (found) {
                                 let el = found.cloneNode(true) as Element;
                                 this.FixupNamespaceNodes(doc as Element, el, true);
@@ -258,10 +259,21 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         const xml = this.XmlSignature.SignedInfo.GetXml();
         if (!xml)
             throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot get Xml element from SignedInfo");
+
         let node = xml.cloneNode(true) as Element;
-        let namespaces = XmlCore.SelectNamespaces(xml);
-        for (let i in namespaces) {
-            let uri = namespaces[i];
+
+        // Get root namespaces
+        const rootNamespaces = SelectRootNamespaces(xml);
+        for (let i in rootNamespaces) {
+            let uri = rootNamespaces[i];
+            if (i === node.prefix)
+                continue;
+            node.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
+        }
+
+        let childNamespaces = XmlCore.SelectNamespaces(xml);
+        for (let i in childNamespaces) {
+            let uri = childNamespaces[i];
             if (i === node.prefix)
                 continue;
             node.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
@@ -548,4 +560,23 @@ function findById(element: Element, id: string): Element | null {
                 return el;
         }
     return null;
+}
+
+// TODO it can be moved to XmlCore
+function _SelectRootNamespaces(node: Node, selectedNodes: XmlCore.AssocArray<string> = {}) {
+    if (node && node.nodeType === XmlNodeType.Element) {
+        const el = node as Element;
+        if (el.namespaceURI && el.namespaceURI !== "http://www.w3.org/XML/1998/namespace") {
+            selectedNodes[el.prefix ? el.prefix : ""] = node.namespaceURI!;
+        }
+        if (node.parentNode) {
+            _SelectRootNamespaces(node.parentNode, selectedNodes);
+        }
+    }
+}
+
+export function SelectRootNamespaces(node: Element) {
+    let attrs: XmlCore.AssocArray<string> = {};
+    _SelectRootNamespaces(node, attrs);
+    return attrs;
 }
