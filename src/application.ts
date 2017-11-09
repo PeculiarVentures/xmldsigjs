@@ -16,7 +16,7 @@ export class Application {
      */
     static setEngine(name: string, crypto: Crypto): void {
         _crypto = {
-            getRandomValues: crypto.getRandomValues,
+            getRandomValues: crypto.getRandomValues.bind(crypto),
             subtle: crypto.subtle,
             name,
         };
