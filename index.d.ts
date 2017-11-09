@@ -275,13 +275,13 @@ declare namespace XmlDSigJs {
          * @param  {CryptoKey} key
          * @returns Promise
          */
-        importKey(key: CryptoKey): Promise<{}>;
+        importKey(key: CryptoKey): PromiseLike<this>;
         /**
          * Exports key from the RSAKeyValue object
          * @param  {Algorithm} alg
          * @returns Promise
          */
-        exportKey(alg: Algorithm): Promise<{}>;
+        exportKey(alg: Algorithm): PromiseLike<CryptoKey>;
         /**
          * Loads an RSA key clause from an XML element.
          * @param  {Element | string} element
