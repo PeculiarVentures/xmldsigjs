@@ -13,7 +13,7 @@ export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com
 export interface OptionsSignReference {
     /**
      * Id of Reference
-     * 
+     *
      * @type {string}
      * @memberOf OptionsSignReference
      */
@@ -22,14 +22,14 @@ export interface OptionsSignReference {
     type?: string;
     /**
      * Hash algorithm
-     * 
+     *
      * @type {AlgorithmIdentifier}
      * @memberOf OptionsSignReference
      */
     hash: AlgorithmIdentifier;
     /**
      * List of transforms
-     * 
+     *
      * @type {OptionsSignTransform[]}
      * @memberOf OptionsSignReference
      */
@@ -39,22 +39,22 @@ export interface OptionsSignReference {
 export interface OptionsSign {
     /**
      * Public key for KeyInfo block
-     * 
+     *
      * @type {boolean}
      * @memberOf OptionsSign
      */
     keyValue?: CryptoKey;
     /**
      * List of X509 Certificates
-     * 
+     *
      * @type {string[]}
      * @memberOf OptionsSign
      */
     x509?: string[];
     /**
      * List of Reference
-     * Default is Reference with hash alg SHA-256 and exc-c14n transform  
-     * 
+     * Default is Reference with hash alg SHA-256 and exc-c14n transform
+     *
      * @type {OptionsSignReference[]}
      * @memberOf OptionsSign
      */
@@ -82,9 +82,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
     /**
      * Creates an instance of SignedXml.
-     * 
+     *
      * @param {(Document | Element)} [node]
-     * 
+     *
      * @memberOf SignedXml
      */
     constructor(node?: Document | Element) {
@@ -133,14 +133,23 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             .then(() => keys);
     }
 
-    protected FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
-        // add namespace nodes
-        let namespaces = XmlCore.SelectNamespaces(dst);
+    protected GetSignatureNamespaces(): { [index: string]: string } {
+        let namespaces = {}
+        namespaces[this.XmlSignature.prefix] = this.XmlSignature.namespaceURI
+        return namespaces
+    }
+
+    protected CopyNamespaces(src: Element, dst: Element, ignoreDefault: boolean): void {
+        this.InjectNamespaces(XmlCore.SelectNamespaces(src), dst, ignoreDefault)
+        this.InjectNamespaces(SelectRootNamespaces(src), dst, ignoreDefault)
+    }
+
+    protected InjectNamespaces(namespaces: { [index: string]: string }, target: Element, ignoreDefault: boolean): void {
         for (let i in namespaces) {
             let uri = namespaces[i];
             if (ignoreDefault && i === "")
                 continue;
-            dst.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
+            target.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
         }
     }
 
@@ -172,7 +181,8 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             found = findById(obj.GetXml()!, objectName!);
                             if (found) {
                                 let el = found.cloneNode(true) as Element;
-                                this.FixupNamespaceNodes(doc as Element, el, true);
+                                this.CopyNamespaces(el, el, true);
+                                this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
                                 doc = el;
                                 return true;
                             }
@@ -182,7 +192,8 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             found = XmlCore.XmlObject.GetElementById(doc, objectName);
                             if (found) {
                                 let el = found.cloneNode(true) as Element;
-                                this.FixupNamespaceNodes(doc, el, false);
+                                this.CopyNamespaces(el, el, false);
+                                this.CopyNamespaces(doc, el, false);
                                 doc = el;
                             }
                         }
@@ -237,7 +248,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected DigestReferences(data: Element) {
         return Promise.resolve()
             .then(() => {
-                // we must tell each reference which hash algorithm to use 
+                // we must tell each reference which hash algorithm to use
                 // before asking for the SignedInfo XML !
                 let promises = this.XmlSignature.SignedInfo.References.Map(ref => {
                     // assume SHA-256 if nothing is specified
@@ -522,17 +533,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     toString() {
         // Check for EnvelopedTransform
         const signature = this.XmlSignature;
-        let enveloped = false;
-        if (signature.SignedInfo.References)
-            signature.SignedInfo.References.Some(ref => {
-                if (ref.Transforms)
-                    ref.Transforms.Some(transform => {
-                        if (transform instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
-                            enveloped = true;
-                        return enveloped;
-                    });
-                return enveloped;
-            });
+        let enveloped = signature.SignedInfo.References && signature.SignedInfo.References.Some(r =>
+          r.Transforms && r.Transforms.Some(t => t instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
+        );
 
         if (enveloped) {
             let doc = this.document!.documentElement.cloneNode(true);
