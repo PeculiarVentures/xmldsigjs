@@ -351,7 +351,7 @@ declare namespace XmlDSigJs {
          * @param  {Algorithm} alg
          * @returns Promise
          */
-        exportKey(alg: Algorithm): Promise<CryptoKey | null>;
+        exportKey(alg: Algorithm): Promise<CryptoKey>;
         private AddCertificatesChainFrom(cert, root);
         /**
          * Gets a list of the X.509v3 certificates contained in the KeyInfoX509Data object.
