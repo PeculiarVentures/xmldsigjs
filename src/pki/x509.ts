@@ -112,7 +112,8 @@ export class X509Certificate {
         let res: string[] = [];
         name.typesAndValues.forEach(type_and_value => {
             let type = type_and_value.type;
-            let name = OID[type.toString()].short;
+            let oid = OID[type.toString()]
+            let name = oid ? oid.short : null;
             res.push(`${name ? name : type}=${type_and_value.value.valueBlock.value}`);
         });
         return res.join(splitter + " ");
