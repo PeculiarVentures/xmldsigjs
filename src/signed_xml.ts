@@ -217,7 +217,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     // we must not C14N references from outside the document
                     // e.g. non-xml documents
                     if (reference.Uri && reference.Uri[0] !== `#`) {
-                        canonOutput = new XMLSerializer().serializeToString(doc);
+                        canonOutput = new XMLSerializer().serializeToString(doc.ownerDocument);
                     }
                     else {
                         // apply default C14N transformation
