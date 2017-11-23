@@ -71,6 +71,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         return this.signature;
     }
 
+    public Parent?: Element | XmlCore.XmlObject;
     public Key?: CryptoKey;
     public Algorithm?: Algorithm | RsaPssParams | EcdsaParams;
     public get Signature() {
@@ -390,6 +391,21 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
         // Get root namespaces
         const rootNamespaces = SelectRootNamespaces(xml);
+
+        if (this.Parent) {
+            const parentXml = (this.Parent instanceof XmlCore.XmlObject)
+                ? this.Parent.GetXml()
+                : this.Parent;
+
+            if (parentXml) {
+                const parentNamespaces = SelectRootNamespaces(parentXml);
+                // copy namespaces to rootNamespaces
+                for (const key in parentNamespaces) {
+                    rootNamespaces[key] = parentNamespaces[key];
+                }
+            }
+        }
+
         for (const i in rootNamespaces) {
             const uri = rootNamespaces[i];
             if (i === node.prefix) {
