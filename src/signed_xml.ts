@@ -1,5 +1,5 @@
 import * as XmlCore from "xml-core";
-import { Signature, SignedInfo, Reference, References, KeyInfo, Transforms as XmlTransforms } from "./xml";
+import { Signature, SignedInfo, Reference, References, KeyInfo, Transform as XmlTransform, Transforms as XmlTransforms } from "./xml";
 import { KeyValue, KeyInfoX509Data } from "./xml/key_infos";
 import { CryptoConfig } from "./crypto_config";
 import { ISignatureAlgorithm } from "./algorithm";
@@ -13,7 +13,7 @@ export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com
 export interface OptionsSignReference {
     /**
      * Id of Reference
-     * 
+     *
      * @type {string}
      * @memberOf OptionsSignReference
      */
@@ -22,14 +22,14 @@ export interface OptionsSignReference {
     type?: string;
     /**
      * Hash algorithm
-     * 
+     *
      * @type {AlgorithmIdentifier}
      * @memberOf OptionsSignReference
      */
     hash: AlgorithmIdentifier;
     /**
      * List of transforms
-     * 
+     *
      * @type {OptionsSignTransform[]}
      * @memberOf OptionsSignReference
      */
@@ -39,22 +39,22 @@ export interface OptionsSignReference {
 export interface OptionsSign {
     /**
      * Public key for KeyInfo block
-     * 
+     *
      * @type {boolean}
      * @memberOf OptionsSign
      */
     keyValue?: CryptoKey;
     /**
      * List of X509 Certificates
-     * 
+     *
      * @type {string[]}
      * @memberOf OptionsSign
      */
     x509?: string[];
     /**
      * List of Reference
-     * Default is Reference with hash alg SHA-256 and exc-c14n transform  
-     * 
+     * Default is Reference with hash alg SHA-256 and exc-c14n transform
+     *
      * @type {OptionsSignReference[]}
      * @memberOf OptionsSign
      */
@@ -82,9 +82,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
     /**
      * Creates an instance of SignedXml.
-     * 
+     *
      * @param {(Document | Element)} [node]
-     * 
+     *
      * @memberOf SignedXml
      */
     constructor(node?: Document | Element) {
@@ -133,22 +133,38 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             .then(() => keys);
     }
 
-    protected FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
-        // add namespace nodes
-        let namespaces = XmlCore.SelectNamespaces(dst);
+    /**
+     * Returns dictionary of namespaces used in signature
+     */
+    protected GetSignatureNamespaces(): { [index: string]: string } {
+        let namespaces = {};
+        namespaces[this.XmlSignature.Prefix] = this.XmlSignature.NamespaceURI;
+        return namespaces;
+    }
+
+    /**
+     * Copies namespaces from source element and its parents into destination element
+     */
+    protected CopyNamespaces(src: Element, dst: Element, ignoreDefault: boolean): void {
+        this.InjectNamespaces(XmlCore.SelectNamespaces(src), dst, ignoreDefault);
+        this.InjectNamespaces(SelectRootNamespaces(src), dst, ignoreDefault);
+    }
+
+    /**
+     * Injects namespaces from dictionary to the target element
+     */
+    protected InjectNamespaces(namespaces: { [index: string]: string }, target: Element, ignoreDefault: boolean): void {
         for (let i in namespaces) {
             let uri = namespaces[i];
             if (ignoreDefault && i === "")
                 continue;
-            dst.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
+            target.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
         }
     }
 
     protected DigestReference(doc: Element, reference: Reference, check_hmac: boolean) {
         return Promise.resolve()
             .then(() => {
-                let canonOutput: any = null;
-
                 if (reference.Uri) {
                     let objectName: string | undefined;
                     if (!reference.Uri.indexOf("#xpointer")) {
@@ -172,7 +188,8 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             found = findById(obj.GetXml()!, objectName!);
                             if (found) {
                                 let el = found.cloneNode(true) as Element;
-                                this.FixupNamespaceNodes(doc as Element, el, true);
+                                this.CopyNamespaces(found, el, true);
+                                this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
                                 doc = el;
                                 return true;
                             }
@@ -182,7 +199,8 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             found = XmlCore.XmlObject.GetElementById(doc, objectName);
                             if (found) {
                                 let el = found.cloneNode(true) as Element;
-                                this.FixupNamespaceNodes(doc, el, false);
+                                this.CopyNamespaces(found, el, false);
+                                this.CopyNamespaces(doc, el, false);
                                 doc = el;
                             }
                         }
@@ -191,29 +209,10 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     }
                 }
 
+                let canonOutput: any = null;
                 if (reference.Transforms && reference.Transforms.Count) {
-                    // Sort transforms. Enveloped should be first transform
-                    reference.Transforms.Sort((a, b) => {
-                        if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
-                            return 1;
-                        return 0;
-                    }).ForEach(transform => {
-                        // Apply transforms
-                        if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform)
-                            transform = new Transforms.XmlDsigC14NTransform(); // TODO: Check RFC for it
-                        if (transform instanceof Transforms.XmlDsigExcC14NWithCommentsTransform)
-                            transform = new Transforms.XmlDsigExcC14NTransform(); // TODO: Check RFC for it
-                        transform.LoadInnerXml(doc);
-                        canonOutput = transform.GetOutput();
-                    });
-                    // Apply C14N transform if Reference has only one transform EnvelopdeSignature
-                    if (reference.Transforms.Count === 1 && reference.Transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
-                        let c14n = new Transforms.XmlDsigC14NTransform();
-                        c14n.LoadInnerXml(doc);
-                        canonOutput = c14n.GetOutput();
-                    }
-                }
-                else {
+                    canonOutput = this.ApplyTransforms(reference.Transforms, doc)
+                } else {
                     // we must not C14N references from outside the document
                     // e.g. non-xml documents
                     if (reference.Uri && reference.Uri[0] !== `#`) {
@@ -226,6 +225,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                         canonOutput = excC14N.GetOutput();
                     }
                 }
+
                 if (!reference.DigestMethod.Algorithm) {
                     throw new XmlCore.XmlError(XmlCore.XE.NULL_PARAM, "Reference", "DigestMethod");
                 }
@@ -237,7 +237,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected DigestReferences(data: Element) {
         return Promise.resolve()
             .then(() => {
-                // we must tell each reference which hash algorithm to use 
+                // we must tell each reference which hash algorithm to use
                 // before asking for the SignedInfo XML !
                 let promises = this.XmlSignature.SignedInfo.References.Map(ref => {
                     // assume SHA-256 if nothing is specified
@@ -281,6 +281,52 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         t.LoadInnerXml(node);
         const res = t.GetOutput();
         return res;
+    }
+
+    protected ResolveTransform(transform: string): XmlTransform {
+        switch (transform) {
+            case "enveloped":
+                return new Transforms.XmlDsigEnvelopedSignatureTransform();
+            case "c14n":
+                return new Transforms.XmlDsigC14NTransform();
+            case "c14n-com":
+                return new Transforms.XmlDsigC14NWithCommentsTransform();
+            case "exc-c14n":
+                return new Transforms.XmlDsigExcC14NTransform();
+            case "exc-c14n-com":
+                return new Transforms.XmlDsigExcC14NWithCommentsTransform();
+            case "base64":
+                return new Transforms.XmlDsigBase64Transform();
+            default:
+                throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
+        }
+    }
+
+    protected ApplyTransforms(transforms: XmlTransforms, input: Element): any {
+        let output: any = null;
+
+        // Sort transforms. Enveloped should be first transform
+        transforms.Sort((a, b) => {
+            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
+                return 1;
+            return 0;
+        }).ForEach(transform => {
+            // Apply transforms
+            if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform)
+                transform = new Transforms.XmlDsigC14NTransform(); // TODO: Check RFC for it
+            if (transform instanceof Transforms.XmlDsigExcC14NWithCommentsTransform)
+                transform = new Transforms.XmlDsigExcC14NTransform(); // TODO: Check RFC for it
+            transform.LoadInnerXml(input);
+            output = transform.GetOutput();
+        });
+        // Apply C14N transform if Reference has only one transform EnvelopdeSignature
+        if (transforms.Count === 1 && transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+            let c14n = new Transforms.XmlDsigC14NTransform();
+            c14n.LoadInnerXml(input);
+            output = c14n.GetOutput();
+        }
+
+        return output;
     }
 
     protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsSign = {}): PromiseLike<void> {
@@ -327,35 +373,13 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                         if (item.type)
                             reference.Type = item.type;
                         // DigestMethod
-                        let _alg: Algorithm = typeof item.hash === "string" ? { name: item.hash } : item.hash;
-                        const digestAlgorithm = CryptoConfig.GetHashAlgorithm(_alg);
+                        const digestAlgorithm = CryptoConfig.GetHashAlgorithm(item.hash);
                         reference.DigestMethod.Algorithm = digestAlgorithm.namespaceURI;
                         // transforms
                         if (item.transforms && item.transforms.length) {
                             let transforms = new XmlTransforms();
                             item.transforms.forEach(transform => {
-                                switch (transform) {
-                                    case "enveloped":
-                                        transforms.Add(new Transforms.XmlDsigEnvelopedSignatureTransform());
-                                        break;
-                                    case "c14n":
-                                        transforms.Add(new Transforms.XmlDsigC14NTransform);
-                                        break;
-                                    case "c14n-com":
-                                        transforms.Add(new Transforms.XmlDsigC14NWithCommentsTransform);
-                                        break;
-                                    case "exc-c14n":
-                                        transforms.Add(new Transforms.XmlDsigExcC14NTransform);
-                                        break;
-                                    case "exc-c14n-com":
-                                        transforms.Add(new Transforms.XmlDsigExcC14NWithCommentsTransform);
-                                        break;
-                                    case "base64":
-                                        transforms.Add(new Transforms.XmlDsigBase64Transform);
-                                        break;
-                                    default:
-                                        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
-                                }
+                                transforms.Add(this.ResolveTransform(transform));
                             });
                             reference.Transforms = transforms;
                         }
@@ -522,17 +546,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     toString() {
         // Check for EnvelopedTransform
         const signature = this.XmlSignature;
-        let enveloped = false;
-        if (signature.SignedInfo.References)
-            signature.SignedInfo.References.Some(ref => {
-                if (ref.Transforms)
-                    ref.Transforms.Some(transform => {
-                        if (transform instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
-                            enveloped = true;
-                        return enveloped;
-                    });
-                return enveloped;
-            });
+        let enveloped = signature.SignedInfo.References && signature.SignedInfo.References.Some(r =>
+          r.Transforms && r.Transforms.Some(t => t instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
+        );
 
         if (enveloped) {
             let doc = this.document!.documentElement.cloneNode(true);
