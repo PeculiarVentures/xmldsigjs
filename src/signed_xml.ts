@@ -1,5 +1,5 @@
 import * as XmlCore from "xml-core";
-import { Signature, SignedInfo, Reference, References, KeyInfo, Transforms as XmlTransforms } from "./xml";
+import { Signature, SignedInfo, Reference, References, KeyInfo, Transform as XmlTransform, Transforms as XmlTransforms } from "./xml";
 import { KeyValue, KeyInfoX509Data } from "./xml/key_infos";
 import { CryptoConfig } from "./crypto_config";
 import { ISignatureAlgorithm } from "./algorithm";
@@ -134,14 +134,14 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     }
 
     protected GetSignatureNamespaces(): { [index: string]: string } {
-        let namespaces = {}
-        namespaces[this.XmlSignature.prefix] = this.XmlSignature.namespaceURI
-        return namespaces
+        let namespaces = {};
+        namespaces[this.XmlSignature.Prefix] = this.XmlSignature.NamespaceURI;
+        return namespaces;
     }
 
     protected CopyNamespaces(src: Element, dst: Element, ignoreDefault: boolean): void {
-        this.InjectNamespaces(XmlCore.SelectNamespaces(src), dst, ignoreDefault)
-        this.InjectNamespaces(SelectRootNamespaces(src), dst, ignoreDefault)
+        this.InjectNamespaces(XmlCore.SelectNamespaces(src), dst, ignoreDefault);
+        this.InjectNamespaces(SelectRootNamespaces(src), dst, ignoreDefault);
     }
 
     protected InjectNamespaces(namespaces: { [index: string]: string }, target: Element, ignoreDefault: boolean): void {
@@ -294,6 +294,25 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         return res;
     }
 
+    protected ResolveTransform(transform: string): XmlTransform {
+        switch (transform) {
+            case "enveloped":
+                return new Transforms.XmlDsigEnvelopedSignatureTransform();
+            case "c14n":
+                return new Transforms.XmlDsigC14NTransform();
+            case "c14n-com":
+                return new Transforms.XmlDsigC14NWithCommentsTransform();
+            case "exc-c14n":
+                return new Transforms.XmlDsigExcC14NTransform();
+            case "exc-c14n-com":
+                return new Transforms.XmlDsigExcC14NWithCommentsTransform();
+            case "base64":
+                return new Transforms.XmlDsigBase64Transform();
+            default:
+                throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
+        }
+    }
+
     protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsSign = {}): PromiseLike<void> {
         return Promise.resolve()
             .then(() => {
@@ -345,28 +364,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                         if (item.transforms && item.transforms.length) {
                             let transforms = new XmlTransforms();
                             item.transforms.forEach(transform => {
-                                switch (transform) {
-                                    case "enveloped":
-                                        transforms.Add(new Transforms.XmlDsigEnvelopedSignatureTransform());
-                                        break;
-                                    case "c14n":
-                                        transforms.Add(new Transforms.XmlDsigC14NTransform);
-                                        break;
-                                    case "c14n-com":
-                                        transforms.Add(new Transforms.XmlDsigC14NWithCommentsTransform);
-                                        break;
-                                    case "exc-c14n":
-                                        transforms.Add(new Transforms.XmlDsigExcC14NTransform);
-                                        break;
-                                    case "exc-c14n-com":
-                                        transforms.Add(new Transforms.XmlDsigExcC14NWithCommentsTransform);
-                                        break;
-                                    case "base64":
-                                        transforms.Add(new Transforms.XmlDsigBase64Transform);
-                                        break;
-                                    default:
-                                        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
-                                }
+                                transforms.Add(this.ResolveTransform(transform));
                             });
                             reference.Transforms = transforms;
                         }
