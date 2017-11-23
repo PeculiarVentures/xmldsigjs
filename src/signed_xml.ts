@@ -357,8 +357,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                         if (item.type)
                             reference.Type = item.type;
                         // DigestMethod
-                        let _alg: Algorithm = typeof item.hash === "string" ? { name: item.hash } : item.hash;
-                        const digestAlgorithm = CryptoConfig.GetHashAlgorithm(_alg);
+                        const digestAlgorithm = CryptoConfig.GetHashAlgorithm(item.hash);
                         reference.DigestMethod.Algorithm = digestAlgorithm.namespaceURI;
                         // transforms
                         if (item.transforms && item.transforms.length) {
