@@ -14,19 +14,20 @@ export interface IHashAlgorithm extends IAlgorithm {
 }
 
 export interface IHashAlgorithmConstructable {
-    new (): IHashAlgorithm;
+    new(): IHashAlgorithm;
 }
 
 export abstract class XmlAlgorithm implements IAlgorithm {
-    algorithm: Algorithm;
-    namespaceURI: string;
-    getAlgorithmName(): string {
+    public algorithm: Algorithm;
+    public namespaceURI: string;
+
+    public getAlgorithmName(): string {
         return this.namespaceURI;
     }
 }
 
 export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
-    Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array> {
+    public Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array> {
         return Promise.resolve()
             .then(() => {
                 // console.log("HashedInfo:", xml);
@@ -34,14 +35,12 @@ export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorit
                 if (typeof xml === "string") {
                     // C14N transforms
                     buf = Convert.FromString(xml, "utf8");
-                }
-                else if (xml instanceof Uint8Array) {
+                } else if (xml instanceof Uint8Array) {
                     // base64 transform
                     buf = xml;
-                }
-                else {
+                } else {
                     // enveloped signature transform
-                    let txt = new XMLSerializer().serializeToString(xml);
+                    const txt = new XMLSerializer().serializeToString(xml);
                     buf = Convert.FromString(txt, "utf8");
                 }
                 return Application.crypto.subtle.digest(this.algorithm, buf);
@@ -58,23 +57,23 @@ export interface ISignatureAlgorithm extends IAlgorithm {
 }
 
 export interface ISignatureAlgorithmConstructable {
-    new (): ISignatureAlgorithm;
+    new(): ISignatureAlgorithm;
 }
 
 export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignatureAlgorithm {
     /**
      * Sign the given string using the given key
      */
-    Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm) {
-        let _signedInfo = Convert.FromString(signedInfo, "utf8");
-        return Application.crypto.subtle.sign(algorithm as any, signingKey, _signedInfo);
+    public Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm) {
+        const info = Convert.FromString(signedInfo, "utf8");
+        return Application.crypto.subtle.sign(algorithm as any, signingKey, info);
     }
 
     /**
-    * Verify the given signature of the given string using key
-    */
-    Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, algorithm?: Algorithm) {
-        let _signedInfo = Convert.FromString(signedInfo, "utf8");
-        return Application.crypto.subtle.verify((algorithm || this.algorithm) as any, key, signatureValue, _signedInfo);
+     * Verify the given signature of the given string using key
+     */
+    public Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, algorithm?: Algorithm) {
+        const info = Convert.FromString(signedInfo, "utf8");
+        return Application.crypto.subtle.verify((algorithm || this.algorithm) as any, key, signatureValue, info);
     }
 }

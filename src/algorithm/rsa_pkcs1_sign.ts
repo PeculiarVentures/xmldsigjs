@@ -9,41 +9,41 @@ export const RSA_PKCS1_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-mor
 export const RSA_PKCS1_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
 
 export class RsaPkcs1Sha1 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: RSA_PKCS1,
         hash: {
-            name: SHA1
-        }
+            name: SHA1,
+        },
     };
-    namespaceURI = RSA_PKCS1_SHA1_NAMESPACE;
+    public namespaceURI = RSA_PKCS1_SHA1_NAMESPACE;
 }
 
 export class RsaPkcs1Sha256 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: RSA_PKCS1,
         hash: {
-            name: SHA256
-        }
+            name: SHA256,
+        },
     };
-    namespaceURI = RSA_PKCS1_SHA256_NAMESPACE;
+    public namespaceURI = RSA_PKCS1_SHA256_NAMESPACE;
 }
 
 export class RsaPkcs1Sha384 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: RSA_PKCS1,
         hash: {
-            name: SHA384
-        }
+            name: SHA384,
+        },
     };
-    namespaceURI = RSA_PKCS1_SHA384_NAMESPACE;
+    public namespaceURI = RSA_PKCS1_SHA384_NAMESPACE;
 }
 
 export class RsaPkcs1Sha512 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: RSA_PKCS1,
         hash: {
-            name: SHA512
-        }
+            name: SHA512,
+        },
     };
-    namespaceURI = RSA_PKCS1_SHA512_NAMESPACE;
+    public namespaceURI = RSA_PKCS1_SHA512_NAMESPACE;
 }

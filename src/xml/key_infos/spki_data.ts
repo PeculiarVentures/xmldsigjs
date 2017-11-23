@@ -1,12 +1,12 @@
-import { XmlElement, XmlChildElement } from "xml-core";
+import { XmlChildElement, XmlElement } from "xml-core";
 import { XmlBase64Converter } from "xml-core";
 
-import { XmlSignature } from "../xml_names";
 import { Application } from "../../application";
+import { XmlSignature } from "../xml_names";
 import { KeyInfoClause } from "./key_info_clause";
 
 /**
- * 
+ *
  * <element name="SPKIData" type="ds:SPKIDataType"/>
  * <complexType name="SPKIDataType">
  *   <sequence maxOccurs="unbounded">
@@ -14,11 +14,11 @@ import { KeyInfoClause } from "./key_info_clause";
  *     <any namespace="##other" processContents="lax" minOccurs="0"/>
  *   </sequence>
  * </complexType>
- * 
+ *
  */
 
 @XmlElement({
-    localName: XmlSignature.ElementNames.SPKIData
+    localName: XmlSignature.ElementNames.SPKIData,
 })
 export class SPKIData extends KeyInfoClause {
 
@@ -29,28 +29,29 @@ export class SPKIData extends KeyInfoClause {
         namespaceURI: XmlSignature.NamespaceURI,
         prefix: XmlSignature.DefaultPrefix,
         required: true,
-        converter: XmlBase64Converter
+        converter: XmlBase64Converter,
     })
     public SPKIexp: Uint8Array | null;
 
-    importKey(key: CryptoKey): PromiseLike<this> {
+    public importKey(key: CryptoKey): PromiseLike<this> {
         return Promise.resolve()
             .then(() => {
                 return Application.crypto.subtle.exportKey("spki", key);
             })
-            .then(spki => {
+            .then((spki) => {
                 this.SPKIexp = new Uint8Array(spki);
                 this.Key = key;
 
                 return this;
             });
     }
-    exportKey(alg: Algorithm): PromiseLike<CryptoKey> {
+
+    public exportKey(alg: Algorithm): PromiseLike<CryptoKey> {
         return Promise.resolve()
             .then(() => {
                 return Application.crypto.subtle.importKey("spki", this.SPKIexp!, alg, true, ["verify"]);
             })
-            .then(key => {
+            .then((key) => {
                 this.Key = key;
                 return key;
             });

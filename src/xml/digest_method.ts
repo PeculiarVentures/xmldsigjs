@@ -1,10 +1,10 @@
-import { XmlElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlElement } from "xml-core";
 
-import { XmlSignatureObject } from "./xml_object";
 import { XmlSignature } from "./xml_names";
+import { XmlSignatureObject } from "./xml_object";
 
 /**
- * 
+ *
  * <element name="DigestMethod" type="ds:DigestMethodType"/>
  * <complexType name="DigestMethodType" mixed="true">
  *   <sequence>
@@ -12,18 +12,18 @@ import { XmlSignature } from "./xml_names";
  *   </sequence>
  *   <attribute name="Algorithm" type="anyURI" use="required"/>
  * </complexType>
- * 
+ *
  */
 
 @XmlElement({
-    localName: XmlSignature.ElementNames.DigestMethod
+    localName: XmlSignature.ElementNames.DigestMethod,
 })
 export class DigestMethod extends XmlSignatureObject {
 
     @XmlAttribute({
         localName: XmlSignature.AttributeNames.Algorithm,
         required: true,
-        defaultValue: XmlSignature.DefaultDigestMethod
+        defaultValue: XmlSignature.DefaultDigestMethod,
     })
     public Algorithm: string;
 

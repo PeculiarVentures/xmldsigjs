@@ -1,15 +1,14 @@
-import { XmlAttribute, XmlElement, XmlChildElement } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 import { XmlBase64Converter } from "xml-core";
 
+import { DataObjects } from "./data_object";
+import { KeyInfo } from "./key_info";
+import { SignedInfo } from "./signed_info";
 import { XmlSignature } from "./xml_names";
 import { XmlSignatureObject } from "./xml_object";
-// import { DataObject } from "./data_object";
-import { SignedInfo } from "./signed_info";
-import { KeyInfo } from "./key_info";
-import { DataObjects } from "./data_object";
 
 /**
- * 
+ *
  * <element name="Signature" type="ds:SignatureType"/>
  * <complexType name="SignatureType">
  *   <sequence>
@@ -20,17 +19,16 @@ import { DataObjects } from "./data_object";
  *   </sequence>
  *   <attribute name="Id" type="ID" use="optional"/>
  * </complexType>
- * 
+ *
  */
 
 /**
  * Represents the <Signature> element of an XML signature.
  */
 @XmlElement({
-    localName: XmlSignature.ElementNames.Signature
+    localName: XmlSignature.ElementNames.Signature,
 })
 export class Signature extends XmlSignatureObject {
-
 
     /**
      * Gets or sets the ID of the current Signature.
@@ -67,14 +65,14 @@ export class Signature extends XmlSignatureObject {
      * Gets or sets the KeyInfo of the current Signature.
      */
     @XmlChildElement({
-        parser: KeyInfo
+        parser: KeyInfo,
     })
     public KeyInfo: KeyInfo;
 
     @XmlChildElement({
         parser: DataObjects,
-        noRoot: true
+        noRoot: true,
     })
-    ObjectList: DataObjects;
+    public ObjectList: DataObjects;
 
 }

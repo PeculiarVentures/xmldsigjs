@@ -1,18 +1,18 @@
-import { XmlError, XE } from "xml-core";
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XE, XmlError } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
 import { XmlSignature } from "./xml_names";
 import { XmlSignatureObject } from "./xml_object";
 
 /**
- * 
+ *
  * <element name="Transforms" type="ds:TransformsType"/>
  * <complexType name="TransformsType">
  *   <sequence>
  *     <element ref="ds:Transform" maxOccurs="unbounded"/>
  *   </sequence>
  * </complexType>
- * 
+ *
  * <element name="Transform" type="ds:TransformType"/>
  * <complexType name="TransformType" mixed="true">
  *   <choice minOccurs="0" maxOccurs="unbounded">
@@ -22,7 +22,7 @@ import { XmlSignatureObject } from "./xml_object";
  *   </choice>
  *   <attribute name="Algorithm" type="anyURI" use="required"/>
  * </complexType>
- * 
+ *
  */
 
 export interface ITransform extends XmlCore.IXmlSerializable {
@@ -33,23 +33,21 @@ export interface ITransform extends XmlCore.IXmlSerializable {
 }
 
 export interface ITransformConstructable {
-    new (): Transform;
+    new(): Transform;
 }
 
 /**
  * The Transform element contains a single transformation
  */
 @XmlElement({
-    localName: XmlSignature.ElementNames.Transform
+    localName: XmlSignature.ElementNames.Transform,
 })
 export class Transform extends XmlSignatureObject implements ITransform {
-
-    protected innerXml: Node | null = null;
 
     // Public properties
     @XmlAttribute({
         localName: XmlSignature.AttributeNames.Algorithm,
-        defaultValue: ""
+        defaultValue: "",
     })
     public Algorithm: string;
 
@@ -58,27 +56,29 @@ export class Transform extends XmlSignatureObject implements ITransform {
      */
     @XmlChildElement({
         localName: XmlSignature.ElementNames.XPath,
-        defaultValue: ""
+        defaultValue: "",
     })
     public XPath: string;
 
+    protected innerXml: Node | null = null;
 
     // Public methods
 
     /**
      * When overridden in a derived class, returns the output of the current Transform object.
      */
-    GetOutput(): string {
+    public GetOutput(): string {
         throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
     }
 
-    LoadInnerXml(node: Node) {
-        if (!node)
+    public LoadInnerXml(node: Node) {
+        if (!node) {
             throw new XmlError(XE.PARAM_REQUIRED, "node");
+        }
         this.innerXml = node;
     }
 
-    GetInnerXml(): Node | null {
+    public GetInnerXml(): Node | null {
         return this.innerXml;
     }
 

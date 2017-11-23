@@ -1,10 +1,12 @@
+// tslint:disable-next-line:no-reference
 /// <reference path="../../types/pkijs.d.ts" />
 
+import { Certificate } from "pkijs";
+import { CryptoEngine, getCrypto, setEngine } from "pkijs";
+
+import * as Asn1Js from "asn1js";
 import { ECDSA } from "../algorithm/index";
 import { Application } from "../application";
-import { Certificate } from "pkijs";
-import { setEngine, getCrypto, CryptoEngine } from "pkijs";
-import * as Asn1Js from "asn1js";
 
 export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
 
@@ -15,65 +17,65 @@ export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512
 const OID: { [key: string]: { short?: string, long?: string } } = {
     "2.5.4.3": {
         short: "CN",
-        long: "CommonName"
+        long: "CommonName",
     },
     "2.5.4.6": {
         short: "C",
-        long: "Country"
+        long: "Country",
     },
     "2.5.4.5": {
-        long: "DeviceSerialNumber"
+        long: "DeviceSerialNumber",
     },
     "0.9.2342.19200300.100.1.25": {
         short: "DC",
-        long: "DomainComponent"
+        long: "DomainComponent",
     },
     "1.2.840.113549.1.9.1": {
         short: "E",
-        long: "EMail"
+        long: "EMail",
     },
     "2.5.4.42": {
         short: "G",
-        long: "GivenName"
+        long: "GivenName",
     },
     "2.5.4.43": {
         short: "I",
-        long: "Initials"
+        long: "Initials",
     },
     "2.5.4.7": {
         short: "L",
-        long: "Locality"
+        long: "Locality",
     },
     "2.5.4.10": {
         short: "O",
-        long: "Organization"
+        long: "Organization",
     },
     "2.5.4.11": {
         short: "OU",
-        long: "OrganizationUnit"
+        long: "OrganizationUnit",
     },
     "2.5.4.8": {
         short: "ST",
-        long: "State"
+        long: "State",
     },
     "2.5.4.9": {
         short: "Street",
-        long: "StreetAddress"
+        long: "StreetAddress",
     },
     "2.5.4.4": {
         short: "SN",
-        long: "SurName"
+        long: "SurName",
     },
     "2.5.4.12": {
         short: "T",
-        long: "Title"
+        long: "Title",
     },
     "1.2.840.113549.1.9.8": {
-        long: "UnstructuredAddress"
+        long: "UnstructuredAddress",
     },
     "1.2.840.113549.1.9.2": {
-        long: "UnstructuredName"
-    }
+        long: "UnstructuredName",
+    },
 };
 
 /**
@@ -101,25 +103,6 @@ export class X509Certificate {
     }
 
     /**
-     * Converts X500Name to string
-     * @param  {RDN} name X500Name
-     * @param  {string} splitter Splitter char. Default ','
-     * @returns string Formated string
-     * Example:
-     * > C=Some name, O=Some organization name, C=RU
-     */
-    protected NameToString(name: PkiJs.RelativeDistinguishedNames, splitter: string = ","): string {
-        let res: string[] = [];
-        name.typesAndValues.forEach(type_and_value => {
-            let type = type_and_value.type;
-            let oid = OID[type.toString()]
-            let name = oid ? oid.short : null;
-            res.push(`${name ? name : type}=${type_and_value.value.valueBlock.value}`);
-        });
-        return res.join(splitter + " ");
-    }
-
-    /**
      * Gets a issuer name of the certificate
      */
     public get Issuer(): string {
@@ -143,26 +126,16 @@ export class X509Certificate {
     }
 
     /**
-     * Loads X509Certificate from DER data
-     * @param  {Uint8Array} rawData
-     */
-    protected LoadRaw(rawData: BufferSource) {
-        this.raw = new Uint8Array(rawData as ArrayBuffer);
-        let asn1 = Asn1Js.fromBER(this.raw.buffer);
-        this.simpl = new Certificate({ schema: asn1.result });
-    }
-
-    /**
      * Gets the public key from the X509Certificate
      */
-    get PublicKey(): CryptoKey | null {
+    public get PublicKey(): CryptoKey | null {
         return this.publicKey;
     }
 
     /**
      * Returns DER raw of X509Certificate
      */
-    GetRaw(): Uint8Array {
+    public GetRaw(): Uint8Array {
         return this.raw;
     }
 
@@ -171,25 +144,56 @@ export class X509Certificate {
      * @param  {Algorithm} algorithm
      * @returns Promise
      */
-    exportKey(algorithm: Algorithm): PromiseLike<CryptoKey> {
+    public exportKey(algorithm: Algorithm): PromiseLike<CryptoKey> {
         return Promise.resolve()
             .then(() => {
                 if (!getCrypto()) {
                     setEngine(Application.crypto.name, new CryptoEngine({ name: Application.crypto.name, crypto: Application.crypto }), Application.crypto.subtle);
                 }
-                let alg = {
+                const alg = {
                     algorithm,
-                    usages: ["verify"]
+                    usages: ["verify"],
                 };
                 if (alg.algorithm.name.toUpperCase() === ECDSA) {
                     // Set named curve
                     (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
                 }
                 return this.simpl.getPublicKey({ algorithm: alg })
-                    .then(key => {
+                    .then((key) => {
                         this.publicKey = key;
                         return key;
                     });
             });
     }
+
+    //#region Protected methods
+    /**
+     * Converts X500Name to string
+     * @param  {RDN} name X500Name
+     * @param  {string} splitter Splitter char. Default ','
+     * @returns string Formated string
+     * Example:
+     * > C=Some name, O=Some organization name, C=RU
+     */
+    protected NameToString(name: PkiJs.RelativeDistinguishedNames, splitter: string = ","): string {
+        const res: string[] = [];
+        name.typesAndValues.forEach((typeAndValue) => {
+            const type = typeAndValue.type;
+            const oid = OID[type.toString()];
+            const name2 = oid ? oid.short : null;
+            res.push(`${name2 ? name2 : type}=${typeAndValue.value.valueBlock.value}`);
+        });
+        return res.join(splitter + " ");
+    }
+
+    /**
+     * Loads X509Certificate from DER data
+     * @param  {Uint8Array} rawData
+     */
+    protected LoadRaw(rawData: BufferSource) {
+        this.raw = new Uint8Array(rawData as ArrayBuffer);
+        const asn1 = Asn1Js.fromBER(this.raw.buffer);
+        this.simpl = new Certificate({ schema: asn1.result });
+    }
+    //#endregion
 }

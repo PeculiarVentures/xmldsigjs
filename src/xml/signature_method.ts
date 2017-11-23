@@ -1,20 +1,20 @@
 import * as XmlCore from "xml-core";
-import { XmlElement, XmlChildElement, XmlAttribute, XmlObject } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement, XmlObject } from "xml-core";
 import { XmlNumberConverter } from "xml-core";
 
-import { XmlSignatureObject, XmlSignatureCollection } from "./xml_object";
-import { XmlSignature } from "./xml_names";
 import { PssAlgorithmParams } from "./key_infos";
+import { XmlSignature } from "./xml_names";
+import { XmlSignatureCollection, XmlSignatureObject } from "./xml_object";
 
 /**
- * 
+ *
  * <element name="SignatureMethod" type="ds:SignatureMethodType"/>
  * <complexType name="SignatureMethodType" mixed="true">
  *   <sequence>
  *     <element name="HMACOutputLength" minOccurs="0" type="ds:HMACOutputLengthType"/>
  *     <any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
  *     <!--
- *     (0,unbounded) elements from (1,1) external namespace 
+ *     (0,unbounded) elements from (1,1) external namespace
  *     -->
  *   </sequence>
  *   <attribute name="Algorithm" type="anyURI" use="required"/>
@@ -27,12 +27,13 @@ import { PssAlgorithmParams } from "./key_infos";
 })
 export class SignatureMethodOther extends XmlSignatureCollection<XmlObject> {
 
-    OnLoadXml(element: Element) {
+    public OnLoadXml(element: Element) {
         for (let i = 0; i < element.childNodes.length; i++) {
-            let node = element.childNodes.item(i) as Element;
+            const node = element.childNodes.item(i) as Element;
             if (node.nodeType !== XmlCore.XmlNodeType.Element ||
-                node.nodeName === XmlSignature.ElementNames.HMACOutputLength) // Exclude HMACOutputLength
+                node.nodeName === XmlSignature.ElementNames.HMACOutputLength) { // Exclude HMACOutputLength
                 continue;
+            }
             let ParserClass: typeof XmlObject | undefined;
             switch (node.localName) {
                 case XmlSignature.ElementNames.RSAPSSParams:
@@ -42,7 +43,7 @@ export class SignatureMethodOther extends XmlSignatureCollection<XmlObject> {
                     break;
             }
             if (ParserClass) {
-                let xml = new ParserClass();
+                const xml = new ParserClass();
                 xml.LoadXml(node);
                 this.Add(xml);
             }
@@ -52,21 +53,21 @@ export class SignatureMethodOther extends XmlSignatureCollection<XmlObject> {
 }
 
 @XmlElement({
-    localName: XmlSignature.ElementNames.SignatureMethod
+    localName: XmlSignature.ElementNames.SignatureMethod,
 })
 export class SignatureMethod extends XmlSignatureObject {
 
     @XmlAttribute({
         localName: XmlSignature.AttributeNames.Algorithm,
         required: true,
-        defaultValue: ""
+        defaultValue: "",
     })
     public Algorithm: string;
 
     /**
      * Parameters for the XML Signature HMAC Algorithm.
      * The parameters include an optional output length which specifies the MAC truncation length in bits.
-     * 
+     *
      * @type {number}
      * @memberOf SignatureMethod
      */

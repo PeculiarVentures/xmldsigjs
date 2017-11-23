@@ -1,14 +1,16 @@
-import { XmlError, XE } from "xml-core";
-import { Convert, XmlNumberConverter, XmlBase64Converter } from "xml-core";
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
-import { XmlObject } from "xml-core";
+import {
+    Convert, XE,
+    XmlAttribute, XmlBase64Converter, XmlChildElement,
+    XmlElement, XmlError, XmlNumberConverter,
+    XmlObject,
+} from "xml-core";
 
-import { XmlSignature } from "../xml_names";
-import { DigestMethod } from "../digest_method";
-import { KeyInfoClause } from "./key_info_clause";
+import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from "../../algorithm/index";
 import { Application } from "../../application";
 import { CryptoConfig } from "../../crypto_config";
-import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from "../../algorithm/index";
+import { DigestMethod } from "../digest_method";
+import { XmlSignature } from "../xml_names";
+import { KeyInfoClause } from "./key_info_clause";
 
 export interface IJwkRsa {
     alg: string;
@@ -30,10 +32,6 @@ export interface RsaPSSSignParams extends RsaPssParams, Algorithm {
 })
 export class RsaKeyValue extends KeyInfoClause {
 
-    protected m_key: CryptoKey | null = null;
-    protected m_jwk: JsonWebKey | null = null;
-    protected m_keyusage: string[] = [];
-
     /**
      * Gets the Modulus of the public key
      */
@@ -42,7 +40,7 @@ export class RsaKeyValue extends KeyInfoClause {
         prefix: XmlSignature.DefaultPrefix,
         namespaceURI: XmlSignature.NamespaceURI,
         required: true,
-        converter: XmlBase64Converter
+        converter: XmlBase64Converter,
     })
     public Modulus: Uint8Array | null;
 
@@ -54,27 +52,32 @@ export class RsaKeyValue extends KeyInfoClause {
         prefix: XmlSignature.DefaultPrefix,
         namespaceURI: XmlSignature.NamespaceURI,
         required: true,
-        converter: XmlBase64Converter
+        converter: XmlBase64Converter,
     })
     public Exponent: Uint8Array | null;
 
+    protected key: CryptoKey | null = null;
+    protected jwk: JsonWebKey | null = null;
+    protected keyUsage: string[] = [];
+
     /**
-     * Imports key to the RSAKeyValue object 
+     * Imports key to the RSAKeyValue object
      * @param  {CryptoKey} key
      * @returns Promise
      */
-    importKey(key: CryptoKey) {
-        return new Promise((resolve, reject) => {
+    public importKey(key: CryptoKey) {
+        return new Promise<this>((resolve, reject) => {
             const algName = key.algorithm.name!.toUpperCase();
-            if (algName !== RSA_PKCS1.toUpperCase() && algName !== RSA_PSS.toUpperCase())
+            if (algName !== RSA_PKCS1.toUpperCase() && algName !== RSA_PSS.toUpperCase()) {
                 throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
-            this.m_key = key;
+            }
+            this.key = key;
             Application.crypto.subtle.exportKey("jwk", key)
                 .then((jwk: IJwkRsa) => {
-                    this.m_jwk = jwk;
+                    this.jwk = jwk;
                     this.Modulus = Convert.FromBase64Url(jwk.n);
                     this.Exponent = Convert.FromBase64Url(jwk.e);
-                    this.m_keyusage = key.usages;
+                    this.keyUsage = key.usages;
                     return Promise.resolve(this);
                 })
                 .then(resolve, reject);
@@ -86,17 +89,20 @@ export class RsaKeyValue extends KeyInfoClause {
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    exportKey(alg: Algorithm) {
-        return new Promise((resolve, reject) => {
-            if (this.m_key)
-                return resolve(this.m_key);
+    public exportKey(alg: Algorithm) {
+        return new Promise<CryptoKey>((resolve, reject) => {
+            if (this.key) {
+                return resolve(this.key);
+            }
             // fill jwk
-            if (!this.Modulus)
+            if (!this.Modulus) {
                 throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Modulus");
-            let modulus = Convert.ToBase64Url(this.Modulus);
-            if (!this.Exponent)
+            }
+            const modulus = Convert.ToBase64Url(this.Modulus);
+            if (!this.Exponent) {
                 throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Exponent");
-            let exponent = Convert.ToBase64Url(this.Exponent);
+            }
+            const exponent = Convert.ToBase64Url(this.Exponent);
             let algJwk: string;
             switch (alg.name.toUpperCase()) {
                 case RSA_PKCS1.toUpperCase():
@@ -124,14 +130,14 @@ export class RsaKeyValue extends KeyInfoClause {
                     algJwk += "S512";
                     break;
             }
-            let jwk: IJwkRsa = {
+            const jwk: IJwkRsa = {
                 kty: "RSA",
                 alg: algJwk,
                 n: modulus,
                 e: exponent,
-                ext: true
+                ext: true,
             };
-            Application.crypto.subtle.importKey("jwk", jwk as any, alg, true, this.m_keyusage)
+            Application.crypto.subtle.importKey("jwk", jwk as any, alg, true, this.keyUsage)
                 .then(resolve, reject);
         });
     }
@@ -141,15 +147,15 @@ export class RsaKeyValue extends KeyInfoClause {
      * @param  {Element | string} element
      * @returns void
      */
-    LoadXml(node: Element | string): void {
+    public LoadXml(node: Element | string): void {
         super.LoadXml(node);
-        this.m_keyusage = ["verify"];
+        this.keyUsage = ["verify"];
     }
 
 }
 
 /**
- * 
+ *
  *  Schema Definition (target namespace
  *  http://www.w3.org/2007/05/xmldsig-more#):
  *
@@ -179,7 +185,7 @@ export class RsaKeyValue extends KeyInfoClause {
  *      <xs:attribute name="Algorithm" type="xs:anyURI"
  *         default="http://www.w3.org/2007/05/xmldsig-more#MGF1"/>
  *  </xs:complexType>
- * 
+ *
  */
 
 const NAMESPACE_URI = "http://www.w3.org/2007/05/xmldsig-more#";
@@ -188,17 +194,17 @@ const PREFIX = "pss";
 @XmlElement({
     localName: XmlSignature.ElementNames.MaskGenerationFunction,
     prefix: PREFIX,
-    namespaceURI: NAMESPACE_URI
+    namespaceURI: NAMESPACE_URI,
 })
 export class MaskGenerationFunction extends XmlObject {
     @XmlChildElement({
-        parser: DigestMethod
+        parser: DigestMethod,
     })
     public DigestMethod: DigestMethod;
 
     @XmlAttribute({
         localName: XmlSignature.AttributeNames.Algorithm,
-        defaultValue: "http://www.w3.org/2007/05/xmldsig-more#MGF1"
+        defaultValue: "http://www.w3.org/2007/05/xmldsig-more#MGF1",
     })
     public Algorithm: string;
 }
@@ -206,25 +212,20 @@ export class MaskGenerationFunction extends XmlObject {
 @XmlElement({
     localName: XmlSignature.ElementNames.RSAPSSParams,
     prefix: PREFIX,
-    namespaceURI: NAMESPACE_URI
+    namespaceURI: NAMESPACE_URI,
 })
 export class PssAlgorithmParams extends XmlObject {
-
-    constructor(algorithm?: RsaPSSSignParams) {
-        super();
-
-        if (algorithm) {
-            this.FromAlgorithm(algorithm);
-        }
+    public static FromAlgorithm(algorithm: RsaPSSSignParams) {
+        return new PssAlgorithmParams(algorithm);
     }
 
     @XmlChildElement({
-        parser: DigestMethod
+        parser: DigestMethod,
     })
     public DigestMethod: DigestMethod;
 
     @XmlChildElement({
-        parser: MaskGenerationFunction
+        parser: MaskGenerationFunction,
     })
     public MGF: MaskGenerationFunction;
 
@@ -236,20 +237,25 @@ export class PssAlgorithmParams extends XmlObject {
     public SaltLength: number;
 
     @XmlChildElement({
-        converter: XmlNumberConverter
+        converter: XmlNumberConverter,
     })
     public TrailerField: number;
 
-    FromAlgorithm(algorithm: RsaPSSSignParams) {
+    constructor(algorithm?: RsaPSSSignParams) {
+        super();
+
+        if (algorithm) {
+            this.FromAlgorithm(algorithm);
+        }
+    }
+
+    public FromAlgorithm(algorithm: RsaPSSSignParams) {
         this.DigestMethod = new DigestMethod();
         const digest = CryptoConfig.GetHashAlgorithm(algorithm.hash);
         this.DigestMethod.Algorithm = digest.namespaceURI;
-        if (algorithm.saltLength)
+        if (algorithm.saltLength) {
             this.SaltLength = algorithm.saltLength;
-    }
-
-    static FromAlgorithm(algorithm: RsaPSSSignParams) {
-        return new PssAlgorithmParams(algorithm);
+        }
     }
 
 }

@@ -11,21 +11,21 @@ export const SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#sha384";
 export const SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmlenc#sha512";
 
 export class Sha1 extends HashAlgorithm {
-    algorithm = { name: SHA1 };
-    namespaceURI = SHA1_NAMESPACE;
+    public algorithm = { name: SHA1 };
+    public namespaceURI = SHA1_NAMESPACE;
 }
 
 export class Sha256 extends HashAlgorithm {
-    algorithm = { name: SHA256 };
-    namespaceURI = SHA256_NAMESPACE;
+    public algorithm = { name: SHA256 };
+    public namespaceURI = SHA256_NAMESPACE;
 }
 
 export class Sha384 extends HashAlgorithm {
-    algorithm = { name: SHA384 };
-    namespaceURI = SHA384_NAMESPACE;
+    public algorithm = { name: SHA384 };
+    public namespaceURI = SHA384_NAMESPACE;
 }
 
 export class Sha512 extends HashAlgorithm {
-    algorithm = { name: SHA512 };
-    namespaceURI = SHA512_NAMESPACE;
+    public algorithm = { name: SHA512 };
+    public namespaceURI = SHA512_NAMESPACE;
 }

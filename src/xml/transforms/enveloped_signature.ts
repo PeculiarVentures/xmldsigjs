@@ -1,4 +1,5 @@
-import { XmlError, XE, Select } from "xml-core";
+import { Select, XE, XmlError } from "xml-core";
+
 import { Transform } from "../transform";
 
 /**
@@ -6,18 +7,21 @@ import { Transform } from "../transform";
  */
 export class XmlDsigEnvelopedSignatureTransform extends Transform {
 
-    Algorithm = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
+    public Algorithm = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
 
     /**
      * Returns the output of the current XmlDsigEnvelopedSignatureTransform object.
      * @returns string
      */
-    GetOutput(): any {
-        if (!this.innerXml)
+    public GetOutput(): any {
+        if (!this.innerXml) {
             throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
+        }
 
-        let signature = Select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
-        if (signature) signature.parentNode!.removeChild(signature);
+        const signature = Select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+        if (signature) {
+            signature.parentNode!.removeChild(signature);
+        }
         return this.innerXml;
     }
 

@@ -1,12 +1,13 @@
-import { XmlAttribute, XmlElement, XmlChildElement } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+
+import { CanonicalizationMethod } from "./canonicalization_method";
+import { References } from "./reference";
+import { SignatureMethod } from "./signature_method";
 import { XmlSignature } from "./xml_names";
 import { XmlSignatureObject } from "./xml_object";
-import { CanonicalizationMethod } from "./canonicalization_method";
-import { SignatureMethod } from "./signature_method";
-import { References } from "./reference";
 
 /**
- * 
+ *
  * <complexType name="SignedInfoType">
  *   <sequence>
  *     <element ref="ds:CanonicalizationMethod"/>
@@ -15,36 +16,36 @@ import { References } from "./reference";
  *   </sequence>
  *   <attribute name="Id" type="ID" use="optional"/>
  * </complexType>
- * 
+ *
  */
 
 /**
- * The SignedInfo class represents the <SignedInfo> element 
+ * The SignedInfo class represents the <SignedInfo> element
  * of an XML signature defined by the XML digital signature specification
- * 
+ *
  * @export
  * @class SignedInfo
  * @extends {XmlSignatureObject}
  */
 @XmlElement({
-    localName: XmlSignature.ElementNames.SignedInfo
+    localName: XmlSignature.ElementNames.SignedInfo,
 })
 export class SignedInfo extends XmlSignatureObject {
 
     /**
      * Gets or sets the ID of the current SignedInfo object.
-     * 
+     *
      * @type {string}
      * @memberOf SignedInfo
      */
     @XmlAttribute({
         localName: XmlSignature.AttributeNames.Id,
-        defaultValue: ""
+        defaultValue: "",
     })
     public Id: string;
 
     /**
-     * Gets or sets the canonicalization algorithm that is used before signing 
+     * Gets or sets the canonicalization algorithm that is used before signing
      * for the current SignedInfo object.
      */
     @XmlChildElement({
@@ -53,7 +54,7 @@ export class SignedInfo extends XmlSignatureObject {
     })
     public CanonicalizationMethod: CanonicalizationMethod;
     /**
-     * Gets or sets the name of the algorithm used for signature generation 
+     * Gets or sets the name of the algorithm used for signature generation
      * and validation for the current SignedInfo object.
      */
     @XmlChildElement({

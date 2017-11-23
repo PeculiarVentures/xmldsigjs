@@ -1,14 +1,15 @@
-import { XmlError, XE } from "xml-core";
+import { XE, XmlError } from "xml-core";
 import { Convert, XmlBase64Converter } from "xml-core";
-import { XmlElement, XmlChildElement, XmlAttribute, XmlObject } from "xml-core";
-import { XmlSignature } from "../index";
+import { XmlAttribute, XmlChildElement, XmlElement, XmlObject } from "xml-core";
+
 import { Application } from "../../application";
+import { XmlSignature } from "../index";
 import { KeyInfoClause } from "./key_info_clause";
 
 export declare type NamedCurveType = string | "P-256" | "P-384" | "P-521";
 
 /**
- * 
+ *
  * <xs:element name="ECDSAKeyValue" type="ecdsa:ECDSAKeyValueType"/>
  * <xs:complexType name="ECDSAKeyValueType">
  *   <xs:sequence>
@@ -17,7 +18,7 @@ export declare type NamedCurveType = string | "P-256" | "P-384" | "P-521";
  *     <xs:element name="PublicKey" type="ecdsa:ECPointType"/>
  *   </xs:sequence>
  * </xs:complexType>
- * 
+ *
  * <xs:complexType name="DomainParamsType">
  *   <xs:choice>
  *     <xs:element name="ExplicitParams"
@@ -29,7 +30,7 @@ export declare type NamedCurveType = string | "P-256" | "P-384" | "P-521";
  *     </xs:element>
  *   </xs:choice>
  * </xs:complexType>
- * 
+ *
  * <xs:complexType name="ECPointType">
  *   <xs:sequence minOccurs="0">
  *     <xs:element name="X" type="ecdsa:FieldElemType"/>
@@ -45,7 +46,7 @@ const PREFIX = "ecdsa";
 @XmlElement({
     localName: XmlSignature.ElementNames.PublicKey,
     namespaceURI: NAMESPACE_URI,
-    prefix: PREFIX
+    prefix: PREFIX,
 })
 export class EcdsaPublicKey extends XmlObject {
 
@@ -54,7 +55,7 @@ export class EcdsaPublicKey extends XmlObject {
         namespaceURI: NAMESPACE_URI,
         prefix: PREFIX,
         required: true,
-        converter: XmlBase64Converter
+        converter: XmlBase64Converter,
     })
     public X: Uint8Array;
 
@@ -63,7 +64,7 @@ export class EcdsaPublicKey extends XmlObject {
         namespaceURI: NAMESPACE_URI,
         prefix: PREFIX,
         required: true,
-        converter: XmlBase64Converter
+        converter: XmlBase64Converter,
     })
     public Y: Uint8Array;
 }
@@ -71,7 +72,7 @@ export class EcdsaPublicKey extends XmlObject {
 @XmlElement({
     localName: XmlSignature.ElementNames.NamedCurve,
     namespaceURI: NAMESPACE_URI,
-    prefix: PREFIX
+    prefix: PREFIX,
 })
 export class NamedCurve extends XmlObject {
 
@@ -86,7 +87,7 @@ export class NamedCurve extends XmlObject {
 @XmlElement({
     localName: XmlSignature.ElementNames.DomainParameters,
     namespaceURI: NAMESPACE_URI,
-    prefix: PREFIX
+    prefix: PREFIX,
 })
 export class DomainParameters extends XmlObject {
 
@@ -103,15 +104,9 @@ export class DomainParameters extends XmlObject {
 @XmlElement({
     localName: XmlSignature.ElementNames.ECDSAKeyValue,
     namespaceURI: NAMESPACE_URI,
-    prefix: PREFIX
+    prefix: PREFIX,
 })
 export class EcdsaKeyValue extends KeyInfoClause {
-
-    protected name = XmlSignature.ElementNames.ECDSAKeyValue;
-
-    protected m_key: CryptoKey | null = null;
-    protected m_jwk: JsonWebKey | null = null;
-    protected m_keyusage: string[] | null = null;
 
     @XmlChildElement({
         parser: DomainParameters,
@@ -124,35 +119,43 @@ export class EcdsaKeyValue extends KeyInfoClause {
     })
     public PublicKey: EcdsaPublicKey;
 
+    protected name = XmlSignature.ElementNames.ECDSAKeyValue;
+    protected key: CryptoKey | null = null;
+    protected jwk: JsonWebKey | null = null;
+    protected keyUsage: string[] | null = null;
+
     /**
      * Gets the NamedCurve value of then public key
      */
-    get NamedCurve() {
+    public get NamedCurve() {
         return GetNamedCurveOid(this.DomainParameters.NamedCurve.Uri);
     }
 
     /**
-     * Imports key to the ECKeyValue object 
+     * Imports key to the ECKeyValue object
      * @param  {CryptoKey} key
      * @returns Promise
      */
-    importKey(key: CryptoKey): PromiseLike<this> {
+    public importKey(key: CryptoKey): PromiseLike<this> {
         return new Promise((resolve, reject) => {
-            if (key.algorithm.name!.toUpperCase() !== "ECDSA")
+            if (key.algorithm.name!.toUpperCase() !== "ECDSA") {
                 throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
-            this.m_key = key;
+            }
+            this.key = key;
             Application.crypto.subtle.exportKey("jwk", key)
                 .then((jwk) => {
-                    this.m_jwk = jwk;
+                    this.jwk = jwk;
                     this.PublicKey = new EcdsaPublicKey();
                     this.PublicKey.X = Convert.FromString(jwk.x!, "base64url");
                     this.PublicKey.Y = Convert.FromString(jwk.y!, "base64url");
-                    if (!this.DomainParameters)
+                    if (!this.DomainParameters) {
                         this.DomainParameters = new DomainParameters();
-                    if (!this.DomainParameters.NamedCurve)
+                    }
+                    if (!this.DomainParameters.NamedCurve) {
                         this.DomainParameters.NamedCurve = new NamedCurve();
+                    }
                     this.DomainParameters.NamedCurve.Uri = GetNamedCurveOid(jwk.crv! as any);
-                    this.m_keyusage = key.usages;
+                    this.keyUsage = key.usages;
                     return Promise.resolve(this);
                 })
                 .then(resolve, reject);
@@ -164,28 +167,29 @@ export class EcdsaKeyValue extends KeyInfoClause {
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    exportKey(alg: Algorithm): PromiseLike<CryptoKey> {
+    public exportKey(alg: Algorithm): PromiseLike<CryptoKey> {
         return Promise.resolve()
             .then(() => {
-                if (this.m_key)
-                    return this.m_key;
+                if (this.key) {
+                    return this.key;
+                }
                 // fill jwk
-                let x = Convert.ToBase64Url(this.PublicKey.X);
-                let y = Convert.ToBase64Url(this.PublicKey.Y);
-                let crv = GetNamedCurveFromOid(this.DomainParameters.NamedCurve.Uri);
-                let jwk: JsonWebKey = {
+                const x = Convert.ToBase64Url(this.PublicKey.X);
+                const y = Convert.ToBase64Url(this.PublicKey.Y);
+                const crv = GetNamedCurveFromOid(this.DomainParameters.NamedCurve.Uri);
+                const jwk: JsonWebKey = {
                     kty: "EC",
                     crv: crv as string,
-                    x: x,
-                    y: y,
-                    ext: true
+                    x,
+                    y,
+                    ext: true,
                 };
-                this.m_keyusage = ["verify"];
-                return Application.crypto.subtle.importKey("jwk", jwk as any, <any>{ name: "ECDSA", namedCurve: crv }, true, this.m_keyusage);
+                this.keyUsage = ["verify"];
+                return Application.crypto.subtle.importKey("jwk", jwk as any, { name: "ECDSA", namedCurve: crv } as any, true, this.keyUsage);
             })
-            .then(key => {
-                this.m_key = key;
-                return this.m_key;
+            .then((key) => {
+                this.key = key;
+                return this.key;
             });
     }
 

@@ -1,12 +1,12 @@
-import { XmlElement, XmlAttribute, XmlChildElement, XmlBase64Converter } from "xml-core";
+import { XmlAttribute, XmlBase64Converter, XmlChildElement, XmlElement } from "xml-core";
 
-import { XmlSignature } from "./xml_names";
-import { XmlSignatureObject, XmlSignatureCollection } from "./xml_object";
-import { Transforms } from "./transform_collection";
 import { DigestMethod } from "./digest_method";
+import { Transforms } from "./transform_collection";
+import { XmlSignature } from "./xml_names";
+import { XmlSignatureCollection, XmlSignatureObject } from "./xml_object";
 
 /**
- * 
+ *
  * <element name="Reference" type="ds:ReferenceType"/>
  * <complexType name="ReferenceType">
  *   <sequence>
@@ -18,7 +18,7 @@ import { DigestMethod } from "./digest_method";
  *   <attribute name="URI" type="anyURI" use="optional"/>
  *   <attribute name="Type" type="anyURI" use="optional"/>
  * </complexType>
- * 
+ *
  */
 
 /**
@@ -29,23 +29,17 @@ import { DigestMethod } from "./digest_method";
 })
 export class Reference extends XmlSignatureObject {
 
-    constructor(uri?: string) {
-        super();
-        if (uri)
-            this.Uri = uri;
-    }
-
     /**
      * Gets or sets the ID of the current Reference.
      */
     @XmlAttribute({
-        defaultValue: ""
+        defaultValue: "",
     })
     public Id: string;
 
     /**
-    * Gets or sets the Uri of the current Reference.
-    */
+     * Gets or sets the Uri of the current Reference.
+     */
     @XmlAttribute({
         localName: XmlSignature.AttributeNames.URI,
         defaultValue: "",
@@ -62,7 +56,7 @@ export class Reference extends XmlSignatureObject {
     public Type: string;
 
     @XmlChildElement({
-        parser: Transforms
+        parser: Transforms,
     })
     public Transforms: Transforms;
 
@@ -71,7 +65,7 @@ export class Reference extends XmlSignatureObject {
      */
     @XmlChildElement({
         required: true,
-        parser: DigestMethod
+        parser: DigestMethod,
     })
     public DigestMethod: DigestMethod;
 
@@ -83,9 +77,16 @@ export class Reference extends XmlSignatureObject {
         localName: XmlSignature.ElementNames.DigestValue,
         namespaceURI: XmlSignature.NamespaceURI,
         prefix: XmlSignature.DefaultPrefix,
-        converter: XmlBase64Converter
+        converter: XmlBase64Converter,
     })
     public DigestValue: Uint8Array;
+
+    constructor(uri?: string) {
+        super();
+        if (uri) {
+            this.Uri = uri;
+        }
+    }
 
 }
 

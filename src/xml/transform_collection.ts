@@ -1,22 +1,22 @@
-import { XmlError, XE } from "xml-core";
+import { XE, XmlError } from "xml-core";
 import { XmlElement } from "xml-core";
 
+import { Transform } from "./transform";
 import { XmlSignature } from "./xml_names";
 import { XmlSignatureCollection } from "./xml_object";
-import { Transform } from "./transform";
 
 /**
  * The Transforms element contains a collection of transformations
  */
 @XmlElement({
     localName: XmlSignature.ElementNames.Transforms,
-    parser: Transform
+    parser: Transform,
 })
 export class Transforms extends XmlSignatureCollection<Transform> {
     protected OnLoadXml(element: Element) {
         super.OnLoadXml(element);
         // Update parsed objects
-        this.items = this.GetIterator().map(item => {
+        this.items = this.GetIterator().map((item) => {
             switch (item.Algorithm) {
                 case XmlSignature.AlgorithmNamespaces.XmlDsigEnvelopedSignatureTransform:
                     return ChangeTransform(item, transforms.XmlDsigEnvelopedSignatureTransform);
@@ -38,7 +38,7 @@ export class Transforms extends XmlSignatureCollection<Transform> {
 }
 
 function ChangeTransform(t1: Transform, t2: typeof Transform) {
-    let t = new t2();
+    const t = new t2();
     (t as any).element = t1.Element;
     return t;
 }

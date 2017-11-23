@@ -1,10 +1,10 @@
-import { XmlError, XE } from "xml-core";
+import { XE, XmlError } from "xml-core";
 
 export interface CryptoEx extends Crypto {
     name: string;
 }
 
-let _crypto: CryptoEx | null = null;
+let engineCrypto: CryptoEx | null = null;
 
 export class Application {
 
@@ -14,8 +14,8 @@ export class Application {
      * @param  {Crypto} crypto
      * @returns void
      */
-    static setEngine(name: string, crypto: Crypto): void {
-        _crypto = {
+    public static setEngine(name: string, crypto: Crypto): void {
+        engineCrypto = {
             getRandomValues: crypto.getRandomValues.bind(crypto),
             subtle: crypto.subtle,
             name,
@@ -25,20 +25,22 @@ export class Application {
     /**
      * Gets the crypto module from the Application
      */
-    static get crypto(): CryptoEx {
-        if (!_crypto)
+    public static get crypto(): CryptoEx {
+        if (!engineCrypto) {
             throw new XmlError(XE.CRYPTOGRAPHIC_NO_MODULE);
-        return _crypto;
+        }
+        return engineCrypto;
     }
 
-    static isNodePlugin(): boolean {
+    public static isNodePlugin(): boolean {
         return (typeof self === "undefined" && typeof window === "undefined");
     }
 }
 
 // set default w3 WebCrypto
-+function init() {
+function init() {
     if (!Application.isNodePlugin()) {
         Application.setEngine("W3 WebCrypto module", self.crypto);
     }
-}();
+}
+init();

@@ -9,41 +9,41 @@ export const ECDSA_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ec
 export const ECDSA_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";
 
 export class EcdsaSha1 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: ECDSA,
         hash: {
-            name: SHA1
-        }
+            name: SHA1,
+        },
     };
-    namespaceURI = ECDSA_SHA1_NAMESPACE;
+    public namespaceURI = ECDSA_SHA1_NAMESPACE;
 }
 
 export class EcdsaSha256 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: ECDSA,
         hash: {
-            name: SHA256
-        }
+            name: SHA256,
+        },
     };
-    namespaceURI = ECDSA_SHA256_NAMESPACE;
+    public namespaceURI = ECDSA_SHA256_NAMESPACE;
 }
 
 export class EcdsaSha384 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: ECDSA,
         hash: {
-            name: SHA384
-        }
+            name: SHA384,
+        },
     };
-    namespaceURI = ECDSA_SHA384_NAMESPACE;
+    public namespaceURI = ECDSA_SHA384_NAMESPACE;
 }
 
 export class EcdsaSha512 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: ECDSA,
         hash: {
-            name: SHA512
-        }
+            name: SHA512,
+        },
     };
-    namespaceURI = ECDSA_SHA512_NAMESPACE;
+    public namespaceURI = ECDSA_SHA512_NAMESPACE;
 }

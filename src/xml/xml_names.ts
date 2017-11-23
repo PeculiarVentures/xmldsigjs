@@ -50,9 +50,8 @@ export const XmlSignature = {
         X509CRL: "X509CRL",
         XPath: "XPath",
         X: "X",
-        Y: "Y"
+        Y: "Y",
     },
-
 
     AttributeNames: {
 
@@ -74,11 +73,11 @@ export const XmlSignature = {
         XmlDsigExcC14NTransform: "http://www.w3.org/2001/10/xml-exc-c14n#",
         XmlDsigExcC14NWithCommentsTransform: "http://www.w3.org/2001/10/xml-exc-c14n#WithComments",
         XmlDecryptionTransform: "http://www.w3.org/2002/07/decrypt#XML",
-        XmlLicenseTransform: "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform"
+        XmlLicenseTransform: "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform",
     },
 
     Uri: {
-        Manifest: "http://www.w3.org/2000/09/xmldsig#Manifest"
+        Manifest: "http://www.w3.org/2000/09/xmldsig#Manifest",
     },
 
     NamespaceURI: "http://www.w3.org/2000/09/xmldsig#",

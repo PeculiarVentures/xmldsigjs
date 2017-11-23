@@ -1,44 +1,53 @@
-import { XmlError, XE } from "xml-core";
+import { XE, XmlError } from "xml-core";
 import * as XmlCore from "xml-core";
 
-import { ISignatureAlgorithm, IHashAlgorithm } from "./algorithm";
-import { SignatureMethod } from "./xml/signature_method";
+import { IHashAlgorithm, ISignatureAlgorithm } from "./algorithm";
 import { PssAlgorithmParams } from "./xml/key_infos";
+import { SignatureMethod } from "./xml/signature_method";
 
+// rsa pkcs1
 import {
-    // rsa pkcs1
     RSA_PKCS1,
     RSA_PKCS1_SHA1_NAMESPACE, RSA_PKCS1_SHA256_NAMESPACE, RSA_PKCS1_SHA384_NAMESPACE, RSA_PKCS1_SHA512_NAMESPACE,
     RsaPkcs1Sha1, RsaPkcs1Sha256, RsaPkcs1Sha384, RsaPkcs1Sha512,
-    // rsa pss
+} from "./algorithm/index";
+// rsa pss
+import {
     RSA_PSS,
     RSA_PSS_WITH_PARAMS_NAMESPACE,
     RsaPssSha1, RsaPssSha256, RsaPssSha384, RsaPssSha512,
-    // ec dsa
+} from "./algorithm/index";
+// ec dsa
+import {
     ECDSA,
     ECDSA_SHA1_NAMESPACE, ECDSA_SHA256_NAMESPACE, ECDSA_SHA384_NAMESPACE, ECDSA_SHA512_NAMESPACE,
     EcdsaSha1, EcdsaSha256, EcdsaSha384, EcdsaSha512,
-    // hmac
+} from "./algorithm/index";
+// hmac
+import {
     HMAC,
     HMAC_SHA1_NAMESPACE, HMAC_SHA256_NAMESPACE, HMAC_SHA384_NAMESPACE, HMAC_SHA512_NAMESPACE,
     HmacSha1, HmacSha256, HmacSha384, HmacSha512,
-    // Sha
-    SHA1, SHA256, SHA384, SHA512,
-    SHA1_NAMESPACE, SHA256_NAMESPACE, SHA384_NAMESPACE, SHA512_NAMESPACE,
-    Sha1, Sha256, Sha384, Sha512,
 } from "./algorithm/index";
-import { XmlSignature, Transform } from "./xml";
+// Sha
+import {
+    SHA1, Sha1, SHA1_NAMESPACE, SHA256,
+    Sha256, SHA256_NAMESPACE, SHA384, Sha384,
+    SHA384_NAMESPACE, SHA512, Sha512, SHA512_NAMESPACE,
+} from "./algorithm/index";
+
+import { HashAlgorithm, IHashAlgorithmConstructable, ISignatureAlgorithmConstructable, SignatureAlgorithm } from "./algorithm";
+import { Transform, XmlSignature } from "./xml";
 import {
     XmlDsigBase64Transform,
     XmlDsigC14NTransform,
     XmlDsigC14NWithCommentsTransform,
     XmlDsigEnvelopedSignatureTransform,
     XmlDsigExcC14NTransform,
-    XmlDsigExcC14NWithCommentsTransform
+    XmlDsigExcC14NWithCommentsTransform,
 } from "./xml/transforms";
-import { ISignatureAlgorithmConstructable, IHashAlgorithmConstructable, SignatureAlgorithm, HashAlgorithm } from "./algorithm";
 
-let SignatureAlgorithms: { [index: string]: ISignatureAlgorithmConstructable } = {};
+const SignatureAlgorithms: { [index: string]: ISignatureAlgorithmConstructable } = {};
 SignatureAlgorithms[RSA_PKCS1_SHA1_NAMESPACE] = RsaPkcs1Sha1;
 SignatureAlgorithms[RSA_PKCS1_SHA256_NAMESPACE] = RsaPkcs1Sha256;
 SignatureAlgorithms[RSA_PKCS1_SHA384_NAMESPACE] = RsaPkcs1Sha384;
@@ -52,7 +61,7 @@ SignatureAlgorithms[HMAC_SHA256_NAMESPACE] = HmacSha256;
 SignatureAlgorithms[HMAC_SHA384_NAMESPACE] = HmacSha384;
 SignatureAlgorithms[HMAC_SHA512_NAMESPACE] = HmacSha512;
 
-let HashAlgorithms: { [namespace: string]: IHashAlgorithmConstructable } = {};
+const HashAlgorithms: { [namespace: string]: IHashAlgorithmConstructable } = {};
 HashAlgorithms[SHA1_NAMESPACE] = Sha1;
 HashAlgorithms[SHA256_NAMESPACE] = Sha256;
 HashAlgorithms[SHA384_NAMESPACE] = Sha384;
@@ -62,14 +71,14 @@ export class CryptoConfig {
     /**
      * Creates Transform from given name
      * if name is not exist then throws error
-     * 
+     *
      * @static
      * @param {(string |)} [name=null]
      * @returns
-     * 
+     *
      * @memberOf CryptoConfig
      */
-    static CreateFromName(name: string | null): Transform {
+    public static CreateFromName(name: string | null): Transform {
         let transform: Transform;
         switch (name) {
             case XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform:
@@ -108,18 +117,19 @@ export class CryptoConfig {
         return transform;
     }
 
-    static CreateSignatureAlgorithm(method: SignatureMethod): SignatureAlgorithm {
-        let alg = SignatureAlgorithms[method.Algorithm] || null;
-        if (alg)
+    public static CreateSignatureAlgorithm(method: SignatureMethod): SignatureAlgorithm {
+        const alg = SignatureAlgorithms[method.Algorithm] || null;
+        if (alg) {
             return new alg();
-        else if (method.Algorithm === RSA_PSS_WITH_PARAMS_NAMESPACE) {
+        } else if (method.Algorithm === RSA_PSS_WITH_PARAMS_NAMESPACE) {
             let pssParams: PssAlgorithmParams | undefined;
-            method.Any.Some(item => {
-                if (item instanceof PssAlgorithmParams)
+            method.Any.Some((item) => {
+                if (item instanceof PssAlgorithmParams) {
                     pssParams = item;
+                }
                 return !!pssParams;
             });
-            if (pssParams)
+            if (pssParams) {
                 switch (pssParams.DigestMethod.Algorithm) {
                     case SHA1_NAMESPACE:
                         return new RsaPssSha1(pssParams.SaltLength);
@@ -130,19 +140,22 @@ export class CryptoConfig {
                     case SHA512_NAMESPACE:
                         return new RsaPssSha512(pssParams.SaltLength);
                 }
+            }
             throw new XmlError(XE.CRYPTOGRAPHIC, `Cannot get params for RSA-PSS algoriithm`);
         }
         throw new Error(`signature algorithm '${method.Algorithm}' is not supported`);
-    };
-
-    static CreateHashAlgorithm(namespace: string): HashAlgorithm {
-        let alg = HashAlgorithms[namespace];
-        if (alg)
-            return new alg();
-        else throw new Error("hash algorithm '" + namespace + "' is not supported");
     }
 
-    static GetHashAlgorithm(algorithm: AlgorithmIdentifier): IHashAlgorithm {
+    public static CreateHashAlgorithm(namespace: string): HashAlgorithm {
+        const alg = HashAlgorithms[namespace];
+        if (alg) {
+            return new alg();
+        } else {
+            throw new Error("hash algorithm '" + namespace + "' is not supported");
+        }
+    }
+
+    public static GetHashAlgorithm(algorithm: AlgorithmIdentifier): IHashAlgorithm {
         const alg = typeof algorithm === "string" ? { name: algorithm } : algorithm;
         switch (alg.name.toUpperCase()) {
             case SHA1:
@@ -158,14 +171,16 @@ export class CryptoConfig {
         }
     }
 
-    static GetSignatureAlgorithm(algorithm: Algorithm): ISignatureAlgorithm {
-        if (typeof (algorithm as any).hash === "string")
+    public static GetSignatureAlgorithm(algorithm: Algorithm): ISignatureAlgorithm {
+        if (typeof (algorithm as any).hash === "string") {
             (algorithm as any).hash = {
-                name: (algorithm as any).hash
+                name: (algorithm as any).hash,
             };
-        let hashName: string = (algorithm as any).hash.name;
-        if (!hashName)
+        }
+        const hashName: string = (algorithm as any).hash.name;
+        if (!hashName) {
             throw new Error("Signing algorithm doesn't have name for hash");
+        }
         let alg: ISignatureAlgorithm;
         switch (algorithm.name.toUpperCase()) {
             case RSA_PKCS1.toUpperCase():

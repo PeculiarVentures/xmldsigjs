@@ -6,18 +6,19 @@ export const RSA_PSS = "RSA-PSS";
 export const RSA_PSS_WITH_PARAMS_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#rsa-pss";
 
 export class RsaPssBase extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: RSA_PSS,
         hash: {
-            name: SHA1
-        }
+            name: SHA1,
+        },
     };
-    namespaceURI = RSA_PSS_WITH_PARAMS_NAMESPACE;
+    public namespaceURI = RSA_PSS_WITH_PARAMS_NAMESPACE;
 
     constructor(saltLength?: number) {
         super();
-        if (saltLength)
+        if (saltLength) {
             this.algorithm.saltLength = saltLength;
+        }
     }
 }
 
@@ -48,4 +49,3 @@ export class RsaPssSha512 extends RsaPssBase {
         this.algorithm.hash.name = SHA512;
     }
 }
-

@@ -8,41 +8,41 @@ export const HMAC_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hma
 export const HMAC_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
 
 export class HmacSha1 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: HMAC,
         hash: {
-            name: SHA1
-        }
+            name: SHA1,
+        },
     };
-    namespaceURI = HMAC_SHA1_NAMESPACE;
+    public namespaceURI = HMAC_SHA1_NAMESPACE;
 }
 
 export class HmacSha256 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: HMAC,
         hash: {
-            name: SHA256
-        }
+            name: SHA256,
+        },
     };
-    namespaceURI = HMAC_SHA256_NAMESPACE;
+    public namespaceURI = HMAC_SHA256_NAMESPACE;
 }
 
 export class HmacSha384 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: HMAC,
         hash: {
-            name: SHA384
-        }
+            name: SHA384,
+        },
     };
-    namespaceURI = HMAC_SHA384_NAMESPACE;
+    public namespaceURI = HMAC_SHA384_NAMESPACE;
 }
 
 export class HmacSha512 extends SignatureAlgorithm {
-    algorithm: any = {
+    public algorithm: any = {
         name: HMAC,
         hash: {
-            name: SHA512
-        }
+            name: SHA512,
+        },
     };
-    namespaceURI = HMAC_SHA512_NAMESPACE;
+    public namespaceURI = HMAC_SHA512_NAMESPACE;
 }
