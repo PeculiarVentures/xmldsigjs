@@ -133,17 +133,26 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             .then(() => keys);
     }
 
+    /**
+     * Returns dictionary of namespaces used in signature
+     */
     protected GetSignatureNamespaces(): { [index: string]: string } {
         let namespaces = {};
         namespaces[this.XmlSignature.Prefix] = this.XmlSignature.NamespaceURI;
         return namespaces;
     }
 
+    /**
+     * Copies namespaces from source element and its parents into destination element
+     */
     protected CopyNamespaces(src: Element, dst: Element, ignoreDefault: boolean): void {
         this.InjectNamespaces(XmlCore.SelectNamespaces(src), dst, ignoreDefault);
         this.InjectNamespaces(SelectRootNamespaces(src), dst, ignoreDefault);
     }
 
+    /**
+     * Injects namespaces from dictionary to the target element
+     */
     protected InjectNamespaces(namespaces: { [index: string]: string }, target: Element, ignoreDefault: boolean): void {
         for (let i in namespaces) {
             let uri = namespaces[i];
@@ -179,7 +188,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             found = findById(obj.GetXml()!, objectName!);
                             if (found) {
                                 let el = found.cloneNode(true) as Element;
-                                this.CopyNamespaces(el, el, true);
+                                this.CopyNamespaces(found, el, true);
                                 this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
                                 doc = el;
                                 return true;
@@ -190,7 +199,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             found = XmlCore.XmlObject.GetElementById(doc, objectName);
                             if (found) {
                                 let el = found.cloneNode(true) as Element;
-                                this.CopyNamespaces(el, el, false);
+                                this.CopyNamespaces(found, el, false);
                                 this.CopyNamespaces(doc, el, false);
                                 doc = el;
                             }
