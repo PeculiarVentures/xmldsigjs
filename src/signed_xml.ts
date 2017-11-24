@@ -312,6 +312,12 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                                 found = findById(obj.GetXml()!, objectName!);
                                 if (found) {
                                     const el = found.cloneNode(true) as Element;
+                                    if (this.Parent) {
+                                        const parent = (this.Parent instanceof XmlCore.XmlObject)
+                                            ? this.Parent.GetXml()!
+                                            : this.Parent;
+                                        this.CopyNamespaces(parent, el, true);
+                                    }
                                     this.CopyNamespaces(found, el, true);
                                     this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
                                     doc = el;
