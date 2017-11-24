@@ -929,16 +929,16 @@ declare namespace XmlDSigJs {
 
         protected WriteNode(node: Node): void;
         protected WriteDocumentNode(node: Node): void;
-        protected WriteTextNode(node);
+        protected WriteTextNode(node: Node): void;
         protected WriteCommentNode(node: Node): void;
-        protected WriteProcessingInstructionNode(node);
+        protected WriteProcessingInstructionNode(node: Node): void;
         protected WriteElementNode(node: Element): void;
         protected WriteNamespacesAxis(node: Element | Attr): number;
-        protected WriteAttributesAxis(node);
+        protected WriteAttributesAxis(node: Node): void;
         protected NormalizeString(input: string | null, type: XmlCore.XmlNodeType): string;
-        protected IsTextNode(type);
-        protected IsNamespaceInclusive(node, prefix);
-        protected IsNamespaceRendered(prefix, uri);
+        protected IsTextNode(type: XmlCore.XmlNodeType): boolean;
+        protected IsNamespaceInclusive(node: Element | Attr, prefix: string | null): boolean;
+        protected IsNamespaceRendered(prefix: string | null, uri: string | null): boolean;
     }
 
     //#endregion
@@ -1021,6 +1021,7 @@ declare namespace XmlDSigJs {
      * Provides a wrapper on a core XML signature object to facilitate creating XML signatures.
      */
     export class SignedXml implements XmlCore.IXmlSerializable {
+        public Parent?: Element | XmlCore.XmlObject;
         public readonly XmlSignature: Signature;
         public Key?: CryptoKey;
         public Algorithm?: Algorithm | RsaPssParams | EcdsaParams;
@@ -1068,15 +1069,15 @@ declare namespace XmlDSigJs {
         protected TransformSignedInfo(): string;
         protected ResolveTransform(transform: string): Transform;
         protected ApplyTransforms(transforms: Transforms, input: Element): any;
-        protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options ?: OptionsSign): PromiseLike<void>;
+        protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options?: OptionsSign): PromiseLike<void>;
         protected ValidateReferences(doc: Element): PromiseLike<boolean>;
         protected ValidateSignatureValue(keys: CryptoKey[]): PromiseLike<boolean>;
-}
-//#endregion
+    }
+    //#endregion
 
-// Methods from xml-core
-export const Select: XmlCore.SelectNodes;
-export function Parse(xmlstring: string): Document;
+    // Methods from xml-core
+    export const Select: XmlCore.SelectNodes;
+    export function Parse(xmlstring: string): Document;
 
 }
 

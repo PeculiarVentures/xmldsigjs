@@ -71,6 +71,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         return this.signature;
     }
 
+    public Parent?: Element | XmlCore.XmlObject;
     public Key?: CryptoKey;
     public Algorithm?: Algorithm | RsaPssParams | EcdsaParams;
     public get Signature() {
@@ -311,6 +312,12 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                                 found = findById(obj.GetXml()!, objectName!);
                                 if (found) {
                                     const el = found.cloneNode(true) as Element;
+                                    if (this.Parent) {
+                                        const parent = (this.Parent instanceof XmlCore.XmlObject)
+                                            ? this.Parent.GetXml()!
+                                            : this.Parent;
+                                        this.CopyNamespaces(parent, el, true);
+                                    }
                                     this.CopyNamespaces(found, el, true);
                                     this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
                                     doc = el;
@@ -390,6 +397,21 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
         // Get root namespaces
         const rootNamespaces = SelectRootNamespaces(xml);
+
+        if (this.Parent) {
+            const parentXml = (this.Parent instanceof XmlCore.XmlObject)
+                ? this.Parent.GetXml()
+                : this.Parent;
+
+            if (parentXml) {
+                const parentNamespaces = SelectRootNamespaces(parentXml);
+                // copy namespaces to rootNamespaces
+                for (const key in parentNamespaces) {
+                    rootNamespaces[key] = parentNamespaces[key];
+                }
+            }
+        }
+
         for (const i in rootNamespaces) {
             const uri = rootNamespaces[i];
             if (i === node.prefix) {
@@ -609,6 +631,14 @@ function _SelectRootNamespaces(node: Node, selectedNodes: XmlCore.AssocArray<str
         if (el.namespaceURI && el.namespaceURI !== "http://www.w3.org/XML/1998/namespace") {
             selectedNodes[el.prefix ? el.prefix : ""] = node.namespaceURI!;
         }
+        //#region Select all xmlns attrs
+        for (let i = 0; i < el.attributes.length; i++) {
+            const attr = el.attributes.item(i);
+            if (attr.prefix === "xmlns") {
+                selectedNodes[attr.localName ? attr.localName : ""] = attr.value;
+            }
+        }
+        //#endregion
         if (node.parentNode) {
             _SelectRootNamespaces(node.parentNode, selectedNodes);
         }

@@ -34,6 +34,7 @@ export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorit
                 let buf: ArrayBufferView;
                 if (typeof xml === "string") {
                     // C14N transforms
+                    // console.log("Hash:\n%s\n", xml);
                     buf = Convert.FromString(xml, "utf8");
                 } else if (xml instanceof Uint8Array) {
                     // base64 transform
@@ -65,6 +66,7 @@ export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignat
      * Sign the given string using the given key
      */
     public Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm) {
+        // console.log("Sign:\n%s\n", signedInfo);
         const info = Convert.FromString(signedInfo, "utf8");
         return Application.crypto.subtle.sign(algorithm as any, signingKey, info);
     }
@@ -73,6 +75,7 @@ export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignat
      * Verify the given signature of the given string using key
      */
     public Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, algorithm?: Algorithm) {
+        // console.log("Verify:\n%s\n", signedInfo);
         const info = Convert.FromString(signedInfo, "utf8");
         return Application.crypto.subtle.verify((algorithm || this.algorithm) as any, key, signatureValue, info);
     }
