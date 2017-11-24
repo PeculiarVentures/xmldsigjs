@@ -625,6 +625,14 @@ function _SelectRootNamespaces(node: Node, selectedNodes: XmlCore.AssocArray<str
         if (el.namespaceURI && el.namespaceURI !== "http://www.w3.org/XML/1998/namespace") {
             selectedNodes[el.prefix ? el.prefix : ""] = node.namespaceURI!;
         }
+        //#region Select all xmlns attrs
+        for (let i = 0; i < el.attributes.length; i++) {
+            const attr = el.attributes.item(i);
+            if (attr.prefix === "xmlns") {
+                selectedNodes[attr.localName ? attr.localName : ""] = attr.value;
+            }
+        }
+        //#endregion
         if (node.parentNode) {
             _SelectRootNamespaces(node.parentNode, selectedNodes);
         }
