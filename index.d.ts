@@ -1069,15 +1069,15 @@ declare namespace XmlDSigJs {
         protected TransformSignedInfo(): string;
         protected ResolveTransform(transform: string): Transform;
         protected ApplyTransforms(transforms: Transforms, input: Element): any;
-        protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options ?: OptionsSign): PromiseLike<void>;
+        protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options?: OptionsSign): PromiseLike<void>;
         protected ValidateReferences(doc: Element): PromiseLike<boolean>;
         protected ValidateSignatureValue(keys: CryptoKey[]): PromiseLike<boolean>;
-}
-//#endregion
+    }
+    //#endregion
 
-// Methods from xml-core
-export const Select: XmlCore.SelectNodes;
-export function Parse(xmlstring: string): Document;
+    // Methods from xml-core
+    export const Select: XmlCore.SelectNodes;
+    export function Parse(xmlstring: string): Document;
 
 }
 
