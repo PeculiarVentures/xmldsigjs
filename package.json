@@ -55,7 +55,7 @@
     "babelrc-rollup": "^3.0.0",
     "coveralls": "^2.13.3",
     "mocha": "^3.5.3",
-    "node-webcrypto-ossl": "^1.0.31",
+    "node-webcrypto-ossl": "^1.0.32",
     "nyc": "^8",
     "rollup": "^0.41.4",
     "rollup-plugin-babel": "^2.7.1",
