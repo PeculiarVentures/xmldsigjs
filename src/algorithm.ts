@@ -10,7 +10,7 @@ export interface IAlgorithm {
 }
 
 export interface IHashAlgorithm extends IAlgorithm {
-    Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array>;
+    Digest(xml: BufferSource | string | Node): PromiseLike<Uint8Array>;
 }
 
 export interface IHashAlgorithmConstructable {
@@ -27,16 +27,16 @@ export abstract class XmlAlgorithm implements IAlgorithm {
 }
 
 export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
-    public Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array> {
+    public Digest(xml: BufferSource | string | Node): PromiseLike<Uint8Array> {
         return Promise.resolve()
             .then(() => {
                 // console.log("HashedInfo:", xml);
-                let buf: ArrayBufferView;
+                let buf: BufferSource;
                 if (typeof xml === "string") {
                     // C14N transforms
                     // console.log("Hash:\n%s\n", xml);
                     buf = Convert.FromString(xml, "utf8");
-                } else if (xml instanceof Uint8Array) {
+                } else if (ArrayBuffer.isView(xml) || xml instanceof ArrayBuffer) {
                     // base64 transform
                     buf = xml;
                 } else {

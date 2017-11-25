@@ -848,7 +848,7 @@ declare namespace XmlDSigJs {
         getAlgorithmName(): string;
     }
     export interface IHashAlgorithm extends IAlgorithm {
-        Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array>;
+        Digest(xml: BufferSource | string | Node): PromiseLike<Uint8Array>;
     }
     export interface IHashAlgorithmConstructable {
         new(): IHashAlgorithm;
@@ -859,7 +859,7 @@ declare namespace XmlDSigJs {
         public getAlgorithmName(): string;
     }
     export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
-        public Digest(xml: Uint8Array | string | Node): PromiseLike<Uint8Array>;
+        public Digest(xml: BufferSource | string | Node): PromiseLike<Uint8Array>;
     }
     export interface ISignatureAlgorithm extends IAlgorithm {
         Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): PromiseLike<ArrayBuffer>;
