@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xmldsigjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xmldsigjs?branch=master)
 [![NPM version](https://badge.fury.io/js/xmldsigjs.png)](http://badge.fury.io/js/xmldsigjs)
 
-[![NPM](https://nodei.co/npm-dl/xmldsigjs.png?months=2&height=2)](https://nodei.co/npm/xmldsigjs/)
+[![NPM](https://nodei.co/npm/xmldsigjs.png)](https://nodei.co/npm/xmldsigjs/)
 
 [XMLDSIG](https://en.wikipedia.org/wiki/XML_Signature) is short for "XML Digital Signature". This library aims to provide an implementation of XMLDSIG in Typescript/Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
 
