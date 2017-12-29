@@ -67,6 +67,7 @@ describe("Verify XML signatures", function () {
     context("some", () => {
         [
             "valid_signature_utf8",
+            "valid_signature_office",
             "valid_saml",
             "saml_external_ns",
             "wsfederation_metadata",
