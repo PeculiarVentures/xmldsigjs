@@ -13,3 +13,4 @@
 /tslint.json
 **/*.map
 *.log
+test*.js
