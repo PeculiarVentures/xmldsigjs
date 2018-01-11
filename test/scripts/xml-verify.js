@@ -19,9 +19,9 @@ describe("Verify XML signatures", function () {
         readXml(folder + name, function (xml) {
             // console.log("Xml", xml);
             // console.log(new XMLSerializer().serializeToString(xml));
-            var signature = XmlCore.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+            var signatures = xml.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
             var sig = new xmldsig.SignedXml(xml);
-            sig.LoadXml(signature);
+            sig.LoadXml(signatures[0]);
             sig.Verify()
                 .then(function (v) {
                     assert.equal(v, res, "Wrong signature");
@@ -71,7 +71,8 @@ describe("Verify XML signatures", function () {
             "valid_saml",
             "saml_external_ns",
             "wsfederation_metadata",
-            "tl-mp"
+            "tl-mp",
+            "tl-mp-repeated-namespace"
         ].forEach(file =>
             it(file, done => verifyXML(`${file}.xml`, done)));
     });
