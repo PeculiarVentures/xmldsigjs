@@ -145,7 +145,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     }
                     this.XmlSignature.SignedInfo.SignatureMethod.HMACOutputLength = outputLength;
                 }
-                const si = this.TransformSignedInfo();
+                const si = this.TransformSignedInfo(data);
                 return alg.Sign(si, key, algorithm);
             })
             .then((signature) => {
@@ -312,12 +312,18 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                                 found = findById(obj.GetXml()!, objectName!);
                                 if (found) {
                                     const el = found.cloneNode(true) as Element;
+
+                                    // Copy xmlns from Document
+                                    this.CopyNamespaces(doc, el, false);
+
+                                    // Copy xmlns from Parent
                                     if (this.Parent) {
                                         const parent = (this.Parent instanceof XmlCore.XmlObject)
                                             ? this.Parent.GetXml()!
                                             : this.Parent;
                                         this.CopyNamespaces(parent, el, true);
                                     }
+
                                     this.CopyNamespaces(found, el, false);
                                     this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
                                     doc = el;
@@ -385,7 +391,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             });
     }
 
-    protected TransformSignedInfo(): string {
+    protected TransformSignedInfo(data?: Element | Document): string {
         const t = CryptoConfig.CreateFromName(this.XmlSignature.SignedInfo.CanonicalizationMethod.Algorithm);
 
         const xml = this.XmlSignature.SignedInfo.GetXml();
@@ -395,30 +401,29 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
         const node = xml.cloneNode(true) as Element;
 
-        // Get root namespaces
-        const rootNamespaces = SelectRootNamespaces(xml);
+        //#region Get root namespaces
+        // Get xmlns from SignedInfo
+        this.CopyNamespaces(xml, node, false);
 
+        if (data) {
+            // Get xmlns from Document
+            if (data.nodeType === XmlNodeType.Document) {
+                this.CopyNamespaces((data as Document).documentElement, node, false);
+            } else {
+                this.CopyNamespaces(data as Element, node, false);
+            }
+        }
         if (this.Parent) {
+            // Get xmlns from Parent
             const parentXml = (this.Parent instanceof XmlCore.XmlObject)
                 ? this.Parent.GetXml()
                 : this.Parent;
 
             if (parentXml) {
-                const parentNamespaces = SelectRootNamespaces(parentXml);
-                // copy namespaces to rootNamespaces
-                for (const key in parentNamespaces) {
-                    rootNamespaces[key] = parentNamespaces[key];
-                }
+                this.CopyNamespaces(parentXml, node, false);
             }
         }
-
-        for (const i in rootNamespaces) {
-            const uri = rootNamespaces[i];
-            if (i === node.prefix) {
-                continue;
-            }
-            node.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
-        }
+        //#endregion
 
         const childNamespaces = XmlCore.SelectNamespaces(xml);
         for (const i in childNamespaces) {
@@ -585,7 +590,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         let signedInfoCanon: string;
         return Promise.resolve()
             .then(() => {
-                signedInfoCanon = this.TransformSignedInfo();
+                signedInfoCanon = this.TransformSignedInfo(this.document);
                 signer = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
                 // Verify signature for all exported keys
 
