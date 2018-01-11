@@ -1,6 +1,10 @@
 machine:
   node:
-    version: 6.9.1
+    version: 8.9.4
+
+dependencies:
+  pre:
+    - sudo apt-get update; sudo apt-get install xmlsec1
 
 test:
   override:
