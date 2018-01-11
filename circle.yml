@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - sudo apt-get update; sudo apt-get install libxmlsec1-openssl
+    - sudo apt-get update; sudo apt-get install xmlsec1
 
 test:
   override:
