@@ -8,3 +8,6 @@
 **/*.map
 *.log
 test*.js
+
+# MacOS
+.DS_Store
