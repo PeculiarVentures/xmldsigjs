@@ -34,10 +34,8 @@ describe("Verify XML signatures", function () {
     function verifyExternalXML(name, externalName, done, res) {
         if (res === void 0) res = true;
         var folder = (typeof module === "undefined") ? "./static/" : "./test/static/";
-        readXml(folder + externalName, function (externalXml) {
-            readXml(folder + name, function (xml) {
-                // console.log("Xml", xml);
-                // console.log(new XMLSerializer().serializeToString(xml));
+        readXml(folder + externalName, (externalXml) => {
+            readXml(folder + name, (xml) => {
                 var signature = XmlCore.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
                 var sig = new xmldsig.SignedXml(externalXml);
                 sig.LoadXml(signature);
@@ -87,11 +85,11 @@ describe("Verify XML signatures", function () {
             "enveloping-sha512-rsa-sha512",
         ].forEach(file =>
             it(file, done => verifyXML(`${file}.xml`, done)));
-            
-            [
-                ["valid_signature_asic", "ping"],
-            ].forEach(file =>
-                it(file[0], done => verifyExternalXML(`${file[0]}.xml`, `${file[1]}.xml`, done)));
+
+        [
+            ["valid_signature_asic", "ping"],
+        ].forEach(file =>
+            it(file[0], done => verifyExternalXML(`${file[0]}.xml`, `${file[1]}.xml`, done)));
 
     });
 
