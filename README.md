@@ -14,7 +14,7 @@
 npm install xmldsigjs
 ```
 
-The npm module has `dist` foldder with the following files:
+The npm module has `dist` folder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
@@ -47,7 +47,7 @@ There is `lib` folder with ES2015 JS file which you can use with the `rollup` bu
 
 ### PLATFORM SUPPORT
 
-XMLDSIGjs works with any browser that suppports Web Crypto. Since node does not have Web Crypto you will need a polyfill on this platform, for this reason the npm package includes [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl); browsers do not need this dependency and in those cases though it will be installed it will be ignored.
+XMLDSIGjs works with any browser that supports Web Crypto. Since node does not have Web Crypto you will need a polyfill on this platform, for this reason the npm package includes [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl); browsers do not need this dependency and in those cases though it will be installed it will be ignored.
 
 If you need to use a Hardware Security Module we have also created a polyfill for Web Crypto that supports PKCS #11. Our polyfill for this is [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
 
@@ -60,7 +60,7 @@ var WebCrypto = require("node-webcrypto-ossl");
 xmldsigjs.Application.setEngine("OpenSSL", new WebCrypto());
 ```
 
-The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) polyfill will work the same way. The only difference is that you have to specify the details about your PKCS #11 device when you instansiate it:
+The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) polyfill will work the same way. The only difference is that you have to specify the details about your PKCS#11 device when you instansiate it:
 
 ```javascript
 var xmldsigjs = require("xmldsigjs");
