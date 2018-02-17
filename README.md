@@ -101,6 +101,10 @@ __Parameters__
 ```typescript
 interface OptionsSign {
     /**
+     * Id of Signature
+     */
+    id?: string 
+    /**
      * Public key for KeyInfo block
      */
     keyValue?: CryptoKey;
