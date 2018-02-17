@@ -610,7 +610,7 @@ declare namespace XmlDSigJs {
         /**
          * Gets or sets the Uri of the current Reference.
          */
-        public Uri: string;
+        public Uri?: string;
         /**
          * Gets or sets the type of the object being signed.
          */
@@ -995,6 +995,10 @@ declare namespace XmlDSigJs {
     }
     export interface OptionsSign {
         /**
+         * Id of Signature
+         */
+        id?: string;
+        /**
          * Public key for KeyInfo block
          *
          * @type {boolean}
@@ -1077,7 +1081,8 @@ declare namespace XmlDSigJs {
 
     // Methods from xml-core
     export const Select: XmlCore.SelectNodes;
-    export function Parse(xmlstring: string): Document;
+    export function Parse(xmlString: string): Document;
+    export function Stringify(target: Node): string;
 
 }
 
