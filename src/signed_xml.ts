@@ -39,6 +39,10 @@ export interface OptionsSignReference {
 
 export interface OptionsSign {
     /**
+     * Id of Signature
+     */
+    id?: string;
+    /**
      * Public key for KeyInfo block
      *
      * @type {boolean}
@@ -490,6 +494,11 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsSign = {}): PromiseLike<void> {
         return Promise.resolve()
             .then(() => {
+                // id
+                if (options.id) {
+                    this.XmlSignature.Id = options.id;
+                }
+
                 // keyValue
                 if (options.keyValue && key.algorithm.name!.toUpperCase() !== Alg.HMAC) {
                     if (!signature.KeyInfo) {
@@ -528,7 +537,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             reference.Id = item.id;
                         }
                         // Uri
-                        if (item.uri) {
+                        if (item.uri !== null && item.uri !== undefined) {
                             reference.Uri = item.uri;
                         }
                         // Type
