@@ -30,5 +30,6 @@ module.exports = {
     XMLSerializer: XMLSerializer,
     readXml: readXml,
     assert: assert,
-    XmlCore: XmlCore
+    XmlCore: XmlCore,
+    crypto: new WebCrypto(),
 }
