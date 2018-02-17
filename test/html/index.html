@@ -19,13 +19,16 @@
     <script src="src/test.js"></script>
     <!---->
     <script>
+        var xmldsig = XmlDSigJs
         mocha.setup("bdd")
     </script>
     <!--Test-->
     <script src="test/canon.js"></script>
-    <!--<script src="test/ecdsa.js"></script>-->
+    <!-- <script src="test/digest.js"></script> -->
+    <script src="test/ecdsa.js"></script>
     <script src="test/hmac.js"></script>
-    <script src="test/rsa.js"></script>
+    <script src="test/rsa_ssa.js"></script>
+    <script src="test/rsa_pss.js"></script>
     <script src="test/xml-verify.js"></script>
     <script>
         mocha.run();

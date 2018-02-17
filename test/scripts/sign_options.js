@@ -121,6 +121,27 @@ describe("Signing options", () => {
                     .then(done, done);
             });
         });
+
+        it("Count", (done) => {
+            (async (value, expectedValue) => {
+                const signature = await SignParse({
+                    keyValue: keys.publicKey,
+                    references: [
+                        {    
+                            hash: "SHA-256",
+                            transforms: ["enveloped"],
+                        },
+                        {    
+                            hash: "SHA-1",
+                            transforms: ["enveloped"],
+                        },
+                    ],
+                });
+
+                assert.equal(2, signature.XmlSignature.SignedInfo.References.Count);
+            })()
+                .then(done, done);
+        })
     });
 
 });

@@ -1,5 +1,5 @@
 "use strict";
-var select, xmldsig, DOMParser, readXml, assert, XmlCore;
+var select, xmldsig, DOMParser, readXml, assert;
 
 if (typeof module !== "undefined") {
     var config = require("../config");
@@ -8,7 +8,6 @@ if (typeof module !== "undefined") {
     DOMParser = config.DOMParser;
     assert = config.assert;
     readXml = config.readXml;
-    XmlCore = config.XmlCore;
 }
 
 describe("Verify XML signatures", function () {
@@ -36,7 +35,7 @@ describe("Verify XML signatures", function () {
         var folder = (typeof module === "undefined") ? "./static/" : "./test/static/";
         readXml(folder + externalName, (externalXml) => {
             readXml(folder + name, (xml) => {
-                var signature = XmlCore.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+                var signature = xmldsig.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
                 var sig = new xmldsig.SignedXml(externalXml);
                 sig.LoadXml(signature);
                 sig.Verify()
@@ -55,7 +54,7 @@ describe("Verify XML signatures", function () {
         assert.equal(!!xmlDoc, true);
         assert.equal(xmlDoc.documentElement.nodeName, "root");
 
-        var first = XmlCore.Select(xmlDoc, "//*[local-name()='first']");
+        var first = xmldsig.Select(xmlDoc, "//*[local-name()='first']");
         assert.equal(!!first, true);
 
         var sx = new xmldsig.SignedXml(first);
