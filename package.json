@@ -41,11 +41,11 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
-    "asn1js": "^2.0.15",
-    "pkijs": "^2.1.13",
-    "pvutils": "^1.0.8",
+    "asn1js": "^2.0.18",
+    "pkijs": "2.1.19",
+    "pvutils": "^1.0.10",
     "tslib": "^1.8.1",
-    "xml-core": "^1.0.12"
+    "xml-core": "^1.0.13"
   },
   "devDependencies": {
     "@types/asn1js": "latest",
