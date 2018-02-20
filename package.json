@@ -7,6 +7,7 @@
   "jsnext:main": "lib/index.js",
   "scripts": {
     "start": "node test/html/server.js",
+    "prepare": "npm run build",
     "pretest": "npm run build:map",
     "test": "mocha test/scripts",
     "test:local": "nyc --reporter=lcov npm test",
