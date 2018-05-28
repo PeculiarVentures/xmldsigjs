@@ -933,11 +933,11 @@ declare namespace XmlDSigJs {
         protected WriteCommentNode(node: Node): void;
         protected WriteProcessingInstructionNode(node: Node): void;
         protected WriteElementNode(node: Element): void;
-        protected WriteNamespacesAxis(node: Element | Attr): number;
+        protected WriteNamespacesAxis(node: Element): number;
         protected WriteAttributesAxis(node: Node): void;
         protected NormalizeString(input: string | null, type: XmlCore.XmlNodeType): string;
         protected IsTextNode(type: XmlCore.XmlNodeType): boolean;
-        protected IsNamespaceInclusive(node: Element | Attr, prefix: string | null): boolean;
+        protected IsNamespaceInclusive(node: Element, prefix: string | null): boolean;
         protected IsNamespaceRendered(prefix: string | null, uri: string | null): boolean;
     }
 

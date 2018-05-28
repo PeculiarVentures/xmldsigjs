@@ -44,7 +44,7 @@ export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorit
                     const txt = new XMLSerializer().serializeToString(xml);
                     buf = Convert.FromString(txt, "utf8");
                 }
-                return Application.crypto.subtle.digest(this.algorithm, buf);
+                return Application.crypto.subtle.digest(this.algorithm, buf as ArrayBuffer);
             })
             .then((hash) => {
                 return new Uint8Array(hash);

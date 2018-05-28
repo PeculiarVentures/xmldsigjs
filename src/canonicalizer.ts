@@ -204,7 +204,7 @@ export class XmlCanonicalizer {
         }
     }
 
-    protected WriteNamespacesAxis(node: Element | Attr): number {
+    protected WriteNamespacesAxis(node: Element): number {
         const list: XmlCore.XmlNamespace[] = [];
         let visibleNamespacesCount = 0;
         for (let i = 0; i < node.attributes.length; i++) {
@@ -288,7 +288,7 @@ export class XmlCanonicalizer {
         return visibleNamespacesCount;
     }
 
-    protected WriteAttributesAxis(node: Node): void {
+    protected WriteAttributesAxis(node: Element): void {
         // Console.WriteLine ("Debug: attributes");
 
         const list: Attr[] = [];
@@ -412,7 +412,7 @@ function XmlDsigC14NTransformAttributesComparer(x: Node, y: Node): number {
     }
 }
 
-function IsNamespaceUsed(node: Element | Attr, prefix: string | null, result: number = 0): number {
+function IsNamespaceUsed(node: Element, prefix: string | null, result: number = 0): number {
     const prefix2 = prefix || null;
     if (node.prefix === prefix2) {
         return ++result;

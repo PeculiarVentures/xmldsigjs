@@ -661,7 +661,7 @@ function _SelectRootNamespaces(node: Node, selectedNodes: XmlCore.AssocArray<str
         //#region Select all xmlns attrs
         for (let i = 0; i < el.attributes.length; i++) {
             const attr = el.attributes.item(i);
-            if (attr.prefix === "xmlns") {
+            if (attr && attr.prefix === "xmlns") {
                 addNamespace(selectedNodes, attr.localName ? attr.localName : "", attr.value);
             }
         }
