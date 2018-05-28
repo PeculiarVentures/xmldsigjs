@@ -7,16 +7,16 @@ let external = Object.keys(pkg.dependencies);
 let sourceMap = process.argv.some(item => item.toLowerCase() === "--dev");
 
 export default {
-    entry: "src/index.ts",
+    input: "src/index.ts",
     plugins: [
         typescript({ typescript: require("typescript"), target: "es5" }),
         nodeResolve({ jsnext: true, main: true }),
     ],
-    targets: [
+    output: [
         {
-            dest: "dist/xmldsig.js",
+            file: "dist/xmldsig.js",
             format: "umd",
-            moduleName: "XmlDSigJs",
+            name: "XmlDSigJs",
             sourceMap
         }
     ]

@@ -9,17 +9,17 @@ external.push("asn1js");
 let sourceMap = process.argv.some(item => item.toLowerCase() === "--dev");
 
 export default {
-    entry: "src/index.ts",
+    input: "src/index.ts",
     plugins: [
         typescript({ typescript: require("typescript"), target: "es5" }),
         babel(babelrc()),
     ],
     external: external,
-    targets: [
+    output: [
         {
-            dest: pkg.main,
+            file: pkg.main,
             format: "cjs",
-            moduleName: "XmlDSigJs",
+            name: "XmlDSigJs",
             sourceMap
         }
     ]
