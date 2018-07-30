@@ -51,6 +51,7 @@
   "devDependencies": {
     "@types/asn1js": "latest",
     "@types/node": "^10.5.4",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-polyfill": "^6.26.0",
