@@ -311,26 +311,32 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     }
                     if (objectName) {
                         let found: Element | null = null;
-                        const xmlSignature = this.XmlSignature.GetXml();
-                        if (xmlSignature) {
-                            found = findById(xmlSignature, objectName!);
-                            if (found) {
-                                const el = found.cloneNode(true) as Element;
+                        const xmlSignatureObjects = [this.XmlSignature.KeyInfo.GetXml()];
+                        this.XmlSignature.ObjectList.ForEach((object) => {
+                            xmlSignatureObjects.push(object.GetXml());
+                        });
+                        for (const xmlSignatureObject of xmlSignatureObjects) {
+                            if (xmlSignatureObject) {
+                                found = findById(xmlSignatureObject, objectName!);
+                                if (found) {
+                                    const el = found.cloneNode(true) as Element;
 
-                                // Copy xmlns from Document
-                                this.CopyNamespaces(doc, el, false);
+                                    // Copy xmlns from Document
+                                    this.CopyNamespaces(doc, el, false);
 
-                                // Copy xmlns from Parent
-                                if (this.Parent) {
-                                    const parent = (this.Parent instanceof XmlCore.XmlObject)
-                                        ? this.Parent.GetXml()!
-                                        : this.Parent;
-                                    this.CopyNamespaces(parent, el, true);
+                                    // Copy xmlns from Parent
+                                    if (this.Parent) {
+                                        const parent = (this.Parent instanceof XmlCore.XmlObject)
+                                            ? this.Parent.GetXml()!
+                                            : this.Parent;
+                                        this.CopyNamespaces(parent, el, true);
+                                    }
+
+                                    this.CopyNamespaces(found, el, false);
+                                    this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
+                                    doc = el;
+                                    break;
                                 }
-
-                                this.CopyNamespaces(found, el, false);
-                                this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
-                                doc = el;
                             }
                         }
                         if (!found && doc) {
