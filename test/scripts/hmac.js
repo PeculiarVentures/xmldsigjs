@@ -87,8 +87,9 @@ describe("HMAC", function () {
                         if (hmacLength) {
                             assert.equal(si.SignatureMethod.HMACOutputLength, hmacLength);
                             sigLength = hmacLength;
-                        } else
+                        } else if (typeof(module) !== "undefined") {
                             assert.equal(si.SignatureMethod.HMACOutputLength, sigLength);
+                        }
 
                         // TODO: Check signature length. Issue #85
 

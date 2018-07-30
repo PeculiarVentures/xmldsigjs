@@ -85,11 +85,12 @@ describe("Verify XML signatures", function () {
         ].forEach(file =>
             it(file, done => verifyXML(`${file}.xml`, done)));
 
-        [
-            ["valid_signature_asic", "ping"],
-        ].forEach(file =>
-            it(file[0], done => verifyExternalXML(`${file[0]}.xml`, `${file[1]}.xml`, done)));
 
     });
+
+    [
+        ["valid_signature_asic", "ping"],
+    ].forEach(file =>
+        it(file[0], done => verifyExternalXML(`${file[0]}.xml`, `${file[1]}.xml`, done)));
 
 })
