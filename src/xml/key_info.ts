@@ -79,7 +79,7 @@ export class KeyInfo extends XmlSignatureCollection<KeyInfoClause> {
                                 keyValue = k;
                                 return true;
                             }
-                        } catch { /* none */ }
+                        } catch (e) { /* none */ }
                         return false;
                     });
                     if (keyValue) {
