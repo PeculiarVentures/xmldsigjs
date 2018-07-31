@@ -39,6 +39,10 @@ export interface OptionsSignReference {
 
 export interface OptionsSign {
     /**
+     * Id of Signature
+     */
+    id?: string;
+    /**
      * Public key for KeyInfo block
      *
      * @type {boolean}
@@ -307,9 +311,13 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     }
                     if (objectName) {
                         let found: Element | null = null;
-                        if (this.XmlSignature.ObjectList) {
-                            this.XmlSignature.ObjectList.Some((obj) => {
-                                found = findById(obj.GetXml()!, objectName!);
+                        const xmlSignatureObjects = [this.XmlSignature.KeyInfo.GetXml()];
+                        this.XmlSignature.ObjectList.ForEach((object) => {
+                            xmlSignatureObjects.push(object.GetXml());
+                        });
+                        for (const xmlSignatureObject of xmlSignatureObjects) {
+                            if (xmlSignatureObject) {
+                                found = findById(xmlSignatureObject, objectName!);
                                 if (found) {
                                     const el = found.cloneNode(true) as Element;
 
@@ -327,10 +335,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                                     this.CopyNamespaces(found, el, false);
                                     this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
                                     doc = el;
-                                    return true;
+                                    break;
                                 }
-                                return false;
-                            });
+                            }
                         }
                         if (!found && doc) {
                             found = XmlCore.XmlObject.GetElementById(doc, objectName);
@@ -490,6 +497,11 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsSign = {}): PromiseLike<void> {
         return Promise.resolve()
             .then(() => {
+                // id
+                if (options.id) {
+                    this.XmlSignature.Id = options.id;
+                }
+
                 // keyValue
                 if (options.keyValue && key.algorithm.name!.toUpperCase() !== Alg.HMAC) {
                     if (!signature.KeyInfo) {
@@ -528,7 +540,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             reference.Id = item.id;
                         }
                         // Uri
-                        if (item.uri) {
+                        if (item.uri !== null && item.uri !== undefined) {
                             reference.Uri = item.uri;
                         }
                         // Type
@@ -652,7 +664,7 @@ function _SelectRootNamespaces(node: Node, selectedNodes: XmlCore.AssocArray<str
         //#region Select all xmlns attrs
         for (let i = 0; i < el.attributes.length; i++) {
             const attr = el.attributes.item(i);
-            if (attr.prefix === "xmlns") {
+            if (attr && attr.prefix === "xmlns") {
                 addNamespace(selectedNodes, attr.localName ? attr.localName : "", attr.value);
             }
         }

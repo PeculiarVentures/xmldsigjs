@@ -7,14 +7,14 @@ external.push("asn1js");
 let sourceMap = process.argv.some(item => item.toLowerCase() === "--dev");
 
 export default {
-    entry: "src/index.ts",
+    input: "src/index.ts",
     plugins: [
         typescript({ typescript: require("typescript") }),
     ],
     external: external,
-    targets: [
+    output: [
         {
-            dest: pkg.module,
+            file: pkg.module,
             format: "es",
             sourceMap
         }

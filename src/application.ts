@@ -1,3 +1,4 @@
+import { CryptoEngine, setEngine } from "pkijs";
 import { XE, XmlError } from "xml-core";
 
 export interface CryptoEx extends Crypto {
@@ -20,6 +21,7 @@ export class Application {
             subtle: crypto.subtle,
             name,
         };
+        setEngine(name, new CryptoEngine({ name, crypto, subtle: crypto.subtle }), new CryptoEngine({ name, crypto, subtle: crypto.subtle }));
     }
 
     /**

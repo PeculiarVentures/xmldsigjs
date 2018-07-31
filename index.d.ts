@@ -610,7 +610,7 @@ declare namespace XmlDSigJs {
         /**
          * Gets or sets the Uri of the current Reference.
          */
-        public Uri: string;
+        public Uri?: string;
         /**
          * Gets or sets the type of the object being signed.
          */
@@ -933,11 +933,11 @@ declare namespace XmlDSigJs {
         protected WriteCommentNode(node: Node): void;
         protected WriteProcessingInstructionNode(node: Node): void;
         protected WriteElementNode(node: Element): void;
-        protected WriteNamespacesAxis(node: Element | Attr): number;
+        protected WriteNamespacesAxis(node: Element): number;
         protected WriteAttributesAxis(node: Node): void;
         protected NormalizeString(input: string | null, type: XmlCore.XmlNodeType): string;
         protected IsTextNode(type: XmlCore.XmlNodeType): boolean;
-        protected IsNamespaceInclusive(node: Element | Attr, prefix: string | null): boolean;
+        protected IsNamespaceInclusive(node: Element, prefix: string | null): boolean;
         protected IsNamespaceRendered(prefix: string | null, uri: string | null): boolean;
     }
 
@@ -994,6 +994,10 @@ declare namespace XmlDSigJs {
         transforms?: OptionsSignTransform[];
     }
     export interface OptionsSign {
+        /**
+         * Id of Signature
+         */
+        id?: string;
         /**
          * Public key for KeyInfo block
          *
@@ -1077,7 +1081,8 @@ declare namespace XmlDSigJs {
 
     // Methods from xml-core
     export const Select: XmlCore.SelectNodes;
-    export function Parse(xmlstring: string): Document;
+    export function Parse(xmlString: string): Document;
+    export function Stringify(target: Node): string;
 
 }
 

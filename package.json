@@ -1,12 +1,13 @@
 {
   "name": "xmldsigjs",
-  "version": "2.0.20",
+  "version": "2.0.21",
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "dist/index.js",
   "module": "lib/index.js",
   "jsnext:main": "lib/index.js",
   "scripts": {
     "start": "node test/html/server.js",
+    "prepare": "npm run build",
     "pretest": "npm run build:map",
     "test": "mocha test/scripts",
     "test:local": "nyc --reporter=lcov npm test",
@@ -41,26 +42,30 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
-    "asn1js": "^2.0.15",
-    "pkijs": "^2.1.13",
-    "pvutils": "^1.0.8",
-    "tslib": "^1.8.1",
-    "xml-core": "^1.0.12"
+    "asn1js": "^2.0.21",
+    "pkijs": "~2.1.66",
+    "pvutils": "^1.0.16",
+    "tslib": "^1.9.3",
+    "xml-core": "^1.0.13"
   },
   "devDependencies": {
     "@types/asn1js": "latest",
-    "@types/node": "^6.0.96",
-    "babel-plugin-external-helpers": "^6.18.0",
-    "babel-preset-es2015": "^6.18.0",
+    "@types/node": "^10.5.4",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
     "babelrc-rollup": "^3.0.0",
-    "coveralls": "^2.13.3",
-    "mocha": "^3.5.3",
-    "node-webcrypto-ossl": "^1.0.33",
-    "nyc": "^8",
-    "rollup": "^0.41.4",
-    "rollup-plugin-babel": "^2.7.1",
-    "rollup-plugin-node-resolve": "^2.0.0",
+    "coveralls": "^3.0.2",
+    "express": "^4.16.3",
+    "mocha": "^5.2.0",
+    "node-webcrypto-ossl": "^1.0.37",
+    "nyc": "^12.0.2",
+    "rollup": "^0.63.4",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-typescript": "^0.8.1",
-    "typescript": "^2.6.2"
+    "typescript": "^2.9.2"
   }
 }

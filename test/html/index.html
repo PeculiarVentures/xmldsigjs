@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>XMLDSIGJS tests</title>
     <link rel="stylesheet" media="all" href="css/mocha.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.min.js"></script>
 </head>
 
 <body>
@@ -19,13 +20,16 @@
     <script src="src/test.js"></script>
     <!---->
     <script>
+        var xmldsig = XmlDSigJs
         mocha.setup("bdd")
     </script>
     <!--Test-->
     <script src="test/canon.js"></script>
-    <!--<script src="test/ecdsa.js"></script>-->
+    <!-- <script src="test/digest.js"></script> --> <!-- TODO Fix Buffer compare -->
+    <script src="test/ecdsa.js"></script>
     <script src="test/hmac.js"></script>
-    <script src="test/rsa.js"></script>
+    <script src="test/rsa_ssa.js"></script>
+    <script src="test/rsa_pss.js"></script>
     <script src="test/xml-verify.js"></script>
     <script>
         mocha.run();

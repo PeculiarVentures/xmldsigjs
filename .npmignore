@@ -11,6 +11,7 @@
 /rollup*.js
 /tsconfig.json
 /tslint.json
+/.circleci
 **/*.map
 *.log
 test*.js

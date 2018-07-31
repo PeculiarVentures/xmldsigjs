@@ -9,7 +9,6 @@ if (typeof module !== "undefined") {
     XMLSerializer = config.XMLSerializer;
     assert = config.assert;
     readXml = config.readXml;
-    var XmlCore = config.XmlCore;
 }
 
 describe("RSA-PSS", function () {
@@ -52,7 +51,7 @@ describe("RSA-PSS", function () {
                                     return signature.Sign(
                                         alg,                                        // algorithm 
                                         keys.privateKey,                                                // key 
-                                        XmlCore.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`),          // document
+                                        xmldsig.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`),          // document
                                         {                                                               // options
                                             keyValue: keys.publicKey,
                                             references: [
@@ -63,7 +62,7 @@ describe("RSA-PSS", function () {
                                 .then(() => {
                                     // console.log(signature.toString());
 
-                                    let signature2 = new xmldsig.SignedXml(XmlCore.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`));
+                                    let signature2 = new xmldsig.SignedXml(xmldsig.Parse(`<root><first id="id1"><foo>hello</foo></first></root>`));
                                     signature2.LoadXml(signature.XmlSignature.GetXml());
 
                                     let si = signature2.XmlSignature.SignedInfo;

@@ -42,9 +42,8 @@ export class Reference extends XmlSignatureObject {
      */
     @XmlAttribute({
         localName: XmlSignature.AttributeNames.URI,
-        defaultValue: "",
     })
-    public Uri: string;
+    public Uri?: string;
 
     /**
      * Gets or sets the type of the object being signed.

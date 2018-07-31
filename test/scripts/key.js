@@ -78,7 +78,7 @@ describe("Key", function () {
             assert.equal(!!cert, true, "Certificate is null");
 
             assert.equal(!!cert.PublicKey, false);
-            cert.exportKey({ name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" })
+            cert.exportKey({ name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } })
                 .then(key => {
                     assert.equal(!!key.algorithm, true);
                     assert.equal(key.type, "public");

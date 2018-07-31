@@ -60,7 +60,7 @@ describe("PKI X509", () => {
 
                 assert.equal(x509.PublicKey, null);
 
-                return x509.exportKey({ name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" })
+                return x509.exportKey({ name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } })
                     .then(key => {
                         assert.equal(!!key, true);
                         assert.equal(key.type, "public");

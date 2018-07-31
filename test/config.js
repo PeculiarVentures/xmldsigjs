@@ -3,6 +3,7 @@ console.warn("Runing: NodeJS");
 var fs = require("fs");
 var assert = require("assert");
 var select = require("xpath.js");
+require("babel-polyfill");
 var DOMParser = require("xmldom-alpha").DOMParser;
 var XMLSerializer = require("xmldom-alpha").XMLSerializer;
 var XmlCore = require("xml-core");
@@ -30,5 +31,6 @@ module.exports = {
     XMLSerializer: XMLSerializer,
     readXml: readXml,
     assert: assert,
-    XmlCore: XmlCore
+    XmlCore: XmlCore,
+    crypto: new WebCrypto(),
 }

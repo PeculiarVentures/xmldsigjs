@@ -87,6 +87,7 @@ export class KeyInfo extends XmlSignatureCollection<KeyInfoClause> {
                     } else {
                         throw new XmlError(XE.CRYPTOGRAPHIC, "Unsupported KeyValue in use");
                     }
+                    item.GetXml();
                 }
                 this.Add(item);
             }

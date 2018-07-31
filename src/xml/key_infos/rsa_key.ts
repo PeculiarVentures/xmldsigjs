@@ -137,7 +137,7 @@ export class RsaKeyValue extends KeyInfoClause {
                 e: exponent,
                 ext: true,
             };
-            Application.crypto.subtle.importKey("jwk", jwk as any, alg, true, this.keyUsage)
+            Application.crypto.subtle.importKey("jwk", jwk as any, alg as any, true, this.keyUsage)
                 .then(resolve, reject);
         });
     }

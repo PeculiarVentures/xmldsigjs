@@ -1,5 +1,5 @@
 "use strict"
-var select, xmldsig, DOMParser, XMLSerializer, readXml, assert, XmlCore;
+var select, xmldsig, DOMParser, XMLSerializer, readXml, assert;
 
 if (typeof module !== "undefined") {
     var config = require("../config");
@@ -9,7 +9,6 @@ if (typeof module !== "undefined") {
     XMLSerializer = config.XMLSerializer;
     readXml = config.readXml;
     assert = config.assert;
-    XmlCore = config.XmlCore;
 }
 
 describe("Digest", function () {
