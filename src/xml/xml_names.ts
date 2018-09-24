@@ -3,7 +3,7 @@ export const XmlSignature = {
     DefaultCanonMethod: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
     DefaultDigestMethod: "http://www.w3.org/2001/04/xmlenc#sha256",
 
-    DefaultPrefix: "ds",
+    DefaultPrefix: "",
 
     ElementNames: {
 
@@ -61,6 +61,7 @@ export const XmlSignature = {
         MimeType: "MimeType",
         Type: "Type",
         URI: "URI",
+        Filter: "Filter"
     },
 
     AlgorithmNamespaces: {
@@ -74,6 +75,7 @@ export const XmlSignature = {
         XmlDsigExcC14NWithCommentsTransform: "http://www.w3.org/2001/10/xml-exc-c14n#WithComments",
         XmlDecryptionTransform: "http://www.w3.org/2002/07/decrypt#XML",
         XmlLicenseTransform: "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform",
+        XmlDsigFilterTransform: "http://www.w3.org/2002/06/xmldsig-filter2",
     },
 
     Uri: {

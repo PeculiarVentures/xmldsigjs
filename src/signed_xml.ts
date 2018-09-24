@@ -459,6 +459,8 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 return new Transforms.XmlDsigExcC14NWithCommentsTransform();
             case "base64":
                 return new Transforms.XmlDsigBase64Transform();
+            case "filter":
+                return new Transforms.XmlDsigFilterTransform();
             default:
                 throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
         }
