@@ -484,10 +484,28 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         let output: any = null;
 
         // Sort transforms. Enveloped should be first transform
+        // Unless there is a Filter transform, in which case it takes precedence
         transforms.Sort((a, b) => {
-            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+            
+            //Filter is always the most imporant
+            if (a instanceof Transforms.XmlDsigDisplayFilterTransform)            {
+                return -1
+            }
+
+            if(b instanceof Transforms.XmlDsigDisplayFilterTransform){
                 return 1;
             }
+
+            //Next comes envelope
+
+            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+                return -1
+            }
+
+            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+                return 1
+            }
+
             return 0;
         }).ForEach((transform) => {
             // Apply transforms
