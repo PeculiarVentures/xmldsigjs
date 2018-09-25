@@ -31,7 +31,7 @@ export class Transforms extends XmlSignatureCollection<Transform> {
                 case XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform:
                     return ChangeTransform(item, transforms.XmlDsigBase64Transform);
                 case XmlSignature.AlgorithmNamespaces.XmlDsigFilterTransform:
-                    return ChangeTransform(item, transforms.XmlDsigFilterTransform);
+                    return ChangeTransform(item, transforms.XmlDsigDisplayFilterTransform);
                 default:
                     throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, item.Algorithm);
             }

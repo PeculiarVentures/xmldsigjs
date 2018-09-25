@@ -1,6 +1,6 @@
 import { XE, XmlError, XmlChildElement  } from "xml-core";
 import { Transform } from "../transform";
-import { XPathFilterObject } from "./children/xpath_filter";
+import { XPathDisplayFilterObject } from "./children/xpath_display_filter";
 import { XmlSignature } from "../xml_names";
 
 /*
@@ -9,21 +9,32 @@ import { XmlSignature } from "../xml_names";
 </Transform>
 */
 
-/**
- * Represents the enveloped signature transform for an XML digital signature as defined by the W3C.
- */
-export class XmlDsigFilterTransform extends Transform {
+//N.B. This does not apply any XPath filters to the original doc, it exists only to ensure that the XPath filter information is included in the signature
+
+export class XmlDsigDisplayFilterTransform extends Transform {
 
     public Algorithm: string = "http://www.w3.org/2002/06/xmldsig-filter2";
 
     @XmlChildElement({
         localName:"XPath",
         required: true,
-        parser: XPathFilterObject,
+        parser: XPathDisplayFilterObject,
         prefix: "",
         namespaceURI: XmlSignature.NamespaceURI
     })
-    public XPathFilter: XPathFilterObject;
+    public XPathFilter: XPathDisplayFilterObject;
+
+    public constructor(params?:IXmlDsigFilterTransformParams){
+        super();
+
+        if(params==null)
+            throw Error("params is undefined")
+
+        this.XPathFilter = new XPathDisplayFilterObject();
+        this.XPathFilter.Prefix = "";
+        this.XPathFilter.XPath = params.XPath;
+        this.XPathFilter.Filter = params.Filter;
+    }
 
     /**
      * Returns the output of the current XmlDsigEnvelopedSignatureTransform object.
@@ -34,15 +45,13 @@ export class XmlDsigFilterTransform extends Transform {
             throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
         }
 
-        if(!this.XPathFilter){
-            this.XPathFilter = new XPathFilterObject()
-            this.XPathFilter.Prefix = "";
-            this.XPathFilter.Filter = "intersect";
-            this.XPathFilter.XPath = "//CounterpartData";
-        }
-
         return this.innerXml;
     }   
+}
+
+export interface IXmlDsigFilterTransformParams{
+    XPath: string;
+    Filter: string;
 }
 
 

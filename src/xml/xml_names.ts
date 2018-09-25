@@ -3,7 +3,7 @@ export const XmlSignature = {
     DefaultCanonMethod: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
     DefaultDigestMethod: "http://www.w3.org/2001/04/xmlenc#sha256",
 
-    DefaultPrefix: "",
+    DefaultPrefix: " ",
 
     ElementNames: {
 

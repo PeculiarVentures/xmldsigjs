@@ -9,7 +9,7 @@ import { KeyInfoX509Data, KeyValue } from "./xml/key_infos";
 import * as KeyInfos from "./xml/key_infos";
 import * as Transforms from "./xml/transforms";
 
-export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
+export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64"
 
 export interface OptionsSignReference {
     /**
@@ -445,6 +445,22 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         return res;
     }
 
+    protected ResolveFilterTransform(transform: string){
+        
+        var split = transform.split(" ");
+
+        if(split.length!=3)
+            throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_TRANSFORM_FILTER, transform);
+
+        var filterMethod = split[1].trim();
+        var xPath = split[2].trim();
+
+        return new Transforms.XmlDsigDisplayFilterTransform({
+            Filter: filterMethod,
+            XPath: xPath,
+        });
+    }
+
     protected ResolveTransform(transform: string): XmlTransform {
         switch (transform) {
             case "enveloped":
@@ -459,8 +475,6 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 return new Transforms.XmlDsigExcC14NWithCommentsTransform();
             case "base64":
                 return new Transforms.XmlDsigBase64Transform();
-            case "filter":
-                return new Transforms.XmlDsigFilterTransform();
             default:
                 throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
         }
@@ -556,7 +570,12 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                         if (item.transforms && item.transforms.length) {
                             const transforms = new XmlTransforms();
                             item.transforms.forEach((transform) => {
-                                transforms.Add(this.ResolveTransform(transform));
+
+                                if(transform.startsWith("filter")){
+                                    transforms.Add(this.ResolveFilterTransform(transform));
+                                }else{
+                                    transforms.Add(this.ResolveTransform(transform));
+                                }
                             });
                             reference.Transforms = transforms;
                         }
