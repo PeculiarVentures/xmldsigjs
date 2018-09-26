@@ -22,7 +22,8 @@
     "sync": "git ac && git pull --rebase && git push",
     "coverage": "nyc npm test",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "lite-server": "lite-server -c lite-server.config.json"
+    "lite-server": "lite-server -c lite-server.config.json",
+    "create-tarball": "npm version patch && npm pack && mv xmldsigjs-*.tgz tarballs/"
   },
   "repository": {
     "type": "git",

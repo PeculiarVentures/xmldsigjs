@@ -24,6 +24,14 @@ The npm module has `dist` folder with the following files:
 
 There is `lib` folder with ES2015 JS file which you can use with the `rollup` bundler.
  
+## DEVELOPMENT
+
+Once you are done with your changes, in order to create a tarball that can be installed without publishing to npm:
+- increase the version in `package.json`
+- run `npm pack`
+- move newly created tarball, it's the one that was created and placed into the root folder under name `xmldsigjs-${your-package.json.version}` into `tarballs` folder
+- now commit everything together and nicely push it to remote
+
 ## COMPATABILITY
 
 ### CRYPTOGRAPHIC ALGORITHM SUPPORT 
