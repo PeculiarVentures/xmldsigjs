@@ -18,15 +18,15 @@ The npm module has `dist` folder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
-| index.js        | 126 Kb | UMD module with external modules. Has comments | 
-| xmldsig.js      | 696 Kb | UMD bundle module. Has comments                | 
+| index.js        | 126 Kb | UMD module with external modules. Has comments |
+| xmldsig.js      | 696 Kb | UMD bundle module. Has comments                |
 | xmldsig.min.js  | 253 Kb | minified UMD bundled module. No comments       |
 
 There is `lib` folder with ES2015 JS file which you can use with the `rollup` bundler.
- 
+
 ## COMPATABILITY
 
-### CRYPTOGRAPHIC ALGORITHM SUPPORT 
+### CRYPTOGRAPHIC ALGORITHM SUPPORT
 
 |                   | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
 |-------------------|------|----------|----------|----------|
@@ -43,6 +43,7 @@ There is `lib` folder with ES2015 JS file which you can use with the `rollup` bu
 - XmlDsigExcC14NWithCommentsTransform
 - XmlDsigEnvelopedSignatureTransform
 - XmlDsigBase64Transform
+- XmlXPathFilter2SignatureTransform
 
 
 ### PLATFORM SUPPORT
@@ -77,7 +78,7 @@ xmldsigjs.Application.setEngine("PKCS11", new WebCrypto({
 
 ## WARNING
 
-**Using XMLDSIG is a bit like running with scissors so use it cautiously. That said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
+**Using XMLDSIG is a bit like running with scissors so use it cautiously. That said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.**
 
 ## Usage
 
@@ -103,7 +104,7 @@ interface OptionsSign {
     /**
      * Id of Signature
      */
-    id?: string 
+    id?: string
     /**
      * Public key for KeyInfo block
      */
@@ -114,7 +115,7 @@ interface OptionsSign {
     x509?: string[];
     /**
      * List of Reference
-     * Default is Reference with hash alg SHA-256 and exc-c14n transform  
+     * Default is Reference with hash alg SHA-256 and exc-c14n transform
      */
     references?: OptionsSignReference[];
 }
@@ -180,8 +181,8 @@ XmlDSigJs.Application.setEngine("OpenSSL", crypto);
 let signature = new XmlDSigJs.SignedXml();
 
 signature.Sign(                                  // Signing document
-    { name: "RSASSA-PKCS1-v1_5" },                        // algorithm 
-    keys.privateKey,                                      // key 
+    { name: "RSASSA-PKCS1-v1_5" },                        // algorithm
+    keys.privateKey,                                      // key
     XmlDSigJs.Parse(xml),                                 // document
     {                                                     // options
         keyValue: keys.publicKey,
@@ -195,7 +196,7 @@ signature.Sign(                                  // Signing document
     .catch(e => console.log(e));
 ```
 
-### Checking a XMLDSIG Signature 
+### Checking a XMLDSIG Signature
 
 
 ```javascript
@@ -264,7 +265,7 @@ npm test
 ```
 
 ### In the browser
-To run the browser test you need to run a test server, from the test directory run: 
+To run the browser test you need to run a test server, from the test directory run:
 ```
 npm start
 ```

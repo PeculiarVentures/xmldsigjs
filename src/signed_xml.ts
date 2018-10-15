@@ -449,6 +449,8 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         switch (transform) {
             case "enveloped":
                 return new Transforms.XmlDsigEnvelopedSignatureTransform();
+            case "xmldsig-filter2":
+                return new Transforms.XmlXPathFilter2SignatureTransform();
             case "c14n":
                 return new Transforms.XmlDsigC14NTransform();
             case "c14n-com":
