@@ -180,4 +180,52 @@ describe("Transforms", () => {
 
     })
 
+    context("filter2", () => {
+        it("GetOutput error", () => {
+            let transform = new xmldsig.XmlDsigXPathFilter2Transform();
+
+            assert.throws(() => {
+                transform.GetOutput();
+            });
+
+        });
+
+        it("GetOutput with signature", () => {
+            const transform = new xmldsig.XmlDsigXPathFilter2Transform();
+            const node = xmldsig.Parse(xml).documentElement;
+            const filter2 = select(node, ".//*[local-name(.)='Transform']")[0];
+
+            transform.element = filter2;
+
+            transform.LoadInnerXml(node);
+
+            let out = transform.GetOutput();
+
+            assert.equal(new XMLSerializer().serializeToString(out), "<root/>");
+        });
+
+        it("GetOutput without signature", () => {
+            let transform = new xmldsig.XmlDsigXPathFilter2Transform();
+            let node = xmldsig.Parse(`<root></root>`).documentElement;
+
+            transform.LoadInnerXml(node);
+
+            let out = transform.GetOutput();
+
+            assert.equal(new XMLSerializer().serializeToString(out), "<root/>");
+        });
+    })
 });
+
+const xml =
+`<root><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="Signature1">
+    <ds:SignedInfo>
+        <ds:Reference Id="reference-document" URI="">
+            <ds:Transforms>
+                <ds:Transform Algorithm="http://www.w3.org/2002/06/xmldsig-filter2">
+                    <XPath xmlns="http://www.w3.org/2002/06/xmldsig-filter2" Filter="subtract">/descendant::ds:Signature</XPath>
+                </ds:Transform>
+            </ds:Transforms>
+        </ds:Reference>
+    </ds:SignedInfo>
+</ds:Signature></root>`

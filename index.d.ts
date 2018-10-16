@@ -602,10 +602,10 @@ declare namespace XmlDSigJs {
     /**
      * Represents the XML-Signature XPath Filter 2.0 transform for an XML digital signature as defined by the W3C.
      */
-    export class XmlXPathFilter2SignatureTransform extends Transform {
+    export class XmlDsigXPathFilter2Transform extends Transform {
         public Algorithm: string;
         /**
-         * Returns the output of the current XmlXPathFilter2SignatureTransform object.
+         * Returns the output of the current XmlDsigXPathFilter2Transform object.
          * @returns string
          */
         public GetOutput(): any;
@@ -829,7 +829,7 @@ declare namespace XmlDSigJs {
             XmlDsigC14NTransform: string;
             XmlDsigC14NWithCommentsTransform: string;
             XmlDsigEnvelopedSignatureTransform: string;
-            XmlXPathFilter2SignatureTransform: string;
+            XmlDsigXPathFilter2Transform: string;
             XmlDsigXPathTransform: string;
             XmlDsigXsltTransform: string;
             XmlDsigExcC14NTransform: string;

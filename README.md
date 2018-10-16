@@ -43,7 +43,7 @@ There is `lib` folder with ES2015 JS file which you can use with the `rollup` bu
 - XmlDsigExcC14NWithCommentsTransform
 - XmlDsigEnvelopedSignatureTransform
 - XmlDsigBase64Transform
-- XmlXPathFilter2SignatureTransform
+- XmlDsigXPathFilter2Transform
 
 
 ### PLATFORM SUPPORT

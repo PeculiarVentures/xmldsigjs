@@ -68,7 +68,7 @@ export const XmlSignature = {
         XmlDsigC14NTransform: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
         XmlDsigC14NWithCommentsTransform: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments",
         XmlDsigEnvelopedSignatureTransform: "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
-        XmlXPathFilter2SignatureTransform: "http://www.w3.org/2002/06/xmldsig-filter2",
+        XmlDsigXPathFilter2Transform: "http://www.w3.org/2002/06/xmldsig-filter2",
         XmlDsigXPathTransform: "http://www.w3.org/TR/1999/REC-xpath-19991116",
         XmlDsigXsltTransform: "http://www.w3.org/TR/1999/REC-xslt-19991116",
         XmlDsigExcC14NTransform: "http://www.w3.org/2001/10/xml-exc-c14n#",

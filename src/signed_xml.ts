@@ -450,7 +450,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             case "enveloped":
                 return new Transforms.XmlDsigEnvelopedSignatureTransform();
             case "xmldsig-filter2":
-                return new Transforms.XmlXPathFilter2SignatureTransform();
+                return new Transforms.XmlDsigXPathFilter2Transform();
             case "c14n":
                 return new Transforms.XmlDsigC14NTransform();
             case "c14n-com":
@@ -486,8 +486,11 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             transform.LoadInnerXml(input);
             output = transform.GetOutput();
         });
-        // Apply C14N transform if Reference has only one transform EnvelopedSignature
-        if (transforms.Count === 1 && transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+        // Apply C14N transform if Reference has only one transform EnvelopedSignature or XPathFilter2
+        if (transforms.Count === 1 && (
+            transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform ||
+            transforms.Item(0) instanceof Transforms.XmlDsigXPathFilter2Transform
+        )) {
             const c14n = new Transforms.XmlDsigC14NTransform();
             c14n.LoadInnerXml(input);
             output = c14n.GetOutput();

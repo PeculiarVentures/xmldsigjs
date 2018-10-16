@@ -20,8 +20,8 @@ export class Transforms extends XmlSignatureCollection<Transform> {
             switch (item.Algorithm) {
                 case XmlSignature.AlgorithmNamespaces.XmlDsigEnvelopedSignatureTransform:
                     return ChangeTransform(item, transforms.XmlDsigEnvelopedSignatureTransform);
-                case XmlSignature.AlgorithmNamespaces.XmlXPathFilter2SignatureTransform:
-                    return ChangeTransform(item, transforms.XmlXPathFilter2SignatureTransform);
+                case XmlSignature.AlgorithmNamespaces.XmlDsigXPathFilter2Transform:
+                    return ChangeTransform(item, transforms.XmlDsigXPathFilter2Transform);
                 case XmlSignature.AlgorithmNamespaces.XmlDsigC14NTransform:
                     return ChangeTransform(item, transforms.XmlDsigC14NTransform);
                 case XmlSignature.AlgorithmNamespaces.XmlDsigC14NWithCommentsTransform:
