@@ -1,9 +1,8 @@
 {
   "name": "xmldsigjs",
-  "version": "2.0.23",
+  "version": "2.0.24",
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "dist/index.js",
-  "module": "lib/index.js",
   "jsnext:main": "lib/index.js",
   "scripts": {
     "start": "node test/html/server.js",
