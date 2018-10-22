@@ -1,0 +1,34 @@
+{
+  "name": "xmldsigjs",
+  "version": "2.0.25",
+  "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
+  "main": "./index.js",
+  "jsnext:main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeculiarVentures/xadesjs.git"
+  },
+  "keywords": [
+    "xml",
+    "xmldsig",
+    "webcrypto",
+    "signature",
+    "rsa",
+    "ec"
+  ],
+  "author": "Peculiar Ventures, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PeculiarVentures/xadesjs/issues"
+  },
+  "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
+  "dependencies": {
+    "asn1js": "^2.0.21",
+    "pkijs": "~2.1.66",
+    "pvutils": "^1.0.16",
+    "tslib": "^1.9.3",
+    "xml-core": "^1.0.15"
+  },
+  "types": "./index.d.ts",
+  "private": false
+}
