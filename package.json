@@ -1,6 +1,6 @@
 {
   "name": "xmldsigjs",
-  "version": "2.0.25",
+  "version": "2.0.26",
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "dist/index.js",
   "jsnext:main": "lib/index.js",
@@ -10,7 +10,7 @@
     "pretest": "npm run build:map",
     "test": "mocha test/scripts",
     "test:local": "nyc --reporter=lcov npm test",
-    "build": "npm run build:lib && npm run build:web",
+    "build": "npm run build:lib",
     "build:es5": "rollup -c",
     "build:lib": "rollup -c rollup.config.lib.js && babel dist/index.js --out-file dist/index.js",
     "build:map": "rollup -c --dev",
