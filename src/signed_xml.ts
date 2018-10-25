@@ -483,31 +483,33 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected ApplyTransforms(transforms: XmlTransforms, input: Element): any {
         let output: any = null;
 
-        // Sort transforms. Enveloped should be first transform
-        // Unless there is a Filter transform, in which case it takes precedence
-        transforms.Sort((a, b) => {
+        var ordered = new XmlTransforms();
+
+        //Filters first
+        transforms.ForEach(element => {
+            if(element instanceof Transforms.XmlDsigDisplayFilterTransform)
+                ordered.Add(element);            
+        });
+
+        //Then envelopes
+        transforms.ForEach(element => {
+            if(element instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
+                ordered.Add(element);            
+        });
+
+        //Then anything else
+        transforms.ForEach(element => {
             
-            //Filter is always the most imporant
-            if (a instanceof Transforms.XmlDsigDisplayFilterTransform)            {
-                return -1
-            }
+          if((element instanceof Transforms.XmlDsigDisplayFilterTransform) || (element instanceof Transforms.XmlDsigEnvelopedSignatureTransform)){
+            //Ignore, already added element types
+          }else{
+            ordered.Add(element);
+          }        
+        });
 
-            if(b instanceof Transforms.XmlDsigDisplayFilterTransform){
-                return 1;
-            }
+        transforms = ordered;
 
-            //Next comes envelope
-
-            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
-                return -1
-            }
-
-            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
-                return 1
-            }
-
-            return 0;
-        }).ForEach((transform) => {
+        transforms.ForEach((transform) => {
             // Apply transforms
             if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform) {
                 transform = new Transforms.XmlDsigC14NTransform(); // TODO: Check RFC for it
