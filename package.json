@@ -1,6 +1,6 @@
 {
   "name": "xmldsigjs",
-  "version": "2.0.23",
+  "version": "2.0.28",
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "dist/index.js",
   "module": "lib/index.js",
@@ -17,6 +17,7 @@
     "build:map": "rollup -c --dev",
     "build:source": "tsc --declaration --declarationDir types",
     "build:web": "rollup -c rollup.config.web.js && babel dist/xmldsig.js --comment=false --out-file dist/xmldsig.js",
+    "postbuild": "node scripts/pack.js && cd dist/ && npm pack && mv *.tgz ../tarballs",
     "prepub": "npm run build",
     "pub": "npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
