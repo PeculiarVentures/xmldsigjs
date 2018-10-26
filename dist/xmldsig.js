@@ -16264,6 +16264,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var engineCrypto = null;
 	var Application = function () {
 		function Application() {}
+
 		Application.setEngine = function (name, crypto) {
 			engineCrypto = {
 				getRandomValues: crypto.getRandomValues.bind(crypto),
@@ -16287,6 +16288,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		};
 		return Application;
 	}();
+
 	function init() {
 		if (!Application.isNodePlugin()) {
 			Application.setEngine("W3 WebCrypto module", self.crypto);
@@ -16335,6 +16337,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.document = node.ownerDocument;
 				node2 = node;
 			}
+
 			this.WriteNode(node2);
 			var res = this.result.join("");
 			return res;
@@ -16403,9 +16406,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}
 			}
 		};
+
 		XmlCanonicalizer.prototype.WriteTextNode = function (node) {
 			this.result.push(this.NormalizeString(node.nodeValue, node.nodeType));
 		};
+
 		XmlCanonicalizer.prototype.WriteProcessingInstructionNode = function (node) {
 			if (this.state === exports.XmlCanonicalizerState.AfterDocElement) {
 				this.result.push('\n<?');
@@ -16427,20 +16432,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			if (this.state === exports.XmlCanonicalizerState.BeforeDocElement) {
 				this.state = exports.XmlCanonicalizerState.InsideDocElement;
 			}
+
 			this.result.push("<");
 			this.result.push(node.nodeName);
+
 			var visibleNamespacesCount = this.WriteNamespacesAxis(node);
+
 			this.WriteAttributesAxis(node);
 			this.result.push(">");
 			for (var n = node.firstChild; n != null; n = n.nextSibling) {
 				this.WriteNode(n);
 			}
+
 			this.result.push("</");
 			this.result.push(node.nodeName);
 			this.result.push(">");
 			if (this.state === exports.XmlCanonicalizerState.BeforeDocElement) {
 				this.state = exports.XmlCanonicalizerState.AfterDocElement;
 			}
+
 			while (visibleNamespacesCount--) {
 				this.visibleNamespaces.Pop();
 			}
@@ -16466,6 +16476,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					this.visibleNamespaces.Add(ns);
 					visibleNamespacesCount++;
 				}
+
 				var prefix = null;
 				var matches = void 0;
 				if (matches = /xmlns:([\w\.]+)/.exec(attribute.nodeName)) {
@@ -16496,6 +16507,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.visibleNamespaces.Add(ns);
 				visibleNamespacesCount++;
 			}
+
 			list.sort(XmlDsigC14NTransformNamespacesComparer);
 			var prevPrefix = null;
 			list.forEach(function (n) {
@@ -16522,6 +16534,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					list.push(attribute);
 				}
 			}
+
 			list.sort(XmlDsigC14NTransformAttributesComparer);
 			list.forEach(function (attribute) {
 				if (attribute != null) {
@@ -16632,6 +16645,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		if (node.prefix === prefix2) {
 			return ++result;
 		}
+
 		if (node.attributes) {
 			for (var i = 0; i < node.attributes.length; i++) {
 				var attr = node.attributes[i];
@@ -16640,6 +16654,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}
 			}
 		}
+
 		for (var n = node.firstChild; !!n; n = n.nextSibling) {
 			if (n.nodeType === XmlNodeType.Element) {
 				var el = n;
@@ -16836,10 +16851,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		function SignatureAlgorithm() {
 			return _super !== null && _super.apply(this, arguments) || this;
 		}
+
 		SignatureAlgorithm.prototype.Sign = function (signedInfo, signingKey, algorithm) {
 			var info = Convert.FromString(signedInfo, "utf8");
 			return Application.crypto.subtle.sign(algorithm, signingKey, info);
 		};
+
 		SignatureAlgorithm.prototype.Verify = function (signedInfo, key, signatureValue, algorithm) {
 			var info = Convert.FromString(signedInfo, "utf8");
 			return Application.crypto.subtle.verify(algorithm || this.algorithm, key, signatureValue, info);
@@ -17296,6 +17313,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this.innerXml = null;
 			return _this;
 		}
+
 		Transform.prototype.GetOutput = function () {
 			throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
 		};
@@ -17329,6 +17347,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this.Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform;
 			return _this;
 		}
+
 		XmlDsigBase64Transform.prototype.GetOutput = function () {
 			if (!this.innerXml) {
 				throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
@@ -17346,6 +17365,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this.xmlCanonicalizer = new XmlCanonicalizer(false, false);
 			return _this;
 		}
+
 		XmlDsigC14NTransform.prototype.GetOutput = function () {
 			if (!this.innerXml) {
 				throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
@@ -17354,6 +17374,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		};
 		return XmlDsigC14NTransform;
 	}(Transform);
+
 	var XmlDsigC14NWithCommentsTransform = function (_super) {
 		__extends$1(XmlDsigC14NWithCommentsTransform, _super);
 		function XmlDsigC14NWithCommentsTransform() {
@@ -17372,6 +17393,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this.Algorithm = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
 			return _this;
 		}
+
 		XmlDsigEnvelopedSignatureTransform.prototype.GetOutput = function () {
 			if (!this.innerXml) {
 				throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
@@ -17403,6 +17425,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			enumerable: true,
 			configurable: true
 		});
+
 		XmlDsigExcC14NTransform.prototype.GetOutput = function () {
 			if (!this.innerXml) {
 				throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
@@ -17411,6 +17434,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		};
 		return XmlDsigExcC14NTransform;
 	}(Transform);
+
 	var XmlDsigExcC14NWithCommentsTransform = function (_super) {
 		__extends$1(XmlDsigExcC14NWithCommentsTransform, _super);
 		function XmlDsigExcC14NWithCommentsTransform() {
@@ -17454,6 +17478,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this.XPathFilter.Filter = params.Filter;
 			return _this;
 		}
+
 		XmlDsigDisplayFilterTransform.prototype.GetOutput = function () {
 			if (!this.innerXml) {
 				throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
@@ -17477,6 +17502,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}
 		Transforms.prototype.OnLoadXml = function (element) {
 			_super.prototype.OnLoadXml.call(this, element);
+
 			this.items = this.GetIterator().map(function (item) {
 				switch (item.Algorithm) {
 					case XmlSignature.AlgorithmNamespaces.XmlDsigEnvelopedSignatureTransform:
@@ -17739,6 +17765,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		})], DomainParameters);
 		return DomainParameters;
 	}(XmlObject);
+
 	var EcdsaKeyValue = function (_super) {
 		__extends$1(EcdsaKeyValue, _super);
 		function EcdsaKeyValue() {
@@ -17756,6 +17783,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			enumerable: true,
 			configurable: true
 		});
+
 		EcdsaKeyValue.prototype.importKey = function (key) {
 			var _this = this;
 			return new Promise(function (resolve, reject) {
@@ -17780,12 +17808,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}).then(resolve, reject);
 			});
 		};
+
 		EcdsaKeyValue.prototype.exportKey = function (alg) {
 			var _this = this;
 			return Promise.resolve().then(function () {
 				if (_this.key) {
 					return _this.key;
 				}
+
 				var x = Convert.ToBase64Url(_this.PublicKey.X);
 				var y = Convert.ToBase64Url(_this.PublicKey.Y);
 				var crv = GetNamedCurveFromOid(_this.DomainParameters.NamedCurve.Uri);
@@ -17849,6 +17879,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this.keyUsage = [];
 			return _this;
 		}
+
 		RsaKeyValue.prototype.importKey = function (key) {
 			var _this = this;
 			return new Promise(function (resolve, reject) {
@@ -17866,12 +17897,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}).then(resolve, reject);
 			});
 		};
+
 		RsaKeyValue.prototype.exportKey = function (alg) {
 			var _this = this;
 			return new Promise(function (resolve, reject) {
 				if (_this.key) {
 					return resolve(_this.key);
 				}
+
 				if (!_this.Modulus) {
 					throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Modulus");
 				}
@@ -17891,6 +17924,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					default:
 						throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, alg.name);
 				}
+
 				switch (alg.hash.name.toUpperCase()) {
 					case SHA1:
 						algJwk += "S1";
@@ -17915,6 +17949,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				Application.crypto.subtle.importKey("jwk", jwk, alg, true, _this.keyUsage).then(resolve, reject);
 			});
 		};
+
 		RsaKeyValue.prototype.LoadXml = function (node) {
 			_super.prototype.LoadXml.call(this, node);
 			this.keyUsage = ["verify"];
@@ -17938,6 +17973,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		})], RsaKeyValue);
 		return RsaKeyValue;
 	}(KeyInfoClause);
+
 	var NAMESPACE_URI$1 = "http://www.w3.org/2007/05/xmldsig-more#";
 	var PREFIX$1 = "pss";
 	var MaskGenerationFunction = function (_super) {
@@ -22147,7 +22183,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		return LocalFromBER$1(inputBuffer, 0, inputBuffer.byteLength);
 	}
 
-
 	var OID = {
 		"2.5.4.3": {
 			short: "CN",
@@ -22211,6 +22246,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			long: "UnstructuredName"
 		}
 	};
+
 	var X509Certificate = function () {
 		function X509Certificate(rawData) {
 			this.publicKey = null;
@@ -22241,6 +22277,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			enumerable: true,
 			configurable: true
 		});
+
 		X509Certificate.prototype.Thumbprint = function (algName) {
 			if (algName === void 0) {
 				algName = "SHA-1";
@@ -22254,9 +22291,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			enumerable: true,
 			configurable: true
 		});
+
 		X509Certificate.prototype.GetRaw = function () {
 			return this.raw;
 		};
+
 		X509Certificate.prototype.exportKey = function (algorithm) {
 			var _this = this;
 			return Promise.resolve().then(function () {
@@ -22286,6 +22325,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				});
 			});
 		};
+
 		X509Certificate.prototype.NameToString = function (name, splitter) {
 			if (splitter === void 0) {
 				splitter = ",";
@@ -22299,6 +22339,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			});
 			return res.join(splitter + " ");
 		};
+
 		X509Certificate.prototype.LoadRaw = function (rawData) {
 			this.raw = new Uint8Array(rawData);
 			var asn1 = fromBER$1(this.raw.buffer);
@@ -22333,6 +22374,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		X509IncludeOption[X509IncludeOption["ExcludeRoot"] = 2] = "ExcludeRoot";
 		X509IncludeOption[X509IncludeOption["WholeChain"] = 3] = "WholeChain";
 	})(exports.X509IncludeOption || (exports.X509IncludeOption = {}));
+
 	var KeyInfoX509Data = function (_super) {
 		__extends$1(KeyInfoX509Data, _super);
 		function KeyInfoX509Data(cert, includeOptions) {
@@ -22373,6 +22415,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		KeyInfoX509Data.prototype.importKey = function (key) {
 			return Promise.reject(new XmlError(XE.METHOD_NOT_SUPPORTED));
 		};
+
 		KeyInfoX509Data.prototype.exportKey = function (alg) {
 			var _this = this;
 			return Promise.resolve().then(function () {
@@ -22423,6 +22466,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			enumerable: true,
 			configurable: true
 		});
+
 		KeyInfoX509Data.prototype.AddCertificate = function (certificate) {
 			if (!certificate) {
 				throw new XmlError(XE.PARAM_REQUIRED, "certificate");
@@ -22432,6 +22476,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 			this.X509CertificateList.push(certificate);
 		};
+
 		KeyInfoX509Data.prototype.AddIssuerSerial = function (issuerName, serialNumber) {
 			if (issuerName == null) {
 				throw new XmlError(XE.PARAM_REQUIRED, "issuerName");
@@ -22442,6 +22487,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			var xis = { issuerName: issuerName, serialNumber: serialNumber };
 			this.IssuerSerialList.push(xis);
 		};
+
 		KeyInfoX509Data.prototype.AddSubjectKeyId = function (subjectKeyId) {
 			if (this.SubjectKeyIdList) {
 				this.SubjectKeyIdList = [];
@@ -22456,16 +22502,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.SubjectKeyIdList.push(subjectKeyId);
 			}
 		};
+
 		KeyInfoX509Data.prototype.AddSubjectName = function (subjectName) {
 			if (this.SubjectNameList == null) {
 				this.SubjectNameList = [];
 			}
 			this.SubjectNameList.push(subjectName);
 		};
+
 		KeyInfoX509Data.prototype.GetXml = function () {
 			var doc = this.CreateDocument();
 			var xel = this.CreateElement(doc);
 			var prefix = this.GetPrefix();
+
 			if (this.IssuerSerialList != null && this.IssuerSerialList.length > 0) {
 				this.IssuerSerialList.forEach(function (iser) {
 					var isl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerSerial);
@@ -22478,6 +22527,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					xel.appendChild(isl);
 				});
 			}
+
 			if (this.SubjectKeyIdList != null && this.SubjectKeyIdList.length > 0) {
 				this.SubjectKeyIdList.forEach(function (skid) {
 					var ski = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SKI);
@@ -22485,6 +22535,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					xel.appendChild(ski);
 				});
 			}
+
 			if (this.SubjectNameList != null && this.SubjectNameList.length > 0) {
 				this.SubjectNameList.forEach(function (subject) {
 					var sn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SubjectName);
@@ -22492,6 +22543,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					xel.appendChild(sn);
 				});
 			}
+
 			if (this.X509CertificateList != null && this.X509CertificateList.length > 0) {
 				this.X509CertificateList.forEach(function (x509) {
 					var cert = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509Certificate);
@@ -22499,6 +22551,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					xel.appendChild(cert);
 				});
 			}
+
 			if (this.x509crl != null) {
 				var crl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509CRL);
 				crl.textContent = Convert.ToBase64(this.x509crl);
@@ -22506,6 +22559,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 			return xel;
 		};
+
 		KeyInfoX509Data.prototype.LoadXml = function (element) {
 			var _this = this;
 			_super.prototype.LoadXml.call(this, element);
@@ -22522,6 +22576,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.X509CertificateList = [];
 			}
 			this.x509crl = null;
+
 			var xnl = this.GetChildren(XmlSignature.ElementNames.X509IssuerSerial);
 			if (xnl) {
 				xnl.forEach(function (xel) {
@@ -22532,6 +22587,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}
 				});
 			}
+
 			xnl = this.GetChildren(XmlSignature.ElementNames.X509SKI);
 			if (xnl) {
 				xnl.forEach(function (xel) {
@@ -22541,6 +22597,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}
 				});
 			}
+
 			xnl = this.GetChildren(XmlSignature.ElementNames.X509SubjectName);
 			if (xnl != null) {
 				xnl.forEach(function (xel) {
@@ -22549,6 +22606,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}
 				});
 			}
+
 			xnl = this.GetChildren(XmlSignature.ElementNames.X509Certificate);
 			if (xnl) {
 				xnl.forEach(function (xel) {
@@ -22558,11 +22616,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}
 				});
 			}
+
 			var x509el = this.GetChild(XmlSignature.ElementNames.X509CRL, false);
 			if (x509el && x509el.textContent) {
 				this.x509crl = Convert.FromBase64(x509el.textContent);
 			}
 		};
+
 		KeyInfoX509Data.prototype.AddCertificatesChainFrom = function (cert, root) {
 			throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
 		};
@@ -22629,6 +22689,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	HashAlgorithms[SHA512_NAMESPACE] = Sha512;
 	var CryptoConfig = function () {
 		function CryptoConfig() {}
+
 		CryptoConfig.CreateFromName = function (name) {
 			var transform;
 			switch (name) {
@@ -22646,8 +22707,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					break;
 				case XmlSignature.AlgorithmNamespaces.XmlDsigXPathTransform:
 					throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, name);
+
 				case XmlSignature.AlgorithmNamespaces.XmlDsigXsltTransform:
 					throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, name);
+
 				case XmlSignature.AlgorithmNamespaces.XmlDsigExcC14NTransform:
 					transform = new XmlDsigExcC14NTransform();
 					break;
@@ -22656,6 +22719,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					break;
 				case XmlSignature.AlgorithmNamespaces.XmlDecryptionTransform:
 					throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, name);
+
 				default:
 					throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, name);
 			}
@@ -22808,6 +22872,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	var SignedXml = function () {
 		function SignedXml(node) {
 			this.signature = new Signature$1();
+
 			if (node && node.nodeType === XmlNodeType.Document) {
 				this.document = node;
 			} else if (node && node.nodeType === XmlNodeType.Element) {
@@ -22908,6 +22973,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		SignedXml.prototype.GetXml = function () {
 			return this.signature.GetXml();
 		};
+
 		SignedXml.prototype.LoadXml = function (value) {
 			this.signature = Signature$1.LoadXml(value);
 		};
@@ -22930,6 +22996,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 			return this.XmlSignature.toString();
 		};
+
 		SignedXml.prototype.GetPublicKeys = function () {
 			var _this = this;
 			var keys = [];
@@ -22955,6 +23022,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				return keys;
 			});
 		};
+
 		SignedXml.prototype.GetSignatureNamespaces = function () {
 			var namespaces = {};
 			if (this.XmlSignature.NamespaceURI) {
@@ -22962,9 +23030,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 			return namespaces;
 		};
+
 		SignedXml.prototype.CopyNamespaces = function (src, dst, ignoreDefault) {
 			this.InjectNamespaces(SelectRootNamespaces(src), dst, ignoreDefault);
 		};
+
 		SignedXml.prototype.InjectNamespaces = function (namespaces, target, ignoreDefault) {
 			for (var i in namespaces) {
 				var uri = namespaces[i];
@@ -23005,7 +23075,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 								found = findById(xmlSignatureObject, objectName);
 								if (found) {
 									var el = found.cloneNode(true);
+
 									_this.CopyNamespaces(doc, el, false);
+
 									if (_this.Parent) {
 										var parent = _this.Parent instanceof XmlObject ? _this.Parent.GetXml() : _this.Parent;
 										_this.CopyNamespaces(parent, el, true);
@@ -23071,6 +23143,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				throw new XmlError(XE.XML_EXCEPTION, "Cannot get Xml element from SignedInfo");
 			}
 			var node = xml.cloneNode(true);
+
 			this.CopyNamespaces(xml, node, false);
 			if (data) {
 				if (data.nodeType === XmlNodeType.Document) {
@@ -23085,6 +23158,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					this.CopyNamespaces(parentXml, node, false);
 				}
 			}
+
 			var childNamespaces = SelectNamespaces(xml);
 			for (var i in childNamespaces) {
 				var uri = childNamespaces[i];
@@ -23155,6 +23229,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				transform.LoadInnerXml(input);
 				output = transform.GetOutput();
 			});
+
 			if (ordered.Count === 1 && ordered.Item(0) instanceof XmlDsigEnvelopedSignatureTransform) {
 				var c14n = new XmlDsigC14NTransform();
 				c14n.LoadInnerXml(input);
@@ -23171,6 +23246,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (options.id) {
 					_this.XmlSignature.Id = options.id;
 				}
+
 				if (options.keyValue && key.algorithm.name.toUpperCase() !== HMAC) {
 					if (!signature.KeyInfo) {
 						signature.KeyInfo = new KeyInfo();
@@ -23199,17 +23275,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (options.references) {
 					options.references.forEach(function (item) {
 						var reference = new Reference();
+
 						if (item.id) {
 							reference.Id = item.id;
 						}
+
 						if (item.uri !== null && item.uri !== undefined) {
 							reference.Uri = item.uri;
 						}
+
 						if (item.type) {
 							reference.Type = item.type;
 						}
+
 						var digestAlgorithm = CryptoConfig.GetHashAlgorithm(item.hash);
 						reference.DigestMethod.Algorithm = digestAlgorithm.namespaceURI;
+
 						if (item.transforms && item.transforms.length) {
 							var transforms_1 = new Transforms();
 							item.transforms.forEach(function (transform) {
@@ -23227,6 +23308,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						signature.SignedInfo.References.Add(reference);
 					});
 				}
+
 				if (!signature.SignedInfo.References.Count) {
 					var reference = new Reference();
 					signature.SignedInfo.References.Add(reference);
@@ -23259,6 +23341,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			return Promise.resolve().then(function () {
 				signedInfoCanon = _this.TransformSignedInfo(_this.document);
 				signer = CryptoConfig.CreateSignatureAlgorithm(_this.XmlSignature.SignedInfo.SignatureMethod);
+
 				var chain = Promise.resolve(false);
 				keys.forEach(function (key) {
 					chain = chain.then(function (v) {
@@ -23290,11 +23373,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}
 		return null;
 	}
+
 	function addNamespace(selectedNodes, name, namespace) {
 		if (!(name in selectedNodes)) {
 			selectedNodes[name] = namespace;
 		}
 	}
+
 	function _SelectRootNamespaces(node, selectedNodes) {
 		if (selectedNodes === void 0) {
 			selectedNodes = {};
@@ -23304,12 +23389,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			if (el.namespaceURI && el.namespaceURI !== "http://www.w3.org/XML/1998/namespace") {
 				addNamespace(selectedNodes, el.prefix ? el.prefix : "", node.namespaceURI);
 			}
+
 			for (var i = 0; i < el.attributes.length; i++) {
 				var attr = el.attributes.item(i);
 				if (attr && attr.prefix === "xmlns") {
 					addNamespace(selectedNodes, attr.localName ? attr.localName : "", attr.value);
 				}
 			}
+
 			if (node.parentNode) {
 				_SelectRootNamespaces(node.parentNode, selectedNodes);
 			}
