@@ -2,7 +2,6 @@
     "comments": false,
     "compact": false,
     "presets": [
-        ["es2015", {"modules": false}],
-        ["minify"] // this does not work for build:web
+        ["es2015", {"modules": false}]
     ]
 }
