@@ -9,7 +9,7 @@ import { KeyInfoX509Data, KeyValue } from "./xml/key_infos";
 import * as KeyInfos from "./xml/key_infos";
 import * as Transforms from "./xml/transforms";
 
-export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64"
+export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
 
 export interface OptionsSignReference {
     /**
@@ -445,15 +445,15 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         return res;
     }
 
-    protected ResolveFilterTransform(transform: string){
-        
-        var split = transform.split(" ");
+    protected ResolveFilterTransform(transform: string) {
+        const split = transform.split(" ");
 
-        if(split.length!=3)
+        if (split.length !== 3) {
             throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_TRANSFORM_FILTER, transform);
+        }
 
-        var filterMethod = split[1].trim();
-        var xPath = split[2].trim();
+        const filterMethod = split[1].trim();
+        const xPath = split[2].trim();
 
         return new Transforms.XmlDsigDisplayFilterTransform({
             Filter: filterMethod,
@@ -483,33 +483,19 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected ApplyTransforms(transforms: XmlTransforms, input: Element): any {
         let output: any = null;
 
-        var ordered = new XmlTransforms();
+        const ordered = new XmlTransforms();
+        transforms.Filter((element) => element instanceof Transforms.XmlDsigDisplayFilterTransform) //
+            .ForEach((element) => ordered.Add(element));
 
-        //Filters first
-        transforms.ForEach(element => {
-            if(element instanceof Transforms.XmlDsigDisplayFilterTransform)
-                ordered.Add(element);            
-        });
+        transforms.Filter((element) => element instanceof Transforms.XmlDsigEnvelopedSignatureTransform) //
+            .ForEach((element) => ordered.Add(element));
 
-        //Then envelopes
-        transforms.ForEach(element => {
-            if(element instanceof Transforms.XmlDsigEnvelopedSignatureTransform)
-                ordered.Add(element);            
-        });
+        transforms.Filter((element) => {
+            return !(element instanceof Transforms.XmlDsigEnvelopedSignatureTransform || //
+                element instanceof Transforms.XmlDsigEnvelopedSignatureTransform);
+        }).ForEach((element) => ordered.Add(element));
 
-        //Then anything else
-        transforms.ForEach(element => {
-            
-          if((element instanceof Transforms.XmlDsigDisplayFilterTransform) || (element instanceof Transforms.XmlDsigEnvelopedSignatureTransform)){
-            //Ignore, already added element types
-          }else{
-            ordered.Add(element);
-          }        
-        });
-
-        transforms = ordered;
-
-        transforms.ForEach((transform) => {
+        ordered.ForEach((transform) => {
             // Apply transforms
             if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform) {
                 transform = new Transforms.XmlDsigC14NTransform(); // TODO: Check RFC for it
@@ -520,8 +506,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             transform.LoadInnerXml(input);
             output = transform.GetOutput();
         });
+
         // Apply C14N transform if Reference has only one transform EnvelopedSignature
-        if (transforms.Count === 1 && transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+        if (ordered.Count === 1 && ordered.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
             const c14n = new Transforms.XmlDsigC14NTransform();
             c14n.LoadInnerXml(input);
             output = c14n.GetOutput();
@@ -591,9 +578,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             const transforms = new XmlTransforms();
                             item.transforms.forEach((transform) => {
 
-                                if(transform.startsWith("filter")){
+                                if (transform.startsWith("filter")) {
                                     transforms.Add(this.ResolveFilterTransform(transform));
-                                }else{
+                                } else {
                                     transforms.Add(this.ResolveTransform(transform));
                                 }
                             });
