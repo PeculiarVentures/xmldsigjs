@@ -10,7 +10,7 @@ export default {
     input: "src/index.ts",
     plugins: [
         typescript({ typescript: require("typescript"), target: "es5" }),
-        nodeResolve({ jsnext: true, main: true })
+        nodeResolve({ jsnext: true, main: true }),
     ],
     output: [
         {
