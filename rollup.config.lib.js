@@ -9,7 +9,7 @@ let sourceMap = process.argv.some(item => item.toLowerCase() === "--dev");
 export default {
     input: "src/index.ts",
     plugins: [
-        typescript({ typescript: require("typescript") }),
+        typescript({ typescript: require("typescript")})
     ],
     external: external,
     output: [

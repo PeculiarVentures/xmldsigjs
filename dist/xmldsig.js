@@ -23099,7 +23099,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		};
 		SignedXml.prototype.ResolveFilterTransform = function (transform) {
 			var split = transform.split(" ");
-			if (split.length != 3) throw new XmlError(XE.CRYPTOGRAPHIC_TRANSFORM_FILTER, transform);
+			if (split.length !== 3) {
+				throw new XmlError(XE.CRYPTOGRAPHIC_TRANSFORM_FILTER, transform);
+			}
 			var filterMethod = split[1].trim();
 			var xPath = split[2].trim();
 			return new XmlDsigDisplayFilterTransform({
@@ -23128,19 +23130,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		SignedXml.prototype.ApplyTransforms = function (transforms, input) {
 			var output = null;
 			var ordered = new Transforms();
-			transforms.ForEach(function (element) {
-				if (element instanceof XmlDsigDisplayFilterTransform) ordered.Add(element);
+			transforms.Filter(function (element) {
+				return element instanceof XmlDsigDisplayFilterTransform;
+			}).ForEach(function (element) {
+				return ordered.Add(element);
 			});
-			transforms.ForEach(function (element) {
-				if (element instanceof XmlDsigEnvelopedSignatureTransform) ordered.Add(element);
+			transforms.Filter(function (element) {
+				return element instanceof XmlDsigEnvelopedSignatureTransform;
+			}).ForEach(function (element) {
+				return ordered.Add(element);
 			});
-			transforms.ForEach(function (element) {
-				if (element instanceof XmlDsigDisplayFilterTransform || element instanceof XmlDsigEnvelopedSignatureTransform) ;else {
-					ordered.Add(element);
-				}
+			transforms.Filter(function (element) {
+				return !(element instanceof XmlDsigEnvelopedSignatureTransform || element instanceof XmlDsigEnvelopedSignatureTransform);
+			}).ForEach(function (element) {
+				return ordered.Add(element);
 			});
-			transforms = ordered;
-			transforms.ForEach(function (transform) {
+			ordered.ForEach(function (transform) {
 				if (transform instanceof XmlDsigC14NWithCommentsTransform) {
 					transform = new XmlDsigC14NTransform();
 				}
@@ -23150,7 +23155,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				transform.LoadInnerXml(input);
 				output = transform.GetOutput();
 			});
-			if (transforms.Count === 1 && transforms.Item(0) instanceof XmlDsigEnvelopedSignatureTransform) {
+			if (ordered.Count === 1 && ordered.Item(0) instanceof XmlDsigEnvelopedSignatureTransform) {
 				var c14n = new XmlDsigC14NTransform();
 				c14n.LoadInnerXml(input);
 				output = c14n.GetOutput();
