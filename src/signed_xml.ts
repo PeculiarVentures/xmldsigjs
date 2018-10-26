@@ -483,31 +483,19 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected ApplyTransforms(transforms: XmlTransforms, input: Element): any {
         let output: any = null;
 
-        // Sort transforms. Enveloped should be first transform
-        // Unless there is a Filter transform, in which case it takes precedence
-        transforms.Sort((a, b) => {
+        const ordered = new XmlTransforms();
+        transforms.Filter((element) => element instanceof Transforms.XmlDsigDisplayFilterTransform) //
+            .ForEach((element) => ordered.Add(element));
 
-            // Filter is always the most imporant
-            if (a instanceof Transforms.XmlDsigDisplayFilterTransform)            {
-                return -1;
-            }
+        transforms.Filter((element) => element instanceof Transforms.XmlDsigEnvelopedSignatureTransform) //
+            .ForEach((element) => ordered.Add(element));
 
-            if (b instanceof Transforms.XmlDsigDisplayFilterTransform) {
-                return 1;
-            }
+        transforms.Filter((element) => {
+            return !(element instanceof Transforms.XmlDsigEnvelopedSignatureTransform || //
+                element instanceof Transforms.XmlDsigEnvelopedSignatureTransform);
+        }).ForEach((element) => ordered.Add(element));
 
-            // Next comes envelope
-
-            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
-                return -1;
-            }
-
-            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
-                return 1;
-            }
-
-            return 0;
-        }).ForEach((transform) => {
+        ordered.ForEach((transform) => {
             // Apply transforms
             if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform) {
                 transform = new Transforms.XmlDsigC14NTransform(); // TODO: Check RFC for it
@@ -518,8 +506,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             transform.LoadInnerXml(input);
             output = transform.GetOutput();
         });
+
         // Apply C14N transform if Reference has only one transform EnvelopedSignature
-        if (transforms.Count === 1 && transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+        if (ordered.Count === 1 && ordered.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
             const c14n = new Transforms.XmlDsigC14NTransform();
             c14n.LoadInnerXml(input);
             output = c14n.GetOutput();
