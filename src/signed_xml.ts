@@ -9,7 +9,7 @@ import { KeyInfoX509Data, KeyValue } from "./xml/key_infos";
 import * as KeyInfos from "./xml/key_infos";
 import * as Transforms from "./xml/transforms";
 
-export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64"
+export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
 
 export interface OptionsSignReference {
     /**
@@ -445,15 +445,15 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         return res;
     }
 
-    protected ResolveFilterTransform(transform: string){
-        
-        var split = transform.split(" ");
+    protected ResolveFilterTransform(transform: string) {
+        const split = transform.split(" ");
 
-        if(split.length!=3)
+        if (split.length !== 3) {
             throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_TRANSFORM_FILTER, transform);
+        }
 
-        var filterMethod = split[1].trim();
-        var xPath = split[2].trim();
+        const filterMethod = split[1].trim();
+        const xPath = split[2].trim();
 
         return new Transforms.XmlDsigDisplayFilterTransform({
             Filter: filterMethod,
@@ -486,24 +486,24 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         // Sort transforms. Enveloped should be first transform
         // Unless there is a Filter transform, in which case it takes precedence
         transforms.Sort((a, b) => {
-            
-            //Filter is always the most imporant
+
+            // Filter is always the most imporant
             if (a instanceof Transforms.XmlDsigDisplayFilterTransform)            {
-                return -1
+                return -1;
             }
 
-            if(b instanceof Transforms.XmlDsigDisplayFilterTransform){
+            if (b instanceof Transforms.XmlDsigDisplayFilterTransform) {
                 return 1;
             }
 
-            //Next comes envelope
+            // Next comes envelope
 
             if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
-                return -1
+                return -1;
             }
 
             if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
-                return 1
+                return 1;
             }
 
             return 0;
@@ -589,9 +589,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             const transforms = new XmlTransforms();
                             item.transforms.forEach((transform) => {
 
-                                if(transform.startsWith("filter")){
+                                if (transform.startsWith("filter")) {
                                     transforms.Add(this.ResolveFilterTransform(transform));
-                                }else{
+                                } else {
                                     transforms.Add(this.ResolveTransform(transform));
                                 }
                             });
