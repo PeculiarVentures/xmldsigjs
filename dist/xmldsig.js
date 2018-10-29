@@ -22990,8 +22990,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (!node) {
 					throw new XmlError(XE.XML_EXCEPTION, "Cannot get Xml element from Signature");
 				}
+				console.log('Node before clone', node.outerHTML);
 				var sig = node.cloneNode(true);
+				console.log('Sig after clone', sig.outerHTML);
 				doc.appendChild(sig);
+				console.log('doc before serializing', doc.outerHTML);
 				return new XMLSerializer().serializeToString(doc);
 			}
 			return this.XmlSignature.toString();
@@ -23203,6 +23206,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		};
 		SignedXml.prototype.ApplyTransforms = function (transforms, input) {
 			var output = null;
+			console.log('before applying reordering:');
+			console.log(transforms.items.map(function (item) {
+				return item._Algorithm;
+			}).join(', '));
 			var ordered = new Transforms();
 			transforms.Filter(function (element) {
 				return element instanceof XmlDsigDisplayFilterTransform;
@@ -23215,7 +23222,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				return ordered.Add(element);
 			});
 			transforms.Filter(function (element) {
-				return !(element instanceof XmlDsigEnvelopedSignatureTransform || element instanceof XmlDsigEnvelopedSignatureTransform);
+				return !(element instanceof XmlDsigEnvelopedSignatureTransform || element instanceof XmlDsigDisplayFilterTransform);
 			}).ForEach(function (element) {
 				return ordered.Add(element);
 			});
@@ -23229,6 +23236,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				transform.LoadInnerXml(input);
 				output = transform.GetOutput();
 			});
+			console.log('after applying reordering:');
+			console.log(ordered.items.map(function (item) {
+				return item._Algorithm;
+			}).join(', '));
 
 			if (ordered.Count === 1 && ordered.Item(0) instanceof XmlDsigEnvelopedSignatureTransform) {
 				var c14n = new XmlDsigC14NTransform();

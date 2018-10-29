@@ -1,3 +1,6 @@
+// tslint:disable:no-console
+// tslint:disable:quotemark
+
 import * as XmlCore from "xml-core";
 import { XmlNodeType } from "xml-core";
 
@@ -217,8 +220,13 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             if (!node) {
                 throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot get Xml element from Signature");
             }
+
+            console.log('Node before clone', node.outerHTML);
             const sig = node.cloneNode(true);
+            console.log('Sig after clone', (sig as Element).outerHTML);
             doc.appendChild(sig);
+
+            console.log('doc before serializing', (doc as Element).outerHTML);
             return new XMLSerializer().serializeToString(doc);
         }
         return this.XmlSignature.toString();
@@ -483,6 +491,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected ApplyTransforms(transforms: XmlTransforms, input: Element): any {
         let output: any = null;
 
+        console.log('before applying reordering:');
+        console.log(transforms.items.map(item => item._Algorithm).join(', '));
+
         const ordered = new XmlTransforms();
         transforms.Filter((element) => element instanceof Transforms.XmlDsigDisplayFilterTransform) //
             .ForEach((element) => ordered.Add(element));
@@ -492,7 +503,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
         transforms.Filter((element) => {
             return !(element instanceof Transforms.XmlDsigEnvelopedSignatureTransform || //
-                element instanceof Transforms.XmlDsigEnvelopedSignatureTransform);
+                element instanceof Transforms.XmlDsigDisplayFilterTransform);
         }).ForEach((element) => ordered.Add(element));
 
         ordered.ForEach((transform) => {
@@ -506,6 +517,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             transform.LoadInnerXml(input);
             output = transform.GetOutput();
         });
+
+        console.log('after applying reordering:');
+        console.log(ordered.items.map(item => item._Algorithm).join(', '));
 
         // Apply C14N transform if Reference has only one transform EnvelopedSignature
         if (ordered.Count === 1 && ordered.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
