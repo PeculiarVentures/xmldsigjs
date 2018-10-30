@@ -2995,11 +2995,11 @@ class SignedXml {
             if (!node) {
                 throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot get Xml element from Signature");
             }
-            console.log('Node before clone', node.outerHTML);
+            // console.log('Node before clone', node.outerHTML);
             const sig = node.cloneNode(true);
-            console.log('Sig after clone', sig.outerHTML);
+            // console.log('Sig after clone', (sig as Element).outerHTML);
             doc.appendChild(sig);
-            console.log('doc before serializing', doc.outerHTML);
+            // console.log('doc before serializing', (doc as Element).outerHTML);
             return new XMLSerializer().serializeToString(doc);
         }
         return this.XmlSignature.toString();
@@ -3239,8 +3239,8 @@ class SignedXml {
     }
     ApplyTransforms(transforms, input) {
         let output = null;
-        console.log('before applying reordering:');
-        console.log(transforms.items.map(item => item._Algorithm).join(', '));
+        // console.log('before applying reordering:');
+        // console.log(transforms.items.map(item => item._Algorithm).join(', '));
         const ordered = new exports.Transforms();
         transforms.Filter((element) => element instanceof XmlDsigDisplayFilterTransform) //
             .ForEach((element) => ordered.Add(element));
@@ -3261,8 +3261,8 @@ class SignedXml {
             transform.LoadInnerXml(input);
             output = transform.GetOutput();
         });
-        console.log('after applying reordering:');
-        console.log(ordered.items.map(item => item._Algorithm).join(', '));
+        // console.log('after applying reordering:');
+        // console.log(ordered.items.map(item => item._Algorithm).join(', '));
         // Apply C14N transform if Reference has only one transform EnvelopedSignature
         if (ordered.Count === 1 && ordered.Item(0) instanceof XmlDsigEnvelopedSignatureTransform) {
             const c14n = new XmlDsigC14NTransform();
