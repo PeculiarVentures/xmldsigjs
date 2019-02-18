@@ -7,35 +7,42 @@ var XmlCore = require('xml-core');
 var tslib_1 = require('tslib');
 var Asn1Js = require('asn1js');
 
-let engineCrypto = null;
-class Application {
+var engineCrypto = null;
+var Application = /** @class */ (function () {
+    function Application() {
+    }
     /**
      * Sets crypto engine for the current Application
      * @param  {string} name
      * @param  {Crypto} crypto
      * @returns void
      */
-    static setEngine(name, crypto) {
+    Application.setEngine = function (name, crypto) {
         engineCrypto = {
             getRandomValues: crypto.getRandomValues.bind(crypto),
             subtle: crypto.subtle,
-            name,
+            name: name,
         };
-        pkijs.setEngine(name, new pkijs.CryptoEngine({ name, crypto, subtle: crypto.subtle }), new pkijs.CryptoEngine({ name, crypto, subtle: crypto.subtle }));
-    }
-    /**
-     * Gets the crypto module from the Application
-     */
-    static get crypto() {
-        if (!engineCrypto) {
-            throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_NO_MODULE);
-        }
-        return engineCrypto;
-    }
-    static isNodePlugin() {
+        pkijs.setEngine(name, new pkijs.CryptoEngine({ name: name, crypto: crypto, subtle: crypto.subtle }), new pkijs.CryptoEngine({ name: name, crypto: crypto, subtle: crypto.subtle }));
+    };
+    Object.defineProperty(Application, "crypto", {
+        /**
+         * Gets the crypto module from the Application
+         */
+        get: function () {
+            if (!engineCrypto) {
+                throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_NO_MODULE);
+            }
+            return engineCrypto;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Application.isNodePlugin = function () {
         return (typeof self === "undefined" && typeof window === "undefined");
-    }
-}
+    };
+    return Application;
+}());
 // set default w3 WebCrypto
 function init() {
     if (!Application.isNodePlugin()) {
@@ -49,8 +56,9 @@ init();
     XmlCanonicalizerState[XmlCanonicalizerState["InsideDocElement"] = 1] = "InsideDocElement";
     XmlCanonicalizerState[XmlCanonicalizerState["AfterDocElement"] = 2] = "AfterDocElement";
 })(exports.XmlCanonicalizerState || (exports.XmlCanonicalizerState = {}));
-class XmlCanonicalizer {
-    constructor(withComments, excC14N, propagatedNamespaces = new XmlCore.NamespaceManager()) {
+var XmlCanonicalizer = /** @class */ (function () {
+    function XmlCanonicalizer(withComments, excC14N, propagatedNamespaces) {
+        if (propagatedNamespaces === void 0) { propagatedNamespaces = new XmlCore.NamespaceManager(); }
         this.propagatedNamespaces = new XmlCore.NamespaceManager();
         this.result = [];
         this.visibleNamespaces = new XmlCore.NamespaceManager();
@@ -60,18 +68,22 @@ class XmlCanonicalizer {
         this.exclusive = excC14N;
         this.propagatedNamespaces = propagatedNamespaces;
     }
-    // See xml-enc-c14n specification
-    get InclusiveNamespacesPrefixList() {
-        return this.inclusiveNamespacesPrefixList.join(" ");
-    }
-    set InclusiveNamespacesPrefixList(value) {
-        this.inclusiveNamespacesPrefixList = value.split(" ");
-    }
-    Canonicalize(node) {
+    Object.defineProperty(XmlCanonicalizer.prototype, "InclusiveNamespacesPrefixList", {
+        // See xml-enc-c14n specification
+        get: function () {
+            return this.inclusiveNamespacesPrefixList.join(" ");
+        },
+        set: function (value) {
+            this.inclusiveNamespacesPrefixList = value.split(" ");
+        },
+        enumerable: true,
+        configurable: true
+    });
+    XmlCanonicalizer.prototype.Canonicalize = function (node) {
         if (!node) {
             throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Parameter 1 is not Node");
         }
-        let node2;
+        var node2;
         if (node.nodeType === XmlCore.XmlNodeType.Document) {
             this.document = node;
             node2 = this.document.documentElement;
@@ -83,10 +95,10 @@ class XmlCanonicalizer {
         // get nss from document
         // this.nsManager = new XmlNamespaceManager(this.document);
         this.WriteNode(node2);
-        const res = this.result.join("");
+        var res = this.result.join("");
         return res;
-    }
-    WriteNode(node) {
+    };
+    XmlCanonicalizer.prototype.WriteNode = function (node) {
         switch (node.nodeType) {
             case XmlCore.XmlNodeType.Document:
             case XmlCore.XmlNodeType.DocumentFragment:
@@ -114,7 +126,7 @@ class XmlCanonicalizer {
                 break;
             case XmlCore.XmlNodeType.EntityReference:
                 // tslint:disable-next-line:prefer-for-of
-                for (let i = 0; i < node.childNodes.length; i++) {
+                for (var i = 0; i < node.childNodes.length; i++) {
                     this.WriteNode(node.childNodes[i]);
                 }
                 break;
@@ -131,14 +143,14 @@ class XmlCanonicalizer {
                 // just do nothing
                 break;
         }
-    }
-    WriteDocumentNode(node) {
+    };
+    XmlCanonicalizer.prototype.WriteDocumentNode = function (node) {
         this.state = exports.XmlCanonicalizerState.BeforeDocElement;
-        for (let child = node.firstChild; child != null; child = child.nextSibling) {
+        for (var child = node.firstChild; child != null; child = child.nextSibling) {
             this.WriteNode(child);
         }
-    }
-    WriteCommentNode(node) {
+    };
+    XmlCanonicalizer.prototype.WriteCommentNode = function (node) {
         // console.log(`WriteCommentNode: ${node.nodeName}`);
         // Console.WriteLine ("Debug: comment node");
         if (this.withComments) {
@@ -156,16 +168,16 @@ class XmlCanonicalizer {
                 this.result.push("-->");
             }
         }
-    }
+    };
     // Text Nodes
     // the string value, except all ampersands are replaced
     // by &amp;, all open angle brackets (<) are replaced by &lt;, all closing
     // angle brackets (>) are replaced by &gt;, and all #xD characters are
     // replaced by &#xD;.
-    WriteTextNode(node) {
+    XmlCanonicalizer.prototype.WriteTextNode = function (node) {
         // console.log(`WriteTextNode: ${node.nodeName}`);
         this.result.push(this.NormalizeString(node.nodeValue, node.nodeType));
-    }
+    };
     // Processing Instruction (PI) Nodes-
     // The opening PI symbol (<?), the PI target name of the node,
     // a leading space and the string value if it is not empty, and
@@ -176,7 +188,7 @@ class XmlCanonicalizer {
     // element, and a leading #xA is rendered before the opening PI
     // symbol of PI children of the root node with a greater document
     // order than the document element.
-    WriteProcessingInstructionNode(node) {
+    XmlCanonicalizer.prototype.WriteProcessingInstructionNode = function (node) {
         // console.log(`WriteProcessingInstructionNode: ${node.nodeName}`);
         if (this.state === exports.XmlCanonicalizerState.AfterDocElement) {
             this.result.push("\u000A<?");
@@ -195,8 +207,8 @@ class XmlCanonicalizer {
         else {
             this.result.push("?>");
         }
-    }
-    WriteElementNode(node) {
+    };
+    XmlCanonicalizer.prototype.WriteElementNode = function (node) {
         // console.log(`WriteElementNode: ${node.nodeName}`);
         if (this.state === exports.XmlCanonicalizerState.BeforeDocElement) {
             this.state = exports.XmlCanonicalizerState.InsideDocElement;
@@ -205,11 +217,11 @@ class XmlCanonicalizer {
         this.result.push("<");
         this.result.push(node.nodeName);
         // namespaces
-        let visibleNamespacesCount = this.WriteNamespacesAxis(node);
+        var visibleNamespacesCount = this.WriteNamespacesAxis(node);
         // attributes
         this.WriteAttributesAxis(node);
         this.result.push(">");
-        for (let n = node.firstChild; n != null; n = n.nextSibling) {
+        for (var n = node.firstChild; n != null; n = n.nextSibling) {
             // if (!(n.nodeType === XmlCore.XmlNodeType.Text && node.childNodes.length > 1))
             this.WriteNode(n);
         }
@@ -224,16 +236,17 @@ class XmlCanonicalizer {
         while (visibleNamespacesCount--) {
             this.visibleNamespaces.Pop();
         }
-    }
-    WriteNamespacesAxis(node) {
-        const list = [];
-        let visibleNamespacesCount = 0;
-        for (let i = 0; i < node.attributes.length; i++) {
-            const attribute = node.attributes[i];
+    };
+    XmlCanonicalizer.prototype.WriteNamespacesAxis = function (node) {
+        var _this = this;
+        var list = [];
+        var visibleNamespacesCount = 0;
+        for (var i = 0; i < node.attributes.length; i++) {
+            var attribute = node.attributes[i];
             if (!IsNamespaceNode(attribute)) {
                 // render namespace for attribute, if needed
                 if (attribute.prefix && !this.IsNamespaceRendered(attribute.prefix, attribute.namespaceURI)) {
-                    const ns = { prefix: attribute.prefix, namespace: attribute.namespaceURI };
+                    var ns = { prefix: attribute.prefix, namespace: attribute.namespaceURI };
                     list.push(ns);
                     this.visibleNamespaces.Add(ns);
                     visibleNamespacesCount++;
@@ -241,7 +254,7 @@ class XmlCanonicalizer {
                 continue;
             }
             if (attribute.localName === "xmlns" && !attribute.prefix && !attribute.nodeValue) {
-                const ns = { prefix: attribute.prefix, namespace: attribute.nodeValue };
+                var ns = { prefix: attribute.prefix, namespace: attribute.nodeValue };
                 list.push(ns);
                 this.visibleNamespaces.Add(ns);
                 visibleNamespacesCount++;
@@ -249,14 +262,14 @@ class XmlCanonicalizer {
             // if (attribute.localName === "xmlns")
             //     continue;
             // get namespace prefix
-            let prefix = null;
-            let matches;
+            var prefix = null;
+            var matches = void 0;
             if (matches = /xmlns:([\w\.]+)/.exec(attribute.nodeName)) {
                 prefix = matches[1];
             }
-            let printable = true;
+            var printable = true;
             if (this.exclusive && !this.IsNamespaceInclusive(node, prefix)) {
-                const used = IsNamespaceUsed(node, prefix);
+                var used = IsNamespaceUsed(node, prefix);
                 if (used > 1) {
                     printable = false;
                 }
@@ -268,62 +281,63 @@ class XmlCanonicalizer {
                 continue;
             }
             if (printable) {
-                const ns = { prefix, namespace: attribute.nodeValue };
+                var ns = { prefix: prefix, namespace: attribute.nodeValue };
                 list.push(ns);
                 this.visibleNamespaces.Add(ns);
                 visibleNamespacesCount++;
             }
         }
         if (!this.IsNamespaceRendered(node.prefix, node.namespaceURI) && node.namespaceURI !== "http://www.w3.org/2000/xmlns/") {
-            const ns = { prefix: node.prefix, namespace: node.namespaceURI };
+            var ns = { prefix: node.prefix, namespace: node.namespaceURI };
             list.push(ns);
             this.visibleNamespaces.Add(ns);
             visibleNamespacesCount++;
         }
         // sort nss
         list.sort(XmlDsigC14NTransformNamespacesComparer);
-        let prevPrefix = null;
-        list.forEach((n) => {
+        var prevPrefix = null;
+        list.forEach(function (n) {
             if (n.prefix === prevPrefix) {
                 return;
             }
             prevPrefix = n.prefix;
-            this.result.push(" xmlns");
+            _this.result.push(" xmlns");
             if (n.prefix) {
-                this.result.push(":" + n.prefix);
+                _this.result.push(":" + n.prefix);
             }
-            this.result.push("=\"");
-            this.result.push(n.namespace); // TODO namespace can be null
-            this.result.push("\"");
+            _this.result.push("=\"");
+            _this.result.push(n.namespace); // TODO namespace can be null
+            _this.result.push("\"");
         });
         return visibleNamespacesCount;
-    }
-    WriteAttributesAxis(node) {
+    };
+    XmlCanonicalizer.prototype.WriteAttributesAxis = function (node) {
         // Console.WriteLine ("Debug: attributes");
-        const list = [];
-        for (let i = 0; i < node.attributes.length; i++) {
-            const attribute = node.attributes[i];
+        var _this = this;
+        var list = [];
+        for (var i = 0; i < node.attributes.length; i++) {
+            var attribute = node.attributes[i];
             if (!IsNamespaceNode(attribute)) {
                 list.push(attribute);
             }
         }
         // sort namespaces and write results
         list.sort(XmlDsigC14NTransformAttributesComparer);
-        list.forEach((attribute) => {
+        list.forEach(function (attribute) {
             if (attribute != null) {
-                this.result.push(" ");
-                this.result.push(attribute.nodeName);
-                this.result.push("=\"");
-                this.result.push(this.NormalizeString(attribute.nodeValue, XmlCore.XmlNodeType.Attribute));
-                this.result.push("\"");
+                _this.result.push(" ");
+                _this.result.push(attribute.nodeName);
+                _this.result.push("=\"");
+                _this.result.push(_this.NormalizeString(attribute.nodeValue, XmlCore.XmlNodeType.Attribute));
+                _this.result.push("\"");
             }
         });
-    }
-    NormalizeString(input, type) {
-        const sb = [];
+    };
+    XmlCanonicalizer.prototype.NormalizeString = function (input, type) {
+        var sb = [];
         if (input) {
-            for (let i = 0; i < input.length; i++) {
-                const ch = input[i];
+            for (var i = 0; i < input.length; i++) {
+                var ch = input[i];
                 if (ch === "<" && (type === XmlCore.XmlNodeType.Attribute || this.IsTextNode(type))) {
                     sb.push("&lt;");
                 }
@@ -351,8 +365,8 @@ class XmlCanonicalizer {
             }
         }
         return sb.join("");
-    }
-    IsTextNode(type) {
+    };
+    XmlCanonicalizer.prototype.IsTextNode = function (type) {
         switch (type) {
             case XmlCore.XmlNodeType.Text:
             case XmlCore.XmlNodeType.CDATA:
@@ -361,15 +375,15 @@ class XmlCanonicalizer {
                 return true;
         }
         return false;
-    }
-    IsNamespaceInclusive(node, prefix) {
-        const prefix2 = prefix || null;
+    };
+    XmlCanonicalizer.prototype.IsNamespaceInclusive = function (node, prefix) {
+        var prefix2 = prefix || null;
         if (node.prefix === prefix2) {
             return false;
         }
         return this.inclusiveNamespacesPrefixList.indexOf(prefix2 || "") !== -1; // && node.prefix === prefix;
-    }
-    IsNamespaceRendered(prefix, uri) {
+    };
+    XmlCanonicalizer.prototype.IsNamespaceRendered = function (prefix, uri) {
         prefix = prefix || "";
         uri = uri || "";
         if (!prefix && !uri) {
@@ -378,13 +392,14 @@ class XmlCanonicalizer {
         if (prefix === "xml" && uri === "http://www.w3.org/XML/1998/namespace") {
             return true;
         }
-        const ns = this.visibleNamespaces.GetPrefix(prefix);
+        var ns = this.visibleNamespaces.GetPrefix(prefix);
         if (ns) {
             return ns.namespace === uri;
         }
         return false;
-    }
-}
+    };
+    return XmlCanonicalizer;
+}());
 function XmlDsigC14NTransformNamespacesComparer(x, y) {
     // simple cases
     // tslint:disable-next-line:triple-equals
@@ -412,8 +427,8 @@ function XmlDsigC14NTransformAttributesComparer(x, y) {
     if (!y.namespaceURI && x.namespaceURI) {
         return 1;
     }
-    const left = x.namespaceURI + x.localName;
-    const right = y.namespaceURI + y.localName;
+    var left = x.namespaceURI + x.localName;
+    var right = y.namespaceURI + y.localName;
     if (left === right) {
         return 0;
     }
@@ -424,25 +439,26 @@ function XmlDsigC14NTransformAttributesComparer(x, y) {
         return 1;
     }
 }
-function IsNamespaceUsed(node, prefix, result = 0) {
-    const prefix2 = prefix || null;
+function IsNamespaceUsed(node, prefix, result) {
+    if (result === void 0) { result = 0; }
+    var prefix2 = prefix || null;
     if (node.prefix === prefix2) {
         return ++result;
     }
     // prefix of attributes
     if (node.attributes) {
-        for (let i = 0; i < node.attributes.length; i++) {
-            const attr = node.attributes[i];
+        for (var i = 0; i < node.attributes.length; i++) {
+            var attr = node.attributes[i];
             if (!IsNamespaceNode(attr) && prefix && node.attributes[i].prefix === prefix) {
                 return ++result;
             }
         }
     }
     // check prefix of Element
-    for (let n = node.firstChild; !!n; n = n.nextSibling) {
+    for (var n = node.firstChild; !!n; n = n.nextSibling) {
         if (n.nodeType === XmlCore.XmlNodeType.Element) {
-            const el = n;
-            const res = IsNamespaceUsed(el, prefix, result);
+            var el = n;
+            var res = IsNamespaceUsed(el, prefix, result);
             if (n.nodeType === XmlCore.XmlNodeType.Element && res) {
                 return ++result + res;
             }
@@ -451,14 +467,14 @@ function IsNamespaceUsed(node, prefix, result = 0) {
     return result;
 }
 function IsNamespaceNode(node) {
-    const reg = /xmlns:/;
+    var reg = /xmlns:/;
     if (node !== null && node.nodeType === XmlCore.XmlNodeType.Attribute && (node.nodeName === "xmlns" || reg.test(node.nodeName))) {
         return true;
     }
     return false;
 }
 
-const XmlSignature = {
+var XmlSignature = {
     DefaultCanonMethod: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
     DefaultDigestMethod: "http://www.w3.org/2001/04/xmlenc#sha256",
     DefaultPrefix: " ",
@@ -538,39 +554,62 @@ const XmlSignature = {
     NamespaceURIPss: "http://www.example.org/xmldsig-pss/#",
 };
 
-exports.XmlSignatureObject = class XmlSignatureObject extends XmlCore.XmlObject {
-};
-exports.XmlSignatureObject = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: "xmldsig",
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
-    })
-], exports.XmlSignatureObject);
-exports.XmlSignatureCollection = class XmlSignatureCollection extends XmlCore.XmlCollection {
-};
-exports.XmlSignatureCollection = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: "xmldsig_collection",
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
-    })
-], exports.XmlSignatureCollection);
-
-class KeyInfoClause extends exports.XmlSignatureObject {
-}
-
-class XmlAlgorithm {
-    getAlgorithmName() {
-        return this.namespaceURI;
+var XmlSignatureObject = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlSignatureObject, _super);
+    function XmlSignatureObject() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-}
-class HashAlgorithm extends XmlAlgorithm {
-    Digest(xml) {
+    XmlSignatureObject = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: "xmldsig",
+            namespaceURI: XmlSignature.NamespaceURI,
+            prefix: XmlSignature.DefaultPrefix,
+        })
+    ], XmlSignatureObject);
+    return XmlSignatureObject;
+}(XmlCore.XmlObject));
+var XmlSignatureCollection = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlSignatureCollection, _super);
+    function XmlSignatureCollection() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    XmlSignatureCollection = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: "xmldsig_collection",
+            namespaceURI: XmlSignature.NamespaceURI,
+            prefix: XmlSignature.DefaultPrefix,
+        })
+    ], XmlSignatureCollection);
+    return XmlSignatureCollection;
+}(XmlCore.XmlCollection));
+
+var KeyInfoClause = /** @class */ (function (_super) {
+    tslib_1.__extends(KeyInfoClause, _super);
+    function KeyInfoClause() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return KeyInfoClause;
+}(XmlSignatureObject));
+
+var XmlAlgorithm = /** @class */ (function () {
+    function XmlAlgorithm() {
+    }
+    XmlAlgorithm.prototype.getAlgorithmName = function () {
+        return this.namespaceURI;
+    };
+    return XmlAlgorithm;
+}());
+var HashAlgorithm = /** @class */ (function (_super) {
+    tslib_1.__extends(HashAlgorithm, _super);
+    function HashAlgorithm() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    HashAlgorithm.prototype.Digest = function (xml) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
+            .then(function () {
             // console.log("HashedInfo:", xml);
-            let buf;
+            var buf;
             if (typeof xml === "string") {
                 // C14N transforms
                 // console.log("Hash:\n%s\n", xml);
@@ -582,275 +621,344 @@ class HashAlgorithm extends XmlAlgorithm {
             }
             else {
                 // enveloped signature transform
-                const txt = new XMLSerializer().serializeToString(xml);
+                var txt = new XMLSerializer().serializeToString(xml);
                 buf = XmlCore.Convert.FromString(txt, "utf8");
             }
-            return Application.crypto.subtle.digest(this.algorithm, buf);
+            return Application.crypto.subtle.digest(_this.algorithm, buf);
         })
-            .then((hash) => {
+            .then(function (hash) {
             return new Uint8Array(hash);
         });
+    };
+    return HashAlgorithm;
+}(XmlAlgorithm));
+var SignatureAlgorithm = /** @class */ (function (_super) {
+    tslib_1.__extends(SignatureAlgorithm, _super);
+    function SignatureAlgorithm() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-}
-class SignatureAlgorithm extends XmlAlgorithm {
     /**
      * Sign the given string using the given key
      */
-    Sign(signedInfo, signingKey, algorithm) {
+    SignatureAlgorithm.prototype.Sign = function (signedInfo, signingKey, algorithm) {
         // console.log("Sign:\n%s\n", signedInfo);
-        const info = XmlCore.Convert.FromString(signedInfo, "utf8");
+        var info = XmlCore.Convert.FromString(signedInfo, "utf8");
         return Application.crypto.subtle.sign(algorithm, signingKey, info);
-    }
+    };
     /**
      * Verify the given signature of the given string using key
      */
-    Verify(signedInfo, key, signatureValue, algorithm) {
+    SignatureAlgorithm.prototype.Verify = function (signedInfo, key, signatureValue, algorithm) {
         // console.log("Verify:\n%s\n", signedInfo);
-        const info = XmlCore.Convert.FromString(signedInfo, "utf8");
+        var info = XmlCore.Convert.FromString(signedInfo, "utf8");
         return Application.crypto.subtle.verify((algorithm || this.algorithm), key, signatureValue, info);
-    }
-}
+    };
+    return SignatureAlgorithm;
+}(XmlAlgorithm));
 
-const SHA1 = "SHA-1";
-const SHA256 = "SHA-256";
-const SHA384 = "SHA-384";
-const SHA512 = "SHA-512";
-const SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#sha1";
-const SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmlenc#sha256";
-const SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#sha384";
-const SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmlenc#sha512";
-class Sha1 extends HashAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = { name: SHA1 };
-        this.namespaceURI = SHA1_NAMESPACE;
+var SHA1 = "SHA-1";
+var SHA256 = "SHA-256";
+var SHA384 = "SHA-384";
+var SHA512 = "SHA-512";
+var SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#sha1";
+var SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmlenc#sha256";
+var SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#sha384";
+var SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmlenc#sha512";
+var Sha1 = /** @class */ (function (_super) {
+    tslib_1.__extends(Sha1, _super);
+    function Sha1() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = { name: SHA1 };
+        _this.namespaceURI = SHA1_NAMESPACE;
+        return _this;
     }
-}
-class Sha256 extends HashAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = { name: SHA256 };
-        this.namespaceURI = SHA256_NAMESPACE;
+    return Sha1;
+}(HashAlgorithm));
+var Sha256 = /** @class */ (function (_super) {
+    tslib_1.__extends(Sha256, _super);
+    function Sha256() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = { name: SHA256 };
+        _this.namespaceURI = SHA256_NAMESPACE;
+        return _this;
     }
-}
-class Sha384 extends HashAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = { name: SHA384 };
-        this.namespaceURI = SHA384_NAMESPACE;
+    return Sha256;
+}(HashAlgorithm));
+var Sha384 = /** @class */ (function (_super) {
+    tslib_1.__extends(Sha384, _super);
+    function Sha384() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = { name: SHA384 };
+        _this.namespaceURI = SHA384_NAMESPACE;
+        return _this;
     }
-}
-class Sha512 extends HashAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = { name: SHA512 };
-        this.namespaceURI = SHA512_NAMESPACE;
+    return Sha384;
+}(HashAlgorithm));
+var Sha512 = /** @class */ (function (_super) {
+    tslib_1.__extends(Sha512, _super);
+    function Sha512() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = { name: SHA512 };
+        _this.namespaceURI = SHA512_NAMESPACE;
+        return _this;
     }
-}
+    return Sha512;
+}(HashAlgorithm));
 
-const ECDSA = "ECDSA";
-const ECDSA_SHA1_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1";
-const ECDSA_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
-const ECDSA_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384";
-const ECDSA_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";
-class EcdsaSha1 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+var ECDSA = "ECDSA";
+var ECDSA_SHA1_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1";
+var ECDSA_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
+var ECDSA_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384";
+var ECDSA_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";
+var EcdsaSha1 = /** @class */ (function (_super) {
+    tslib_1.__extends(EcdsaSha1, _super);
+    function EcdsaSha1() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: ECDSA,
             hash: {
                 name: SHA1,
             },
         };
-        this.namespaceURI = ECDSA_SHA1_NAMESPACE;
+        _this.namespaceURI = ECDSA_SHA1_NAMESPACE;
+        return _this;
     }
-}
-class EcdsaSha256 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return EcdsaSha1;
+}(SignatureAlgorithm));
+var EcdsaSha256 = /** @class */ (function (_super) {
+    tslib_1.__extends(EcdsaSha256, _super);
+    function EcdsaSha256() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: ECDSA,
             hash: {
                 name: SHA256,
             },
         };
-        this.namespaceURI = ECDSA_SHA256_NAMESPACE;
+        _this.namespaceURI = ECDSA_SHA256_NAMESPACE;
+        return _this;
     }
-}
-class EcdsaSha384 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return EcdsaSha256;
+}(SignatureAlgorithm));
+var EcdsaSha384 = /** @class */ (function (_super) {
+    tslib_1.__extends(EcdsaSha384, _super);
+    function EcdsaSha384() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: ECDSA,
             hash: {
                 name: SHA384,
             },
         };
-        this.namespaceURI = ECDSA_SHA384_NAMESPACE;
+        _this.namespaceURI = ECDSA_SHA384_NAMESPACE;
+        return _this;
     }
-}
-class EcdsaSha512 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return EcdsaSha384;
+}(SignatureAlgorithm));
+var EcdsaSha512 = /** @class */ (function (_super) {
+    tslib_1.__extends(EcdsaSha512, _super);
+    function EcdsaSha512() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: ECDSA,
             hash: {
                 name: SHA512,
             },
         };
-        this.namespaceURI = ECDSA_SHA512_NAMESPACE;
+        _this.namespaceURI = ECDSA_SHA512_NAMESPACE;
+        return _this;
     }
-}
+    return EcdsaSha512;
+}(SignatureAlgorithm));
 
-const HMAC = "HMAC";
-const HMAC_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
-const HMAC_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
-const HMAC_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
-const HMAC_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
-class HmacSha1 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+var HMAC = "HMAC";
+var HMAC_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
+var HMAC_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
+var HMAC_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
+var HMAC_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
+var HmacSha1 = /** @class */ (function (_super) {
+    tslib_1.__extends(HmacSha1, _super);
+    function HmacSha1() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: HMAC,
             hash: {
                 name: SHA1,
             },
         };
-        this.namespaceURI = HMAC_SHA1_NAMESPACE;
+        _this.namespaceURI = HMAC_SHA1_NAMESPACE;
+        return _this;
     }
-}
-class HmacSha256 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return HmacSha1;
+}(SignatureAlgorithm));
+var HmacSha256 = /** @class */ (function (_super) {
+    tslib_1.__extends(HmacSha256, _super);
+    function HmacSha256() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: HMAC,
             hash: {
                 name: SHA256,
             },
         };
-        this.namespaceURI = HMAC_SHA256_NAMESPACE;
+        _this.namespaceURI = HMAC_SHA256_NAMESPACE;
+        return _this;
     }
-}
-class HmacSha384 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return HmacSha256;
+}(SignatureAlgorithm));
+var HmacSha384 = /** @class */ (function (_super) {
+    tslib_1.__extends(HmacSha384, _super);
+    function HmacSha384() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: HMAC,
             hash: {
                 name: SHA384,
             },
         };
-        this.namespaceURI = HMAC_SHA384_NAMESPACE;
+        _this.namespaceURI = HMAC_SHA384_NAMESPACE;
+        return _this;
     }
-}
-class HmacSha512 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return HmacSha384;
+}(SignatureAlgorithm));
+var HmacSha512 = /** @class */ (function (_super) {
+    tslib_1.__extends(HmacSha512, _super);
+    function HmacSha512() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: HMAC,
             hash: {
                 name: SHA512,
             },
         };
-        this.namespaceURI = HMAC_SHA512_NAMESPACE;
+        _this.namespaceURI = HMAC_SHA512_NAMESPACE;
+        return _this;
     }
-}
+    return HmacSha512;
+}(SignatureAlgorithm));
 
-const RSA_PKCS1 = "RSASSA-PKCS1-v1_5";
-const RSA_PKCS1_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
-const RSA_PKCS1_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
-const RSA_PKCS1_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
-const RSA_PKCS1_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
-class RsaPkcs1Sha1 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+var RSA_PKCS1 = "RSASSA-PKCS1-v1_5";
+var RSA_PKCS1_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+var RSA_PKCS1_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+var RSA_PKCS1_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
+var RSA_PKCS1_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
+var RsaPkcs1Sha1 = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPkcs1Sha1, _super);
+    function RsaPkcs1Sha1() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: RSA_PKCS1,
             hash: {
                 name: SHA1,
             },
         };
-        this.namespaceURI = RSA_PKCS1_SHA1_NAMESPACE;
+        _this.namespaceURI = RSA_PKCS1_SHA1_NAMESPACE;
+        return _this;
     }
-}
-class RsaPkcs1Sha256 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return RsaPkcs1Sha1;
+}(SignatureAlgorithm));
+var RsaPkcs1Sha256 = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPkcs1Sha256, _super);
+    function RsaPkcs1Sha256() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: RSA_PKCS1,
             hash: {
                 name: SHA256,
             },
         };
-        this.namespaceURI = RSA_PKCS1_SHA256_NAMESPACE;
+        _this.namespaceURI = RSA_PKCS1_SHA256_NAMESPACE;
+        return _this;
     }
-}
-class RsaPkcs1Sha384 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return RsaPkcs1Sha256;
+}(SignatureAlgorithm));
+var RsaPkcs1Sha384 = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPkcs1Sha384, _super);
+    function RsaPkcs1Sha384() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: RSA_PKCS1,
             hash: {
                 name: SHA384,
             },
         };
-        this.namespaceURI = RSA_PKCS1_SHA384_NAMESPACE;
+        _this.namespaceURI = RSA_PKCS1_SHA384_NAMESPACE;
+        return _this;
     }
-}
-class RsaPkcs1Sha512 extends SignatureAlgorithm {
-    constructor() {
-        super(...arguments);
-        this.algorithm = {
+    return RsaPkcs1Sha384;
+}(SignatureAlgorithm));
+var RsaPkcs1Sha512 = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPkcs1Sha512, _super);
+    function RsaPkcs1Sha512() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.algorithm = {
             name: RSA_PKCS1,
             hash: {
                 name: SHA512,
             },
         };
-        this.namespaceURI = RSA_PKCS1_SHA512_NAMESPACE;
+        _this.namespaceURI = RSA_PKCS1_SHA512_NAMESPACE;
+        return _this;
     }
-}
+    return RsaPkcs1Sha512;
+}(SignatureAlgorithm));
 
-const RSA_PSS = "RSA-PSS";
-const RSA_PSS_WITH_PARAMS_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#rsa-pss";
-class RsaPssBase extends SignatureAlgorithm {
-    constructor(saltLength) {
-        super();
-        this.algorithm = {
+var RSA_PSS = "RSA-PSS";
+var RSA_PSS_WITH_PARAMS_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#rsa-pss";
+var RsaPssBase = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPssBase, _super);
+    function RsaPssBase(saltLength) {
+        var _this = _super.call(this) || this;
+        _this.algorithm = {
             name: RSA_PSS,
             hash: {
                 name: SHA1,
             },
         };
-        this.namespaceURI = RSA_PSS_WITH_PARAMS_NAMESPACE;
+        _this.namespaceURI = RSA_PSS_WITH_PARAMS_NAMESPACE;
         if (saltLength) {
-            this.algorithm.saltLength = saltLength;
+            _this.algorithm.saltLength = saltLength;
         }
+        return _this;
     }
-}
-class RsaPssSha1 extends RsaPssBase {
-    constructor(saltLength) {
-        super(saltLength);
-        this.algorithm.hash.name = SHA1;
+    return RsaPssBase;
+}(SignatureAlgorithm));
+var RsaPssSha1 = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPssSha1, _super);
+    function RsaPssSha1(saltLength) {
+        var _this = _super.call(this, saltLength) || this;
+        _this.algorithm.hash.name = SHA1;
+        return _this;
     }
-}
-class RsaPssSha256 extends RsaPssBase {
-    constructor(saltLength) {
-        super(saltLength);
-        this.algorithm.hash.name = SHA256;
+    return RsaPssSha1;
+}(RsaPssBase));
+var RsaPssSha256 = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPssSha256, _super);
+    function RsaPssSha256(saltLength) {
+        var _this = _super.call(this, saltLength) || this;
+        _this.algorithm.hash.name = SHA256;
+        return _this;
     }
-}
-class RsaPssSha384 extends RsaPssBase {
-    constructor(saltLength) {
-        super(saltLength);
-        this.algorithm.hash.name = SHA384;
+    return RsaPssSha256;
+}(RsaPssBase));
+var RsaPssSha384 = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPssSha384, _super);
+    function RsaPssSha384(saltLength) {
+        var _this = _super.call(this, saltLength) || this;
+        _this.algorithm.hash.name = SHA384;
+        return _this;
     }
-}
-class RsaPssSha512 extends RsaPssBase {
-    constructor(saltLength) {
-        super(saltLength);
-        this.algorithm.hash.name = SHA512;
+    return RsaPssSha384;
+}(RsaPssBase));
+var RsaPssSha512 = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaPssSha512, _super);
+    function RsaPssSha512(saltLength) {
+        var _this = _super.call(this, saltLength) || this;
+        _this.algorithm.hash.name = SHA512;
+        return _this;
     }
-}
+    return RsaPssSha512;
+}(RsaPssBase));
 
 /**
  *
@@ -871,20 +979,25 @@ class RsaPssSha512 extends RsaPssBase {
  * @class CanonicalizationMethod
  * @extends {XmlSignatureObject}
  */
-exports.CanonicalizationMethod = class CanonicalizationMethod extends exports.XmlSignatureObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Algorithm,
-        required: true,
-        defaultValue: XmlSignature.DefaultCanonMethod,
-    })
-], exports.CanonicalizationMethod.prototype, "Algorithm", void 0);
-exports.CanonicalizationMethod = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.CanonicalizationMethod,
-    })
-], exports.CanonicalizationMethod);
+var CanonicalizationMethod = /** @class */ (function (_super) {
+    tslib_1.__extends(CanonicalizationMethod, _super);
+    function CanonicalizationMethod() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Algorithm,
+            required: true,
+            defaultValue: XmlSignature.DefaultCanonMethod,
+        })
+    ], CanonicalizationMethod.prototype, "Algorithm", void 0);
+    CanonicalizationMethod = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.CanonicalizationMethod,
+        })
+    ], CanonicalizationMethod);
+    return CanonicalizationMethod;
+}(XmlSignatureObject));
 
 // XmlElement part of the signature
 // Note: Looks like KeyInfoNode (but the later is XmlElement inside KeyInfo)
@@ -905,39 +1018,49 @@ exports.CanonicalizationMethod = tslib_1.__decorate([
 /**
  * Represents the object element of an XML signature that holds data to be signed.
  */
-exports.DataObject = class DataObject extends exports.XmlSignatureObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Id,
-        defaultValue: "",
-    })
-], exports.DataObject.prototype, "Id", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.MimeType,
-        defaultValue: "",
-    })
-], exports.DataObject.prototype, "MimeType", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Encoding,
-        defaultValue: "",
-    })
-], exports.DataObject.prototype, "Encoding", void 0);
-exports.DataObject = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.Object,
-    })
-], exports.DataObject);
-exports.DataObjects = class DataObjects extends exports.XmlSignatureCollection {
-};
-exports.DataObjects = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: "xmldsig_objects",
-        parser: exports.DataObject,
-    })
-], exports.DataObjects);
+var DataObject = /** @class */ (function (_super) {
+    tslib_1.__extends(DataObject, _super);
+    function DataObject() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Id,
+            defaultValue: "",
+        })
+    ], DataObject.prototype, "Id", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.MimeType,
+            defaultValue: "",
+        })
+    ], DataObject.prototype, "MimeType", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Encoding,
+            defaultValue: "",
+        })
+    ], DataObject.prototype, "Encoding", void 0);
+    DataObject = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.Object,
+        })
+    ], DataObject);
+    return DataObject;
+}(XmlSignatureObject));
+var DataObjects = /** @class */ (function (_super) {
+    tslib_1.__extends(DataObjects, _super);
+    function DataObjects() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    DataObjects = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: "xmldsig_objects",
+            parser: DataObject,
+        })
+    ], DataObjects);
+    return DataObjects;
+}(XmlSignatureCollection));
 
 /**
  *
@@ -950,20 +1073,25 @@ exports.DataObjects = tslib_1.__decorate([
  * </complexType>
  *
  */
-exports.DigestMethod = class DigestMethod extends exports.XmlSignatureObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Algorithm,
-        required: true,
-        defaultValue: XmlSignature.DefaultDigestMethod,
-    })
-], exports.DigestMethod.prototype, "Algorithm", void 0);
-exports.DigestMethod = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.DigestMethod,
-    })
-], exports.DigestMethod);
+var DigestMethod = /** @class */ (function (_super) {
+    tslib_1.__extends(DigestMethod, _super);
+    function DigestMethod() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Algorithm,
+            required: true,
+            defaultValue: XmlSignature.DefaultDigestMethod,
+        })
+    ], DigestMethod.prototype, "Algorithm", void 0);
+    DigestMethod = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.DigestMethod,
+        })
+    ], DigestMethod);
+    return DigestMethod;
+}(XmlSignatureObject));
 
 /**
  *
@@ -987,23 +1115,27 @@ exports.DigestMethod = tslib_1.__decorate([
 /**
  * Represents an XML digital signature or XML encryption <KeyInfo> element.
  */
-exports.KeyInfo = class KeyInfo extends exports.XmlSignatureCollection {
-    OnLoadXml(element) {
-        for (let i = 0; i < element.childNodes.length; i++) {
-            const node = element.childNodes.item(i);
+var KeyInfo = /** @class */ (function (_super) {
+    tslib_1.__extends(KeyInfo, _super);
+    function KeyInfo() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    KeyInfo.prototype.OnLoadXml = function (element) {
+        var _loop_1 = function (i) {
+            var node = element.childNodes.item(i);
             if (node.nodeType !== XmlCore.XmlNodeType.Element) {
-                continue;
+                return "continue";
             }
-            let KeyInfoClass = null;
+            var KeyInfoClass = null;
             switch (node.localName) {
                 case XmlSignature.ElementNames.KeyValue:
-                    KeyInfoClass = exports.KeyValue;
+                    KeyInfoClass = KeyValue;
                     break;
                 case XmlSignature.ElementNames.X509Data:
-                    KeyInfoClass = exports.KeyInfoX509Data;
+                    KeyInfoClass = KeyInfoX509Data;
                     break;
                 case XmlSignature.ElementNames.SPKIData:
-                    KeyInfoClass = exports.SPKIData;
+                    KeyInfoClass = SPKIData;
                     break;
                 case XmlSignature.ElementNames.KeyName:
                 case XmlSignature.ElementNames.RetrievalMethod:
@@ -1011,234 +1143,266 @@ exports.KeyInfo = class KeyInfo extends exports.XmlSignatureCollection {
                 case XmlSignature.ElementNames.MgmtData:
             }
             if (KeyInfoClass) {
-                const item = new KeyInfoClass();
+                var item = new KeyInfoClass();
                 item.LoadXml(node);
-                if (item instanceof exports.KeyValue) {
+                if (item instanceof KeyValue) {
                     // Read KeyValue
-                    let keyValue = null;
-                    [exports.RsaKeyValue, exports.EcdsaKeyValue].some((KeyClass) => {
+                    var keyValue_1 = null;
+                    [RsaKeyValue, EcdsaKeyValue].some(function (KeyClass) {
                         try {
-                            const k = new KeyClass();
-                            for (let j = 0; j < node.childNodes.length; j++) {
-                                const nodeKey = node.childNodes.item(j);
+                            var k = new KeyClass();
+                            for (var j = 0; j < node.childNodes.length; j++) {
+                                var nodeKey = node.childNodes.item(j);
                                 if (nodeKey.nodeType !== XmlCore.XmlNodeType.Element) {
                                     continue;
                                 }
                                 k.LoadXml(nodeKey);
-                                keyValue = k;
+                                keyValue_1 = k;
                                 return true;
                             }
                         }
                         catch (e) { /* none */ }
                         return false;
                     });
-                    if (keyValue) {
-                        item.Value = keyValue;
+                    if (keyValue_1) {
+                        item.Value = keyValue_1;
                     }
                     else {
                         throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Unsupported KeyValue in use");
                     }
                     item.GetXml();
                 }
-                this.Add(item);
+                this_1.Add(item);
             }
+        };
+        var this_1 = this;
+        for (var i = 0; i < element.childNodes.length; i++) {
+            _loop_1(i);
         }
-    }
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Id,
-        defaultValue: "",
-    })
-], exports.KeyInfo.prototype, "Id", void 0);
-exports.KeyInfo = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.KeyInfo,
-    })
-], exports.KeyInfo);
+    };
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Id,
+            defaultValue: "",
+        })
+    ], KeyInfo.prototype, "Id", void 0);
+    KeyInfo = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.KeyInfo,
+        })
+    ], KeyInfo);
+    return KeyInfo;
+}(XmlSignatureCollection));
 
 /**
  * The Transform element contains a single transformation
  */
-exports.Transform = class Transform extends exports.XmlSignatureObject {
-    /**
-     * The Transform element contains a single transformation
-     */
-    constructor() {
-        super(...arguments);
-        this.innerXml = null;
+var Transform = /** @class */ (function (_super) {
+    tslib_1.__extends(Transform, _super);
+    function Transform() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.innerXml = null;
+        return _this;
     }
     // Public methods
     /**
      * When overridden in a derived class, returns the output of the current Transform object.
      */
-    GetOutput() {
+    Transform.prototype.GetOutput = function () {
         throw new XmlCore.XmlError(XmlCore.XE.METHOD_NOT_IMPLEMENTED);
-    }
-    LoadInnerXml(node) {
+    };
+    Transform.prototype.LoadInnerXml = function (node) {
         if (!node) {
             throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "node");
         }
         this.innerXml = node;
-    }
-    GetInnerXml() {
+    };
+    Transform.prototype.GetInnerXml = function () {
         return this.innerXml;
-    }
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Algorithm,
-        defaultValue: "",
-    })
-], exports.Transform.prototype, "Algorithm", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.XPath,
-        defaultValue: "",
-    })
-], exports.Transform.prototype, "XPath", void 0);
-exports.Transform = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.Transform,
-    })
-], exports.Transform);
+    };
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Algorithm,
+            defaultValue: "",
+        })
+    ], Transform.prototype, "Algorithm", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.XPath,
+            defaultValue: "",
+        })
+    ], Transform.prototype, "XPath", void 0);
+    Transform = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.Transform,
+        })
+    ], Transform);
+    return Transform;
+}(XmlSignatureObject));
 
-class XmlDsigBase64Transform extends exports.Transform {
-    constructor() {
-        super(...arguments);
-        this.Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform;
+var XmlDsigBase64Transform = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlDsigBase64Transform, _super);
+    function XmlDsigBase64Transform() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform;
+        return _this;
     }
     /**
      * Returns the output of the current XmlDsigBase64Transform object
      */
-    GetOutput() {
+    XmlDsigBase64Transform.prototype.GetOutput = function () {
         if (!this.innerXml) {
             throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "innerXml");
         }
         return XmlCore.Convert.FromString(this.innerXml.textContent || "", "base64");
-    }
-}
+    };
+    return XmlDsigBase64Transform;
+}(Transform));
 
 /**
  * Represents the C14N XML canonicalization transform for a digital signature
  * as defined by the World Wide Web Consortium (W3C), without comments.
  */
-class XmlDsigC14NTransform extends exports.Transform {
-    constructor() {
-        super(...arguments);
-        this.Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
-        this.xmlCanonicalizer = new XmlCanonicalizer(false, false);
+var XmlDsigC14NTransform = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlDsigC14NTransform, _super);
+    function XmlDsigC14NTransform() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+        _this.xmlCanonicalizer = new XmlCanonicalizer(false, false);
+        return _this;
     }
     /**
      * Returns the output of the current XmlDSigC14NTransform object.
      * @returns string
      */
-    GetOutput() {
+    XmlDsigC14NTransform.prototype.GetOutput = function () {
         if (!this.innerXml) {
             throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "innerXml");
         }
         return this.xmlCanonicalizer.Canonicalize(this.innerXml);
-    }
-}
+    };
+    return XmlDsigC14NTransform;
+}(Transform));
 /**
  * Represents the C14N XML canonicalization transform for a digital signature
  * as defined by the World Wide Web Consortium (W3C), with comments.
  */
-class XmlDsigC14NWithCommentsTransform extends XmlDsigC14NTransform {
-    constructor() {
-        super(...arguments);
-        this.Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";
-        this.xmlCanonicalizer = new XmlCanonicalizer(true, false);
+var XmlDsigC14NWithCommentsTransform = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlDsigC14NWithCommentsTransform, _super);
+    function XmlDsigC14NWithCommentsTransform() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";
+        _this.xmlCanonicalizer = new XmlCanonicalizer(true, false);
+        return _this;
     }
-}
+    return XmlDsigC14NWithCommentsTransform;
+}(XmlDsigC14NTransform));
 
 /**
  * Represents the enveloped signature transform for an XML digital signature as defined by the W3C.
  */
-class XmlDsigEnvelopedSignatureTransform extends exports.Transform {
-    constructor() {
-        super(...arguments);
-        this.Algorithm = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
+var XmlDsigEnvelopedSignatureTransform = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlDsigEnvelopedSignatureTransform, _super);
+    function XmlDsigEnvelopedSignatureTransform() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.Algorithm = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
+        return _this;
     }
     /**
      * Returns the output of the current XmlDsigEnvelopedSignatureTransform object.
      * @returns string
      */
-    GetOutput() {
+    XmlDsigEnvelopedSignatureTransform.prototype.GetOutput = function () {
         if (!this.innerXml) {
             throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "innerXml");
         }
-        const signature = XmlCore.Select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+        var signature = XmlCore.Select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
         if (signature) {
             signature.parentNode.removeChild(signature);
         }
         return this.innerXml;
-    }
-}
+    };
+    return XmlDsigEnvelopedSignatureTransform;
+}(Transform));
 
 /**
  * Represents the exclusive C14N XML canonicalization transform for a digital signature
  * as defined by the World Wide Web Consortium (W3C), without comments.
  */
-class XmlDsigExcC14NTransform extends exports.Transform {
-    constructor() {
-        super(...arguments);
-        this.Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
-        this.xmlCanonicalizer = new XmlCanonicalizer(false, true);
+var XmlDsigExcC14NTransform = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlDsigExcC14NTransform, _super);
+    function XmlDsigExcC14NTransform() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
+        _this.xmlCanonicalizer = new XmlCanonicalizer(false, true);
+        return _this;
     }
-    /**
-     * Gets or sets a string that contains namespace prefixes to canonicalize
-     * using the standard canonicalization algorithm.
-     */
-    get InclusiveNamespacesPrefixList() {
-        return this.xmlCanonicalizer.InclusiveNamespacesPrefixList;
-    }
-    set InclusiveNamespacesPrefixList(value) {
-        this.xmlCanonicalizer.InclusiveNamespacesPrefixList = value;
-    }
+    Object.defineProperty(XmlDsigExcC14NTransform.prototype, "InclusiveNamespacesPrefixList", {
+        /**
+         * Gets or sets a string that contains namespace prefixes to canonicalize
+         * using the standard canonicalization algorithm.
+         */
+        get: function () {
+            return this.xmlCanonicalizer.InclusiveNamespacesPrefixList;
+        },
+        set: function (value) {
+            this.xmlCanonicalizer.InclusiveNamespacesPrefixList = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Returns the output of the current XmlDsigExcC14NTransform object
      */
-    GetOutput() {
+    XmlDsigExcC14NTransform.prototype.GetOutput = function () {
         if (!this.innerXml) {
             throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "innerXml");
         }
         return this.xmlCanonicalizer.Canonicalize(this.innerXml);
-    }
-}
+    };
+    return XmlDsigExcC14NTransform;
+}(Transform));
 /**
  * Represents the exclusive C14N XML canonicalization transform for a digital signature
  * as defined by the World Wide Web Consortium (W3C), with comments.
  */
-class XmlDsigExcC14NWithCommentsTransform extends XmlDsigExcC14NTransform {
-    constructor() {
-        super(...arguments);
-        this.Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
-        this.xmlCanonicalizer = new XmlCanonicalizer(true, true);
+var XmlDsigExcC14NWithCommentsTransform = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlDsigExcC14NWithCommentsTransform, _super);
+    function XmlDsigExcC14NWithCommentsTransform() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
+        _this.xmlCanonicalizer = new XmlCanonicalizer(true, true);
+        return _this;
     }
-}
+    return XmlDsigExcC14NWithCommentsTransform;
+}(XmlDsigExcC14NTransform));
 
 //N.B. This does not apply any XPath filters to the original doc, it exists only to ensure that the XPath filter information is included in the signature
-let XPathDisplayFilterObject = class XPathDisplayFilterObject extends exports.XmlSignatureObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Filter,
-        required: true,
-    })
-], XPathDisplayFilterObject.prototype, "Filter", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlContent({
-        required: true
-    })
-], XPathDisplayFilterObject.prototype, "XPath", void 0);
-XPathDisplayFilterObject = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.XPath,
-        prefix: "",
-        namespaceURI: "http://www.w3.org/2002/06/xmldsig-filter2",
-    })
-], XPathDisplayFilterObject);
+var XPathDisplayFilterObject = /** @class */ (function (_super) {
+    tslib_1.__extends(XPathDisplayFilterObject, _super);
+    function XPathDisplayFilterObject() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Filter,
+            required: true,
+        })
+    ], XPathDisplayFilterObject.prototype, "Filter", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlContent({
+            required: true
+        })
+    ], XPathDisplayFilterObject.prototype, "XPath", void 0);
+    XPathDisplayFilterObject = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.XPath,
+            prefix: "",
+            namespaceURI: "http://www.w3.org/2002/06/xmldsig-filter2",
+        })
+    ], XPathDisplayFilterObject);
+    return XPathDisplayFilterObject;
+}(XmlSignatureObject));
 
 /*
 <Transform Algorithm="http://www.w3.org/2002/06/xmldsig-filter2">
@@ -1246,46 +1410,53 @@ XPathDisplayFilterObject = tslib_1.__decorate([
 </Transform>
 */
 //N.B. This does not apply any XPath filters to the original doc, it exists only to ensure that the XPath filter information is included in the signature
-class XmlDsigDisplayFilterTransform extends exports.Transform {
-    constructor(params) {
-        super();
-        this.Algorithm = "http://www.w3.org/2002/06/xmldsig-filter2";
+var XmlDsigDisplayFilterTransform = /** @class */ (function (_super) {
+    tslib_1.__extends(XmlDsigDisplayFilterTransform, _super);
+    function XmlDsigDisplayFilterTransform(params) {
+        var _this = _super.call(this) || this;
+        _this.Algorithm = "http://www.w3.org/2002/06/xmldsig-filter2";
         if (params == null)
             throw Error("params is undefined");
-        this.XPathFilter = new XPathDisplayFilterObject();
-        this.XPathFilter.Prefix = "";
-        this.XPathFilter.XPath = params.XPath;
-        this.XPathFilter.Filter = params.Filter;
+        _this.XPathFilter = new XPathDisplayFilterObject();
+        _this.XPathFilter.Prefix = "";
+        _this.XPathFilter.XPath = params.XPath;
+        _this.XPathFilter.Filter = params.Filter;
+        return _this;
     }
     /**
      * Returns the output of the current XmlDsigEnvelopedSignatureTransform object.
      * @returns string
      */
-    GetOutput() {
+    XmlDsigDisplayFilterTransform.prototype.GetOutput = function () {
         if (!this.innerXml) {
             throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "innerXml");
         }
         return this.innerXml;
-    }
-}
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: "XPath",
-        required: true,
-        parser: XPathDisplayFilterObject,
-        prefix: "",
-        namespaceURI: XmlSignature.NamespaceURI
-    })
-], XmlDsigDisplayFilterTransform.prototype, "XPathFilter", void 0);
+    };
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: "XPath",
+            required: true,
+            parser: XPathDisplayFilterObject,
+            prefix: "",
+            namespaceURI: XmlSignature.NamespaceURI
+        })
+    ], XmlDsigDisplayFilterTransform.prototype, "XPathFilter", void 0);
+    return XmlDsigDisplayFilterTransform;
+}(Transform));
 
 /**
  * The Transforms element contains a collection of transformations
  */
-exports.Transforms = class Transforms extends exports.XmlSignatureCollection {
-    OnLoadXml(element) {
-        super.OnLoadXml(element);
+var Transforms = /** @class */ (function (_super) {
+    tslib_1.__extends(Transforms, _super);
+    function Transforms() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Transforms.prototype.OnLoadXml = function (element) {
+        _super.prototype.OnLoadXml.call(this, element);
         // Update parsed objects
-        this.items = this.GetIterator().map((item) => {
+        this.items = this.GetIterator().map(function (item) {
             switch (item.Algorithm) {
                 case XmlSignature.AlgorithmNamespaces.XmlDsigEnvelopedSignatureTransform:
                     return ChangeTransform(item, XmlDsigEnvelopedSignatureTransform);
@@ -1305,16 +1476,17 @@ exports.Transforms = class Transforms extends exports.XmlSignatureCollection {
                     throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, item.Algorithm);
             }
         });
-    }
-};
-exports.Transforms = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.Transforms,
-        parser: exports.Transform,
-    })
-], exports.Transforms);
+    };
+    Transforms = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.Transforms,
+            parser: Transform,
+        })
+    ], Transforms);
+    return Transforms;
+}(XmlSignatureCollection));
 function ChangeTransform(t1, t2) {
-    const t = new t2();
+    var t = new t2();
     t.element = t1.Element;
     return t;
 }
@@ -1337,63 +1509,71 @@ function ChangeTransform(t1, t2) {
 /**
  * Represents the <reference> element of an XML signature.
  */
-exports.Reference = class Reference extends exports.XmlSignatureObject {
-    constructor(uri) {
-        super();
+var Reference = /** @class */ (function (_super) {
+    tslib_1.__extends(Reference, _super);
+    function Reference(uri) {
+        var _this = _super.call(this) || this;
         if (uri) {
-            this.Uri = uri;
+            _this.Uri = uri;
         }
+        return _this;
     }
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        defaultValue: "",
-    })
-], exports.Reference.prototype, "Id", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.URI,
-    })
-], exports.Reference.prototype, "Uri", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Type,
-        defaultValue: "",
-    })
-], exports.Reference.prototype, "Type", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.Transforms,
-    })
-], exports.Reference.prototype, "Transforms", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        required: true,
-        parser: exports.DigestMethod,
-    })
-], exports.Reference.prototype, "DigestMethod", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        required: true,
-        localName: XmlSignature.ElementNames.DigestValue,
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
-        converter: XmlCore.XmlBase64Converter,
-    })
-], exports.Reference.prototype, "DigestValue", void 0);
-exports.Reference = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.Reference,
-    })
-], exports.Reference);
-exports.References = class References extends exports.XmlSignatureCollection {
-};
-exports.References = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: "References",
-        parser: exports.Reference,
-    })
-], exports.References);
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            defaultValue: "",
+        })
+    ], Reference.prototype, "Id", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.URI,
+        })
+    ], Reference.prototype, "Uri", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Type,
+            defaultValue: "",
+        })
+    ], Reference.prototype, "Type", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: Transforms,
+        })
+    ], Reference.prototype, "Transforms", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            required: true,
+            parser: DigestMethod,
+        })
+    ], Reference.prototype, "DigestMethod", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            required: true,
+            localName: XmlSignature.ElementNames.DigestValue,
+            namespaceURI: XmlSignature.NamespaceURI,
+            prefix: XmlSignature.DefaultPrefix,
+            converter: XmlCore.XmlBase64Converter,
+        })
+    ], Reference.prototype, "DigestValue", void 0);
+    Reference = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.Reference,
+        })
+    ], Reference);
+    return Reference;
+}(XmlSignatureObject));
+var References = /** @class */ (function (_super) {
+    tslib_1.__extends(References, _super);
+    function References() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    References = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: "References",
+            parser: Reference,
+        })
+    ], References);
+    return References;
+}(XmlSignatureCollection));
 
 /**
  *
@@ -1410,64 +1590,74 @@ exports.References = tslib_1.__decorate([
  * </complexType>
  *
  */
-exports.SignatureMethodOther = class SignatureMethodOther extends exports.XmlSignatureCollection {
-    OnLoadXml(element) {
-        for (let i = 0; i < element.childNodes.length; i++) {
-            const node = element.childNodes.item(i);
+var SignatureMethodOther = /** @class */ (function (_super) {
+    tslib_1.__extends(SignatureMethodOther, _super);
+    function SignatureMethodOther() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    SignatureMethodOther.prototype.OnLoadXml = function (element) {
+        for (var i = 0; i < element.childNodes.length; i++) {
+            var node = element.childNodes.item(i);
             if (node.nodeType !== XmlCore.XmlNodeType.Element ||
                 node.nodeName === XmlSignature.ElementNames.HMACOutputLength) { // Exclude HMACOutputLength
                 continue;
             }
-            let ParserClass;
+            var ParserClass = void 0;
             switch (node.localName) {
                 case XmlSignature.ElementNames.RSAPSSParams:
-                    ParserClass = exports.PssAlgorithmParams;
+                    ParserClass = PssAlgorithmParams;
                     break;
                 default:
                     break;
             }
             if (ParserClass) {
-                const xml = new ParserClass();
+                var xml = new ParserClass();
                 xml.LoadXml(node);
                 this.Add(xml);
             }
         }
+    };
+    SignatureMethodOther = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: "Other",
+        })
+    ], SignatureMethodOther);
+    return SignatureMethodOther;
+}(XmlSignatureCollection));
+var SignatureMethod = /** @class */ (function (_super) {
+    tslib_1.__extends(SignatureMethod, _super);
+    function SignatureMethod() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-};
-exports.SignatureMethodOther = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: "Other",
-    })
-], exports.SignatureMethodOther);
-exports.SignatureMethod = class SignatureMethod extends exports.XmlSignatureObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Algorithm,
-        required: true,
-        defaultValue: "",
-    })
-], exports.SignatureMethod.prototype, "Algorithm", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.HMACOutputLength,
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
-        converter: XmlCore.XmlNumberConverter,
-    })
-], exports.SignatureMethod.prototype, "HMACOutputLength", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.SignatureMethodOther,
-        noRoot: true,
-        minOccurs: 0,
-    })
-], exports.SignatureMethod.prototype, "Any", void 0);
-exports.SignatureMethod = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.SignatureMethod,
-    })
-], exports.SignatureMethod);
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Algorithm,
+            required: true,
+            defaultValue: "",
+        })
+    ], SignatureMethod.prototype, "Algorithm", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.HMACOutputLength,
+            namespaceURI: XmlSignature.NamespaceURI,
+            prefix: XmlSignature.DefaultPrefix,
+            converter: XmlCore.XmlNumberConverter,
+        })
+    ], SignatureMethod.prototype, "HMACOutputLength", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: SignatureMethodOther,
+            noRoot: true,
+            minOccurs: 0,
+        })
+    ], SignatureMethod.prototype, "Any", void 0);
+    SignatureMethod = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.SignatureMethod,
+        })
+    ], SignatureMethod);
+    return SignatureMethod;
+}(XmlSignatureObject));
 
 /**
  *
@@ -1489,38 +1679,43 @@ exports.SignatureMethod = tslib_1.__decorate([
  * @class SignedInfo
  * @extends {XmlSignatureObject}
  */
-exports.SignedInfo = class SignedInfo extends exports.XmlSignatureObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Id,
-        defaultValue: "",
-    })
-], exports.SignedInfo.prototype, "Id", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.CanonicalizationMethod,
-        required: true,
-    })
-], exports.SignedInfo.prototype, "CanonicalizationMethod", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.SignatureMethod,
-        required: true,
-    })
-], exports.SignedInfo.prototype, "SignatureMethod", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.References,
-        minOccurs: 1,
-        noRoot: true,
-    })
-], exports.SignedInfo.prototype, "References", void 0);
-exports.SignedInfo = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.SignedInfo,
-    })
-], exports.SignedInfo);
+var SignedInfo = /** @class */ (function (_super) {
+    tslib_1.__extends(SignedInfo, _super);
+    function SignedInfo() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Id,
+            defaultValue: "",
+        })
+    ], SignedInfo.prototype, "Id", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: CanonicalizationMethod,
+            required: true,
+        })
+    ], SignedInfo.prototype, "CanonicalizationMethod", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: SignatureMethod,
+            required: true,
+        })
+    ], SignedInfo.prototype, "SignatureMethod", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: References,
+            minOccurs: 1,
+            noRoot: true,
+        })
+    ], SignedInfo.prototype, "References", void 0);
+    SignedInfo = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.SignedInfo,
+        })
+    ], SignedInfo);
+    return SignedInfo;
+}(XmlSignatureObject));
 
 /**
  *
@@ -1539,46 +1734,51 @@ exports.SignedInfo = tslib_1.__decorate([
 /**
  * Represents the <Signature> element of an XML signature.
  */
-exports.Signature = class Signature extends exports.XmlSignatureObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Id,
-        defaultValue: "",
-    })
-], exports.Signature.prototype, "Id", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.SignedInfo,
-        required: true,
-    })
-], exports.Signature.prototype, "SignedInfo", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.SignatureValue,
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
-        required: true,
-        converter: XmlCore.XmlBase64Converter,
-        defaultValue: null,
-    })
-], exports.Signature.prototype, "SignatureValue", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.KeyInfo,
-    })
-], exports.Signature.prototype, "KeyInfo", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.DataObjects,
-        noRoot: true,
-    })
-], exports.Signature.prototype, "ObjectList", void 0);
-exports.Signature = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.Signature,
-    })
-], exports.Signature);
+var Signature = /** @class */ (function (_super) {
+    tslib_1.__extends(Signature, _super);
+    function Signature() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Id,
+            defaultValue: "",
+        })
+    ], Signature.prototype, "Id", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: SignedInfo,
+            required: true,
+        })
+    ], Signature.prototype, "SignedInfo", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.SignatureValue,
+            namespaceURI: XmlSignature.NamespaceURI,
+            prefix: XmlSignature.DefaultPrefix,
+            required: true,
+            converter: XmlCore.XmlBase64Converter,
+            defaultValue: null,
+        })
+    ], Signature.prototype, "SignatureValue", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: KeyInfo,
+        })
+    ], Signature.prototype, "KeyInfo", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: DataObjects,
+            noRoot: true,
+        })
+    ], Signature.prototype, "ObjectList", void 0);
+    Signature = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.Signature,
+        })
+    ], Signature);
+    return Signature;
+}(XmlSignatureObject));
 
 /**
  *
@@ -1611,163 +1811,184 @@ exports.Signature = tslib_1.__decorate([
  * </xs:complexType>
  *
  */
-const NAMESPACE_URI = "http://www.w3.org/2001/04/xmldsig-more#";
-const PREFIX = "ecdsa";
-exports.EcdsaPublicKey = class EcdsaPublicKey extends XmlCore.XmlObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.X,
-        namespaceURI: NAMESPACE_URI,
-        prefix: PREFIX,
-        required: true,
-        converter: XmlCore.XmlBase64Converter,
-    })
-], exports.EcdsaPublicKey.prototype, "X", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.Y,
-        namespaceURI: NAMESPACE_URI,
-        prefix: PREFIX,
-        required: true,
-        converter: XmlCore.XmlBase64Converter,
-    })
-], exports.EcdsaPublicKey.prototype, "Y", void 0);
-exports.EcdsaPublicKey = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.PublicKey,
-        namespaceURI: NAMESPACE_URI,
-        prefix: PREFIX,
-    })
-], exports.EcdsaPublicKey);
-exports.NamedCurve = class NamedCurve extends XmlCore.XmlObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.URI,
-        required: true,
-    })
-], exports.NamedCurve.prototype, "Uri", void 0);
-exports.NamedCurve = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.NamedCurve,
-        namespaceURI: NAMESPACE_URI,
-        prefix: PREFIX,
-    })
-], exports.NamedCurve);
-exports.DomainParameters = class DomainParameters extends XmlCore.XmlObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.NamedCurve,
-    })
-], exports.DomainParameters.prototype, "NamedCurve", void 0);
-exports.DomainParameters = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.DomainParameters,
-        namespaceURI: NAMESPACE_URI,
-        prefix: PREFIX,
-    })
-], exports.DomainParameters);
+var NAMESPACE_URI = "http://www.w3.org/2001/04/xmldsig-more#";
+var PREFIX = "ecdsa";
+var EcdsaPublicKey = /** @class */ (function (_super) {
+    tslib_1.__extends(EcdsaPublicKey, _super);
+    function EcdsaPublicKey() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.X,
+            namespaceURI: NAMESPACE_URI,
+            prefix: PREFIX,
+            required: true,
+            converter: XmlCore.XmlBase64Converter,
+        })
+    ], EcdsaPublicKey.prototype, "X", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.Y,
+            namespaceURI: NAMESPACE_URI,
+            prefix: PREFIX,
+            required: true,
+            converter: XmlCore.XmlBase64Converter,
+        })
+    ], EcdsaPublicKey.prototype, "Y", void 0);
+    EcdsaPublicKey = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.PublicKey,
+            namespaceURI: NAMESPACE_URI,
+            prefix: PREFIX,
+        })
+    ], EcdsaPublicKey);
+    return EcdsaPublicKey;
+}(XmlCore.XmlObject));
+var NamedCurve = /** @class */ (function (_super) {
+    tslib_1.__extends(NamedCurve, _super);
+    function NamedCurve() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.URI,
+            required: true,
+        })
+    ], NamedCurve.prototype, "Uri", void 0);
+    NamedCurve = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.NamedCurve,
+            namespaceURI: NAMESPACE_URI,
+            prefix: PREFIX,
+        })
+    ], NamedCurve);
+    return NamedCurve;
+}(XmlCore.XmlObject));
+var DomainParameters = /** @class */ (function (_super) {
+    tslib_1.__extends(DomainParameters, _super);
+    function DomainParameters() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: NamedCurve,
+        })
+    ], DomainParameters.prototype, "NamedCurve", void 0);
+    DomainParameters = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.DomainParameters,
+            namespaceURI: NAMESPACE_URI,
+            prefix: PREFIX,
+        })
+    ], DomainParameters);
+    return DomainParameters;
+}(XmlCore.XmlObject));
 /**
  * Represents the <ECKeyValue> element of an XML signature.
  */
-exports.EcdsaKeyValue = class EcdsaKeyValue extends KeyInfoClause {
-    /**
-     * Represents the <ECKeyValue> element of an XML signature.
-     */
-    constructor() {
-        super(...arguments);
-        this.name = XmlSignature.ElementNames.ECDSAKeyValue;
-        this.key = null;
-        this.jwk = null;
-        this.keyUsage = null;
+var EcdsaKeyValue = /** @class */ (function (_super) {
+    tslib_1.__extends(EcdsaKeyValue, _super);
+    function EcdsaKeyValue() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.name = XmlSignature.ElementNames.ECDSAKeyValue;
+        _this.key = null;
+        _this.jwk = null;
+        _this.keyUsage = null;
+        return _this;
     }
-    /**
-     * Gets the NamedCurve value of then public key
-     */
-    get NamedCurve() {
-        return GetNamedCurveOid(this.DomainParameters.NamedCurve.Uri);
-    }
+    Object.defineProperty(EcdsaKeyValue.prototype, "NamedCurve", {
+        /**
+         * Gets the NamedCurve value of then public key
+         */
+        get: function () {
+            return GetNamedCurveOid(this.DomainParameters.NamedCurve.Uri);
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Imports key to the ECKeyValue object
      * @param  {CryptoKey} key
      * @returns Promise
      */
-    importKey(key) {
-        return new Promise((resolve, reject) => {
+    EcdsaKeyValue.prototype.importKey = function (key) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
             if (key.algorithm.name.toUpperCase() !== "ECDSA") {
                 throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
             }
-            this.key = key;
+            _this.key = key;
             Application.crypto.subtle.exportKey("jwk", key)
-                .then((jwk) => {
-                this.jwk = jwk;
-                this.PublicKey = new exports.EcdsaPublicKey();
-                this.PublicKey.X = XmlCore.Convert.FromString(jwk.x, "base64url");
-                this.PublicKey.Y = XmlCore.Convert.FromString(jwk.y, "base64url");
-                if (!this.DomainParameters) {
-                    this.DomainParameters = new exports.DomainParameters();
+                .then(function (jwk) {
+                _this.jwk = jwk;
+                _this.PublicKey = new EcdsaPublicKey();
+                _this.PublicKey.X = XmlCore.Convert.FromString(jwk.x, "base64url");
+                _this.PublicKey.Y = XmlCore.Convert.FromString(jwk.y, "base64url");
+                if (!_this.DomainParameters) {
+                    _this.DomainParameters = new DomainParameters();
                 }
-                if (!this.DomainParameters.NamedCurve) {
-                    this.DomainParameters.NamedCurve = new exports.NamedCurve();
+                if (!_this.DomainParameters.NamedCurve) {
+                    _this.DomainParameters.NamedCurve = new NamedCurve();
                 }
-                this.DomainParameters.NamedCurve.Uri = GetNamedCurveOid(jwk.crv);
-                this.keyUsage = key.usages;
-                return Promise.resolve(this);
+                _this.DomainParameters.NamedCurve.Uri = GetNamedCurveOid(jwk.crv);
+                _this.keyUsage = key.usages;
+                return Promise.resolve(_this);
             })
                 .then(resolve, reject);
         });
-    }
+    };
     /**
      * Exports key from the ECKeyValue object
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    exportKey(alg) {
+    EcdsaKeyValue.prototype.exportKey = function (alg) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
-            if (this.key) {
-                return this.key;
+            .then(function () {
+            if (_this.key) {
+                return _this.key;
             }
             // fill jwk
-            const x = XmlCore.Convert.ToBase64Url(this.PublicKey.X);
-            const y = XmlCore.Convert.ToBase64Url(this.PublicKey.Y);
-            const crv = GetNamedCurveFromOid(this.DomainParameters.NamedCurve.Uri);
-            const jwk = {
+            var x = XmlCore.Convert.ToBase64Url(_this.PublicKey.X);
+            var y = XmlCore.Convert.ToBase64Url(_this.PublicKey.Y);
+            var crv = GetNamedCurveFromOid(_this.DomainParameters.NamedCurve.Uri);
+            var jwk = {
                 kty: "EC",
                 crv: crv,
-                x,
-                y,
+                x: x,
+                y: y,
                 ext: true,
             };
-            this.keyUsage = ["verify"];
-            return Application.crypto.subtle.importKey("jwk", jwk, { name: "ECDSA", namedCurve: crv }, true, this.keyUsage);
+            _this.keyUsage = ["verify"];
+            return Application.crypto.subtle.importKey("jwk", jwk, { name: "ECDSA", namedCurve: crv }, true, _this.keyUsage);
         })
-            .then((key) => {
-            this.key = key;
-            return this.key;
+            .then(function (key) {
+            _this.key = key;
+            return _this.key;
         });
-    }
-};
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.DomainParameters,
-    })
-], exports.EcdsaKeyValue.prototype, "DomainParameters", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.EcdsaPublicKey,
-        required: true,
-    })
-], exports.EcdsaKeyValue.prototype, "PublicKey", void 0);
-exports.EcdsaKeyValue = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.ECDSAKeyValue,
-        namespaceURI: NAMESPACE_URI,
-        prefix: PREFIX,
-    })
-], exports.EcdsaKeyValue);
+    };
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: DomainParameters,
+        })
+    ], EcdsaKeyValue.prototype, "DomainParameters", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: EcdsaPublicKey,
+            required: true,
+        })
+    ], EcdsaKeyValue.prototype, "PublicKey", void 0);
+    EcdsaKeyValue = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.ECDSAKeyValue,
+            namespaceURI: NAMESPACE_URI,
+            prefix: PREFIX,
+        })
+    ], EcdsaKeyValue);
+    return EcdsaKeyValue;
+}(KeyInfoClause));
 function GetNamedCurveOid(namedCurve) {
     switch (namedCurve) {
         case "P-256":
@@ -1791,63 +2012,63 @@ function GetNamedCurveFromOid(oid) {
     throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Unknown NamedCurve OID");
 }
 
-var PssAlgorithmParams_1;
 /**
  * Represents the <RSAKeyValue> element of an XML signature.
  */
-exports.RsaKeyValue = class RsaKeyValue extends KeyInfoClause {
-    /**
-     * Represents the <RSAKeyValue> element of an XML signature.
-     */
-    constructor() {
-        super(...arguments);
-        this.key = null;
-        this.jwk = null;
-        this.keyUsage = [];
+var RsaKeyValue = /** @class */ (function (_super) {
+    tslib_1.__extends(RsaKeyValue, _super);
+    function RsaKeyValue() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.key = null;
+        _this.jwk = null;
+        _this.keyUsage = [];
+        return _this;
     }
     /**
      * Imports key to the RSAKeyValue object
      * @param  {CryptoKey} key
      * @returns Promise
      */
-    importKey(key) {
-        return new Promise((resolve, reject) => {
-            const algName = key.algorithm.name.toUpperCase();
+    RsaKeyValue.prototype.importKey = function (key) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var algName = key.algorithm.name.toUpperCase();
             if (algName !== RSA_PKCS1.toUpperCase() && algName !== RSA_PSS.toUpperCase()) {
                 throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
             }
-            this.key = key;
+            _this.key = key;
             Application.crypto.subtle.exportKey("jwk", key)
-                .then((jwk) => {
-                this.jwk = jwk;
-                this.Modulus = XmlCore.Convert.FromBase64Url(jwk.n);
-                this.Exponent = XmlCore.Convert.FromBase64Url(jwk.e);
-                this.keyUsage = key.usages;
-                return Promise.resolve(this);
+                .then(function (jwk) {
+                _this.jwk = jwk;
+                _this.Modulus = XmlCore.Convert.FromBase64Url(jwk.n);
+                _this.Exponent = XmlCore.Convert.FromBase64Url(jwk.e);
+                _this.keyUsage = key.usages;
+                return Promise.resolve(_this);
             })
                 .then(resolve, reject);
         });
-    }
+    };
     /**
      * Exports key from the RSAKeyValue object
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    exportKey(alg) {
-        return new Promise((resolve, reject) => {
-            if (this.key) {
-                return resolve(this.key);
+    RsaKeyValue.prototype.exportKey = function (alg) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            if (_this.key) {
+                return resolve(_this.key);
             }
             // fill jwk
-            if (!this.Modulus) {
+            if (!_this.Modulus) {
                 throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "RsaKeyValue has no Modulus");
             }
-            const modulus = XmlCore.Convert.ToBase64Url(this.Modulus);
-            if (!this.Exponent) {
+            var modulus = XmlCore.Convert.ToBase64Url(_this.Modulus);
+            if (!_this.Exponent) {
                 throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "RsaKeyValue has no Exponent");
             }
-            const exponent = XmlCore.Convert.ToBase64Url(this.Exponent);
-            let algJwk;
+            var exponent = XmlCore.Convert.ToBase64Url(_this.Exponent);
+            var algJwk;
             switch (alg.name.toUpperCase()) {
                 case RSA_PKCS1.toUpperCase():
                     algJwk = "R";
@@ -1873,50 +2094,51 @@ exports.RsaKeyValue = class RsaKeyValue extends KeyInfoClause {
                     algJwk += "S512";
                     break;
             }
-            const jwk = {
+            var jwk = {
                 kty: "RSA",
                 alg: algJwk,
                 n: modulus,
                 e: exponent,
                 ext: true,
             };
-            Application.crypto.subtle.importKey("jwk", jwk, alg, true, this.keyUsage)
+            Application.crypto.subtle.importKey("jwk", jwk, alg, true, _this.keyUsage)
                 .then(resolve, reject);
         });
-    }
+    };
     /**
      * Loads an RSA key clause from an XML element.
      * @param  {Element | string} element
      * @returns void
      */
-    LoadXml(node) {
-        super.LoadXml(node);
+    RsaKeyValue.prototype.LoadXml = function (node) {
+        _super.prototype.LoadXml.call(this, node);
         this.keyUsage = ["verify"];
-    }
-};
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.Modulus,
-        prefix: XmlSignature.DefaultPrefix,
-        namespaceURI: XmlSignature.NamespaceURI,
-        required: true,
-        converter: XmlCore.XmlBase64Converter,
-    })
-], exports.RsaKeyValue.prototype, "Modulus", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.Exponent,
-        prefix: XmlSignature.DefaultPrefix,
-        namespaceURI: XmlSignature.NamespaceURI,
-        required: true,
-        converter: XmlCore.XmlBase64Converter,
-    })
-], exports.RsaKeyValue.prototype, "Exponent", void 0);
-exports.RsaKeyValue = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.RSAKeyValue,
-    })
-], exports.RsaKeyValue);
+    };
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.Modulus,
+            prefix: XmlSignature.DefaultPrefix,
+            namespaceURI: XmlSignature.NamespaceURI,
+            required: true,
+            converter: XmlCore.XmlBase64Converter,
+        })
+    ], RsaKeyValue.prototype, "Modulus", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.Exponent,
+            prefix: XmlSignature.DefaultPrefix,
+            namespaceURI: XmlSignature.NamespaceURI,
+            required: true,
+            converter: XmlCore.XmlBase64Converter,
+        })
+    ], RsaKeyValue.prototype, "Exponent", void 0);
+    RsaKeyValue = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.RSAKeyValue,
+        })
+    ], RsaKeyValue);
+    return RsaKeyValue;
+}(KeyInfoClause));
 /**
  *
  *  Schema Definition (target namespace
@@ -1950,144 +2172,163 @@ exports.RsaKeyValue = tslib_1.__decorate([
  *  </xs:complexType>
  *
  */
-const NAMESPACE_URI$1 = "http://www.w3.org/2007/05/xmldsig-more#";
-const PREFIX$1 = "pss";
-exports.MaskGenerationFunction = class MaskGenerationFunction extends XmlCore.XmlObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.DigestMethod,
-    })
-], exports.MaskGenerationFunction.prototype, "DigestMethod", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlAttribute({
-        localName: XmlSignature.AttributeNames.Algorithm,
-        defaultValue: "http://www.w3.org/2007/05/xmldsig-more#MGF1",
-    })
-], exports.MaskGenerationFunction.prototype, "Algorithm", void 0);
-exports.MaskGenerationFunction = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.MaskGenerationFunction,
-        prefix: PREFIX$1,
-        namespaceURI: NAMESPACE_URI$1,
-    })
-], exports.MaskGenerationFunction);
-exports.PssAlgorithmParams = PssAlgorithmParams_1 = class PssAlgorithmParams extends XmlCore.XmlObject {
-    constructor(algorithm) {
-        super();
+var NAMESPACE_URI$1 = "http://www.w3.org/2007/05/xmldsig-more#";
+var PREFIX$1 = "pss";
+var MaskGenerationFunction = /** @class */ (function (_super) {
+    tslib_1.__extends(MaskGenerationFunction, _super);
+    function MaskGenerationFunction() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: DigestMethod,
+        })
+    ], MaskGenerationFunction.prototype, "DigestMethod", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlAttribute({
+            localName: XmlSignature.AttributeNames.Algorithm,
+            defaultValue: "http://www.w3.org/2007/05/xmldsig-more#MGF1",
+        })
+    ], MaskGenerationFunction.prototype, "Algorithm", void 0);
+    MaskGenerationFunction = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.MaskGenerationFunction,
+            prefix: PREFIX$1,
+            namespaceURI: NAMESPACE_URI$1,
+        })
+    ], MaskGenerationFunction);
+    return MaskGenerationFunction;
+}(XmlCore.XmlObject));
+var PssAlgorithmParams = /** @class */ (function (_super) {
+    tslib_1.__extends(PssAlgorithmParams, _super);
+    function PssAlgorithmParams(algorithm) {
+        var _this = _super.call(this) || this;
         if (algorithm) {
-            this.FromAlgorithm(algorithm);
+            _this.FromAlgorithm(algorithm);
         }
+        return _this;
     }
-    static FromAlgorithm(algorithm) {
+    PssAlgorithmParams_1 = PssAlgorithmParams;
+    PssAlgorithmParams.FromAlgorithm = function (algorithm) {
         return new PssAlgorithmParams_1(algorithm);
-    }
-    FromAlgorithm(algorithm) {
-        this.DigestMethod = new exports.DigestMethod();
-        const digest = CryptoConfig.GetHashAlgorithm(algorithm.hash);
+    };
+    PssAlgorithmParams.prototype.FromAlgorithm = function (algorithm) {
+        this.DigestMethod = new DigestMethod();
+        var digest = CryptoConfig.GetHashAlgorithm(algorithm.hash);
         this.DigestMethod.Algorithm = digest.namespaceURI;
         if (algorithm.saltLength) {
             this.SaltLength = algorithm.saltLength;
         }
-    }
-};
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.DigestMethod,
-    })
-], exports.PssAlgorithmParams.prototype, "DigestMethod", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        parser: exports.MaskGenerationFunction,
-    })
-], exports.PssAlgorithmParams.prototype, "MGF", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        converter: XmlCore.XmlNumberConverter,
-        prefix: PREFIX$1,
-        namespaceURI: NAMESPACE_URI$1,
-    })
-], exports.PssAlgorithmParams.prototype, "SaltLength", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        converter: XmlCore.XmlNumberConverter,
-    })
-], exports.PssAlgorithmParams.prototype, "TrailerField", void 0);
-exports.PssAlgorithmParams = PssAlgorithmParams_1 = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.RSAPSSParams,
-        prefix: PREFIX$1,
-        namespaceURI: NAMESPACE_URI$1,
-    })
-], exports.PssAlgorithmParams);
+    };
+    var PssAlgorithmParams_1;
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: DigestMethod,
+        })
+    ], PssAlgorithmParams.prototype, "DigestMethod", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            parser: MaskGenerationFunction,
+        })
+    ], PssAlgorithmParams.prototype, "MGF", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            converter: XmlCore.XmlNumberConverter,
+            prefix: PREFIX$1,
+            namespaceURI: NAMESPACE_URI$1,
+        })
+    ], PssAlgorithmParams.prototype, "SaltLength", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            converter: XmlCore.XmlNumberConverter,
+        })
+    ], PssAlgorithmParams.prototype, "TrailerField", void 0);
+    PssAlgorithmParams = PssAlgorithmParams_1 = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.RSAPSSParams,
+            prefix: PREFIX$1,
+            namespaceURI: NAMESPACE_URI$1,
+        })
+    ], PssAlgorithmParams);
+    return PssAlgorithmParams;
+}(XmlCore.XmlObject));
 
 /**
  * Represents the <KeyValue> element of an XML signature.
  */
-exports.KeyValue = class KeyValue extends KeyInfoClause {
-    constructor(value) {
-        super();
+var KeyValue = /** @class */ (function (_super) {
+    tslib_1.__extends(KeyValue, _super);
+    function KeyValue(value) {
+        var _this = _super.call(this) || this;
         if (value) {
-            this.Value = value;
+            _this.Value = value;
         }
+        return _this;
     }
-    set Value(v) {
-        this.element = null;
-        this.value = v;
-    }
-    get Value() {
-        return this.value;
-    }
-    importKey(key) {
+    Object.defineProperty(KeyValue.prototype, "Value", {
+        get: function () {
+            return this.value;
+        },
+        set: function (v) {
+            this.element = null;
+            this.value = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    KeyValue.prototype.importKey = function (key) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
+            .then(function () {
             switch (key.algorithm.name.toUpperCase()) {
                 case RSA_PSS.toUpperCase():
                 case RSA_PKCS1.toUpperCase():
-                    this.Value = new exports.RsaKeyValue();
-                    return this.Value.importKey(key);
+                    _this.Value = new RsaKeyValue();
+                    return _this.Value.importKey(key);
                 case ECDSA.toUpperCase():
-                    this.Value = new exports.EcdsaKeyValue();
-                    return this.Value.importKey(key);
+                    _this.Value = new EcdsaKeyValue();
+                    return _this.Value.importKey(key);
                 default:
                     throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, key.algorithm.name);
             }
         })
-            .then(() => {
-            return this;
+            .then(function () {
+            return _this;
         });
-    }
-    exportKey(alg) {
+    };
+    KeyValue.prototype.exportKey = function (alg) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
-            if (!this.Value) {
+            .then(function () {
+            if (!_this.Value) {
                 throw new XmlCore.XmlError(XmlCore.XE.NULL_REFERENCE);
             }
-            return this.Value.exportKey(alg);
+            return _this.Value.exportKey(alg);
         });
-    }
-    OnGetXml(element) {
+    };
+    KeyValue.prototype.OnGetXml = function (element) {
         if (!this.Value) {
             throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "KeyValue has empty value");
         }
-        const node = this.Value.GetXml();
+        var node = this.Value.GetXml();
         if (node) {
             element.appendChild(node);
         }
-    }
-};
-exports.KeyValue = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.KeyValue,
-    })
-], exports.KeyValue);
+    };
+    KeyValue = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.KeyValue,
+        })
+    ], KeyValue);
+    return KeyValue;
+}(KeyInfoClause));
 
 // tslint:disable-next-line:no-reference
 /**
  * List of OIDs
  * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx
  */
-const OID = {
+var OID = {
     "2.5.4.3": {
         short: "CN",
         long: "CommonName",
@@ -2153,68 +2394,86 @@ const OID = {
 /**
  * Represents an <X509Certificate> element.
  */
-class X509Certificate {
-    constructor(rawData) {
+var X509Certificate = /** @class */ (function () {
+    function X509Certificate(rawData) {
         this.publicKey = null;
         if (rawData) {
-            const buf = new Uint8Array(rawData);
+            var buf = new Uint8Array(rawData);
             this.LoadRaw(buf);
             this.raw = buf;
         }
     }
-    /**
-     * Gets a serial number of the certificate in BIG INTEGER string format
-     */
-    get SerialNumber() {
-        return this.simpl.serialNumber.valueBlock.toString();
-    }
-    /**
-     * Gets a issuer name of the certificate
-     */
-    get Issuer() {
-        return this.NameToString(this.simpl.issuer);
-    }
-    /**
-     * Gets a subject name of the certificate
-     */
-    get Subject() {
-        return this.NameToString(this.simpl.subject);
-    }
+    Object.defineProperty(X509Certificate.prototype, "SerialNumber", {
+        /**
+         * Gets a serial number of the certificate in BIG INTEGER string format
+         */
+        get: function () {
+            return this.simpl.serialNumber.valueBlock.toString();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(X509Certificate.prototype, "Issuer", {
+        /**
+         * Gets a issuer name of the certificate
+         */
+        get: function () {
+            return this.NameToString(this.simpl.issuer);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(X509Certificate.prototype, "Subject", {
+        /**
+         * Gets a subject name of the certificate
+         */
+        get: function () {
+            return this.NameToString(this.simpl.subject);
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Returns a thumbprint of the certificate
      * @param  {DigestAlgorithm="SHA-1"} algName Digest algorithm name
      * @returns PromiseLike
      */
-    Thumbprint(algName = "SHA-1") {
+    X509Certificate.prototype.Thumbprint = function (algName) {
+        if (algName === void 0) { algName = "SHA-1"; }
         return Application.crypto.subtle.digest(algName, this.raw);
-    }
-    /**
-     * Gets the public key from the X509Certificate
-     */
-    get PublicKey() {
-        return this.publicKey;
-    }
+    };
+    Object.defineProperty(X509Certificate.prototype, "PublicKey", {
+        /**
+         * Gets the public key from the X509Certificate
+         */
+        get: function () {
+            return this.publicKey;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Returns DER raw of X509Certificate
      */
-    GetRaw() {
+    X509Certificate.prototype.GetRaw = function () {
         return this.raw;
-    }
+    };
     /**
      * Returns public key from X509Certificate
      * @param  {Algorithm} algorithm
      * @returns Promise
      */
-    exportKey(algorithm) {
+    X509Certificate.prototype.exportKey = function (algorithm) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
-            const alg = {
-                algorithm,
+            .then(function () {
+            var alg = {
+                algorithm: algorithm,
                 usages: ["verify"],
             };
             if (alg.algorithm.name.toUpperCase() === ECDSA) {
                 // Set named curve
-                const namedCurveOid = this.simpl.subjectPublicKeyInfo.toJSON().algorithm.algorithmParams.valueBlock.value;
+                var namedCurveOid = _this.simpl.subjectPublicKeyInfo.toJSON().algorithm.algorithmParams.valueBlock.value;
                 switch (namedCurveOid) {
                     case "1.2.840.10045.3.1.7": // P-256
                         alg.algorithm.namedCurve = "P-256";
@@ -2226,16 +2485,16 @@ class X509Certificate {
                         alg.algorithm.namedCurve = "P-521";
                         break;
                     default:
-                        throw new Error(`Unsupported named curve OID '${namedCurveOid}'`);
+                        throw new Error("Unsupported named curve OID '" + namedCurveOid + "'");
                 }
             }
-            return this.simpl.getPublicKey({ algorithm: alg })
-                .then((key) => {
-                this.publicKey = key;
+            return _this.simpl.getPublicKey({ algorithm: alg })
+                .then(function (key) {
+                _this.publicKey = key;
                 return key;
             });
         });
-    }
+    };
     //#region Protected methods
     /**
      * Converts X500Name to string
@@ -2245,26 +2504,28 @@ class X509Certificate {
      * Example:
      * > C=Some name, O=Some organization name, C=RU
      */
-    NameToString(name, splitter = ",") {
-        const res = [];
-        name.typesAndValues.forEach((typeAndValue) => {
-            const type = typeAndValue.type;
-            const oid = OID[type.toString()];
-            const name2 = oid ? oid.short : null;
-            res.push(`${name2 ? name2 : type}=${typeAndValue.value.valueBlock.value}`);
+    X509Certificate.prototype.NameToString = function (name, splitter) {
+        if (splitter === void 0) { splitter = ","; }
+        var res = [];
+        name.typesAndValues.forEach(function (typeAndValue) {
+            var type = typeAndValue.type;
+            var oid = OID[type.toString()];
+            var name2 = oid ? oid.short : null;
+            res.push((name2 ? name2 : type) + "=" + typeAndValue.value.valueBlock.value);
         });
         return res.join(splitter + " ");
-    }
+    };
     /**
      * Loads X509Certificate from DER data
      * @param  {Uint8Array} rawData
      */
-    LoadRaw(rawData) {
+    X509Certificate.prototype.LoadRaw = function (rawData) {
         this.raw = new Uint8Array(rawData);
-        const asn1 = Asn1Js.fromBER(this.raw.buffer);
+        var asn1 = Asn1Js.fromBER(this.raw.buffer);
         this.simpl = new pkijs.Certificate({ schema: asn1.result });
-    }
-}
+    };
+    return X509Certificate;
+}());
 
 /**
  *
@@ -2290,27 +2551,32 @@ class X509Certificate {
  *  </complexType>
  *
  */
-exports.X509IssuerSerial = class X509IssuerSerial extends exports.XmlSignatureObject {
-};
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.X509IssuerName,
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
-        required: true,
-    })
-], exports.X509IssuerSerial.prototype, "X509IssuerName", void 0);
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.X509SerialNumber,
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
-        required: true,
-    })
-], exports.X509IssuerSerial.prototype, "X509SerialNumber", void 0);
-exports.X509IssuerSerial = tslib_1.__decorate([
-    XmlCore.XmlElement({ localName: XmlSignature.ElementNames.X509IssuerSerial })
-], exports.X509IssuerSerial);
+var X509IssuerSerial = /** @class */ (function (_super) {
+    tslib_1.__extends(X509IssuerSerial, _super);
+    function X509IssuerSerial() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.X509IssuerName,
+            namespaceURI: XmlSignature.NamespaceURI,
+            prefix: XmlSignature.DefaultPrefix,
+            required: true,
+        })
+    ], X509IssuerSerial.prototype, "X509IssuerName", void 0);
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.X509SerialNumber,
+            namespaceURI: XmlSignature.NamespaceURI,
+            prefix: XmlSignature.DefaultPrefix,
+            required: true,
+        })
+    ], X509IssuerSerial.prototype, "X509SerialNumber", void 0);
+    X509IssuerSerial = tslib_1.__decorate([
+        XmlCore.XmlElement({ localName: XmlSignature.ElementNames.X509IssuerSerial })
+    ], X509IssuerSerial);
+    return X509IssuerSerial;
+}(XmlSignatureObject));
 (function (X509IncludeOption) {
     X509IncludeOption[X509IncludeOption["None"] = 0] = "None";
     X509IncludeOption[X509IncludeOption["EndCertOnly"] = 1] = "EndCertOnly";
@@ -2320,98 +2586,126 @@ exports.X509IssuerSerial = tslib_1.__decorate([
 /**
  * Represents an <X509Data> sub element of an XMLDSIG or XML Encryption <KeyInfo> element.
  */
-exports.KeyInfoX509Data = class KeyInfoX509Data extends KeyInfoClause {
-    constructor(cert, includeOptions = exports.X509IncludeOption.None) {
-        super();
-        this.x509crl = null;
-        this.SubjectKeyIdList = [];
-        this.key = null;
+var KeyInfoX509Data = /** @class */ (function (_super) {
+    tslib_1.__extends(KeyInfoX509Data, _super);
+    function KeyInfoX509Data(cert, includeOptions) {
+        if (includeOptions === void 0) { includeOptions = exports.X509IncludeOption.None; }
+        var _this = _super.call(this) || this;
+        _this.x509crl = null;
+        _this.SubjectKeyIdList = [];
+        _this.key = null;
         if (cert) {
             if (cert instanceof Uint8Array) {
-                this.AddCertificate(new X509Certificate(cert));
+                _this.AddCertificate(new X509Certificate(cert));
             }
             else if (cert instanceof X509Certificate) {
                 switch (includeOptions) {
                     case exports.X509IncludeOption.None:
                     case exports.X509IncludeOption.EndCertOnly:
-                        this.AddCertificate(cert);
+                        _this.AddCertificate(cert);
                         break;
                     case exports.X509IncludeOption.ExcludeRoot:
-                        this.AddCertificatesChainFrom(cert, false);
+                        _this.AddCertificatesChainFrom(cert, false);
                         break;
                     case exports.X509IncludeOption.WholeChain:
-                        this.AddCertificatesChainFrom(cert, true);
+                        _this.AddCertificatesChainFrom(cert, true);
                         break;
                 }
             }
         }
+        return _this;
     }
-    /**
-     * Gets public key of the X509Data
-     */
-    get Key() {
-        return this.key;
-    }
-    importKey(key) {
+    Object.defineProperty(KeyInfoX509Data.prototype, "Key", {
+        /**
+         * Gets public key of the X509Data
+         */
+        get: function () {
+            return this.key;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    KeyInfoX509Data.prototype.importKey = function (key) {
         return Promise.reject(new XmlCore.XmlError(XmlCore.XE.METHOD_NOT_SUPPORTED));
-    }
+    };
     /**
      * Exports key from X509Data object
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    exportKey(alg) {
+    KeyInfoX509Data.prototype.exportKey = function (alg) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
-            if (this.Certificates.length) {
-                return this.Certificates[0].exportKey(alg);
+            .then(function () {
+            if (_this.Certificates.length) {
+                return _this.Certificates[0].exportKey(alg);
             }
             throw new XmlCore.XmlError(XmlCore.XE.NULL_REFERENCE);
         })
-            .then((key) => {
-            this.key = key;
+            .then(function (key) {
+            _this.key = key;
             return key;
         });
-    }
-    /**
-     * Gets a list of the X.509v3 certificates contained in the KeyInfoX509Data object.
-     */
-    get Certificates() {
-        return this.X509CertificateList;
-    }
-    /**
-     * Gets or sets the Certificate Revocation List (CRL) contained within the KeyInfoX509Data object.
-     */
-    get CRL() {
-        return this.x509crl;
-    }
-    set CRL(value) {
-        this.x509crl = value;
-    }
-    /**
-     * Gets a list of X509IssuerSerial structures that represent an issuer name and serial number pair.
-     */
-    get IssuerSerials() {
-        return this.IssuerSerialList;
-    }
-    /**
-     * Gets a list of the subject key identifiers (SKIs) contained in the KeyInfoX509Data object.
-     */
-    get SubjectKeyIds() {
-        return this.SubjectKeyIdList;
-    }
-    /**
-     * Gets a list of the subject names of the entities contained in the KeyInfoX509Data object.
-     */
-    get SubjectNames() {
-        return this.SubjectNameList;
-    }
+    };
+    Object.defineProperty(KeyInfoX509Data.prototype, "Certificates", {
+        /**
+         * Gets a list of the X.509v3 certificates contained in the KeyInfoX509Data object.
+         */
+        get: function () {
+            return this.X509CertificateList;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(KeyInfoX509Data.prototype, "CRL", {
+        /**
+         * Gets or sets the Certificate Revocation List (CRL) contained within the KeyInfoX509Data object.
+         */
+        get: function () {
+            return this.x509crl;
+        },
+        set: function (value) {
+            this.x509crl = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(KeyInfoX509Data.prototype, "IssuerSerials", {
+        /**
+         * Gets a list of X509IssuerSerial structures that represent an issuer name and serial number pair.
+         */
+        get: function () {
+            return this.IssuerSerialList;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(KeyInfoX509Data.prototype, "SubjectKeyIds", {
+        /**
+         * Gets a list of the subject key identifiers (SKIs) contained in the KeyInfoX509Data object.
+         */
+        get: function () {
+            return this.SubjectKeyIdList;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(KeyInfoX509Data.prototype, "SubjectNames", {
+        /**
+         * Gets a list of the subject names of the entities contained in the KeyInfoX509Data object.
+         */
+        get: function () {
+            return this.SubjectNameList;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Adds the specified X.509v3 certificate to the KeyInfoX509Data.
      * @param  {X509Certificate} certificate
      * @returns void
      */
-    AddCertificate(certificate) {
+    KeyInfoX509Data.prototype.AddCertificate = function (certificate) {
         if (!certificate) {
             throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "certificate");
         }
@@ -2419,35 +2713,35 @@ exports.KeyInfoX509Data = class KeyInfoX509Data extends KeyInfoClause {
             this.X509CertificateList = [];
         }
         this.X509CertificateList.push(certificate);
-    }
+    };
     /**
      * Adds the specified issuer name and serial number pair to the KeyInfoX509Data object.
      * @param  {string} issuerName
      * @param  {string} serialNumber
      * @returns void
      */
-    AddIssuerSerial(issuerName, serialNumber) {
+    KeyInfoX509Data.prototype.AddIssuerSerial = function (issuerName, serialNumber) {
         if (issuerName == null) {
             throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "issuerName");
         }
         if (this.IssuerSerialList == null) {
             this.IssuerSerialList = [];
         }
-        const xis = { issuerName, serialNumber };
+        var xis = { issuerName: issuerName, serialNumber: serialNumber };
         this.IssuerSerialList.push(xis);
-    }
+    };
     /**
      * Adds the specified subject key identifier (SKI) to the KeyInfoX509Data object.
      * @param  {string | Uint8Array} subjectKeyId
      * @returns void
      */
-    AddSubjectKeyId(subjectKeyId) {
+    KeyInfoX509Data.prototype.AddSubjectKeyId = function (subjectKeyId) {
         if (this.SubjectKeyIdList) {
             this.SubjectKeyIdList = [];
         }
         if (typeof subjectKeyId === "string") {
             if (subjectKeyId != null) {
-                let id;
+                var id = void 0;
                 id = XmlCore.Convert.FromBase64(subjectKeyId);
                 this.SubjectKeyIdList.push(id);
             }
@@ -2455,34 +2749,34 @@ exports.KeyInfoX509Data = class KeyInfoX509Data extends KeyInfoClause {
         else {
             this.SubjectKeyIdList.push(subjectKeyId);
         }
-    }
+    };
     /**
      * Adds the subject name of the entity that was issued an X.509v3 certificate to the KeyInfoX509Data object.
      * @param  {string} subjectName
      * @returns void
      */
-    AddSubjectName(subjectName) {
+    KeyInfoX509Data.prototype.AddSubjectName = function (subjectName) {
         if (this.SubjectNameList == null) {
             this.SubjectNameList = [];
         }
         this.SubjectNameList.push(subjectName);
-    }
+    };
     /**
      * Returns an XML representation of the KeyInfoX509Data object.
      * @returns Element
      */
-    GetXml() {
-        const doc = this.CreateDocument();
-        const xel = this.CreateElement(doc);
-        const prefix = this.GetPrefix();
+    KeyInfoX509Data.prototype.GetXml = function () {
+        var doc = this.CreateDocument();
+        var xel = this.CreateElement(doc);
+        var prefix = this.GetPrefix();
         // <X509IssuerSerial>
         if ((this.IssuerSerialList != null) && (this.IssuerSerialList.length > 0)) {
-            this.IssuerSerialList.forEach((iser) => {
-                const isl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerSerial);
-                const xin = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerName);
+            this.IssuerSerialList.forEach(function (iser) {
+                var isl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerSerial);
+                var xin = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerName);
                 xin.textContent = iser.issuerName;
                 isl.appendChild(xin);
-                const xsn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SerialNumber);
+                var xsn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SerialNumber);
                 xsn.textContent = iser.serialNumber;
                 isl.appendChild(xsn);
                 xel.appendChild(isl);
@@ -2490,43 +2784,44 @@ exports.KeyInfoX509Data = class KeyInfoX509Data extends KeyInfoClause {
         }
         // <X509SKI>
         if ((this.SubjectKeyIdList != null) && (this.SubjectKeyIdList.length > 0)) {
-            this.SubjectKeyIdList.forEach((skid) => {
-                const ski = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SKI);
+            this.SubjectKeyIdList.forEach(function (skid) {
+                var ski = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SKI);
                 ski.textContent = XmlCore.Convert.ToBase64(skid);
                 xel.appendChild(ski);
             });
         }
         // <X509SubjectName>
         if ((this.SubjectNameList != null) && (this.SubjectNameList.length > 0)) {
-            this.SubjectNameList.forEach((subject) => {
-                const sn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SubjectName);
+            this.SubjectNameList.forEach(function (subject) {
+                var sn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SubjectName);
                 sn.textContent = subject;
                 xel.appendChild(sn);
             });
         }
         // <X509Certificate>
         if ((this.X509CertificateList != null) && (this.X509CertificateList.length > 0)) {
-            this.X509CertificateList.forEach((x509) => {
-                const cert = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509Certificate);
+            this.X509CertificateList.forEach(function (x509) {
+                var cert = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509Certificate);
                 cert.textContent = XmlCore.Convert.ToBase64(x509.GetRaw());
                 xel.appendChild(cert);
             });
         }
         // only one <X509CRL>
         if (this.x509crl != null) {
-            const crl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509CRL);
+            var crl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509CRL);
             crl.textContent = XmlCore.Convert.ToBase64(this.x509crl);
             xel.appendChild(crl);
         }
         return xel;
-    }
+    };
     /**
      * Parses the input XmlElement object and configures the internal state of the KeyInfoX509Data object to match.
      * @param  {Element} element
      * @returns void
      */
-    LoadXml(element) {
-        super.LoadXml(element);
+    KeyInfoX509Data.prototype.LoadXml = function (element) {
+        var _this = this;
+        _super.prototype.LoadXml.call(this, element);
         if (this.IssuerSerialList) {
             this.IssuerSerialList = [];
         }
@@ -2541,64 +2836,65 @@ exports.KeyInfoX509Data = class KeyInfoX509Data extends KeyInfoClause {
         }
         this.x509crl = null;
         // <X509IssuerSerial>
-        let xnl = this.GetChildren(XmlSignature.ElementNames.X509IssuerSerial);
+        var xnl = this.GetChildren(XmlSignature.ElementNames.X509IssuerSerial);
         if (xnl) {
-            xnl.forEach((xel) => {
-                const issuer = exports.XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509IssuerName, XmlSignature.NamespaceURI, true);
-                const serial = exports.XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509SerialNumber, XmlSignature.NamespaceURI, true);
+            xnl.forEach(function (xel) {
+                var issuer = XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509IssuerName, XmlSignature.NamespaceURI, true);
+                var serial = XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509SerialNumber, XmlSignature.NamespaceURI, true);
                 if (issuer && issuer.textContent && serial && serial.textContent) {
-                    this.AddIssuerSerial(issuer.textContent, serial.textContent);
+                    _this.AddIssuerSerial(issuer.textContent, serial.textContent);
                 }
             });
         }
         // <X509SKI>
         xnl = this.GetChildren(XmlSignature.ElementNames.X509SKI);
         if (xnl) {
-            xnl.forEach((xel) => {
+            xnl.forEach(function (xel) {
                 if (xel.textContent) {
-                    const skid = XmlCore.Convert.FromBase64(xel.textContent);
-                    this.AddSubjectKeyId(skid);
+                    var skid = XmlCore.Convert.FromBase64(xel.textContent);
+                    _this.AddSubjectKeyId(skid);
                 }
             });
         }
         // <X509SubjectName>
         xnl = this.GetChildren(XmlSignature.ElementNames.X509SubjectName);
         if (xnl != null) {
-            xnl.forEach((xel) => {
+            xnl.forEach(function (xel) {
                 if (xel.textContent) {
-                    this.AddSubjectName(xel.textContent);
+                    _this.AddSubjectName(xel.textContent);
                 }
             });
         }
         // <X509Certificate>
         xnl = this.GetChildren(XmlSignature.ElementNames.X509Certificate);
         if (xnl) {
-            xnl.forEach((xel) => {
+            xnl.forEach(function (xel) {
                 if (xel.textContent) {
-                    const cert = XmlCore.Convert.FromBase64(xel.textContent);
-                    this.AddCertificate(new X509Certificate(cert));
+                    var cert = XmlCore.Convert.FromBase64(xel.textContent);
+                    _this.AddCertificate(new X509Certificate(cert));
                 }
             });
         }
         // only one <X509CRL>
-        const x509el = this.GetChild(XmlSignature.ElementNames.X509CRL, false);
+        var x509el = this.GetChild(XmlSignature.ElementNames.X509CRL, false);
         if (x509el && x509el.textContent) {
             this.x509crl = XmlCore.Convert.FromBase64(x509el.textContent);
         }
-    }
+    };
     // this gets complicated because we must:
     // 1. build the chain using a X509Certificate2 class;
     // 2. test for root using the Mono.Security.X509.X509Certificate class;
     // 3. add the certificates as X509Certificate instances;
-    AddCertificatesChainFrom(cert, root) {
+    KeyInfoX509Data.prototype.AddCertificatesChainFrom = function (cert, root) {
         throw new XmlCore.XmlError(XmlCore.XE.METHOD_NOT_IMPLEMENTED);
-    }
-};
-exports.KeyInfoX509Data = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.X509Data,
-    })
-], exports.KeyInfoX509Data);
+    };
+    KeyInfoX509Data = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.X509Data,
+        })
+    ], KeyInfoX509Data);
+    return KeyInfoX509Data;
+}(KeyInfoClause));
 
 /**
  *
@@ -2611,45 +2907,52 @@ exports.KeyInfoX509Data = tslib_1.__decorate([
  * </complexType>
  *
  */
-exports.SPKIData = class SPKIData extends KeyInfoClause {
-    importKey(key) {
+var SPKIData = /** @class */ (function (_super) {
+    tslib_1.__extends(SPKIData, _super);
+    function SPKIData() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    SPKIData.prototype.importKey = function (key) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
+            .then(function () {
             return Application.crypto.subtle.exportKey("spki", key);
         })
-            .then((spki) => {
-            this.SPKIexp = new Uint8Array(spki);
-            this.Key = key;
-            return this;
+            .then(function (spki) {
+            _this.SPKIexp = new Uint8Array(spki);
+            _this.Key = key;
+            return _this;
         });
-    }
-    exportKey(alg) {
+    };
+    SPKIData.prototype.exportKey = function (alg) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
-            return Application.crypto.subtle.importKey("spki", this.SPKIexp, alg, true, ["verify"]);
+            .then(function () {
+            return Application.crypto.subtle.importKey("spki", _this.SPKIexp, alg, true, ["verify"]);
         })
-            .then((key) => {
-            this.Key = key;
+            .then(function (key) {
+            _this.Key = key;
             return key;
         });
-    }
-};
-tslib_1.__decorate([
-    XmlCore.XmlChildElement({
-        localName: XmlSignature.ElementNames.SPKIexp,
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
-        required: true,
-        converter: XmlCore.XmlBase64Converter,
-    })
-], exports.SPKIData.prototype, "SPKIexp", void 0);
-exports.SPKIData = tslib_1.__decorate([
-    XmlCore.XmlElement({
-        localName: XmlSignature.ElementNames.SPKIData,
-    })
-], exports.SPKIData);
+    };
+    tslib_1.__decorate([
+        XmlCore.XmlChildElement({
+            localName: XmlSignature.ElementNames.SPKIexp,
+            namespaceURI: XmlSignature.NamespaceURI,
+            prefix: XmlSignature.DefaultPrefix,
+            required: true,
+            converter: XmlCore.XmlBase64Converter,
+        })
+    ], SPKIData.prototype, "SPKIexp", void 0);
+    SPKIData = tslib_1.__decorate([
+        XmlCore.XmlElement({
+            localName: XmlSignature.ElementNames.SPKIData,
+        })
+    ], SPKIData);
+    return SPKIData;
+}(KeyInfoClause));
 
-const SignatureAlgorithms = {};
+var SignatureAlgorithms = {};
 SignatureAlgorithms[RSA_PKCS1_SHA1_NAMESPACE] = RsaPkcs1Sha1;
 SignatureAlgorithms[RSA_PKCS1_SHA256_NAMESPACE] = RsaPkcs1Sha256;
 SignatureAlgorithms[RSA_PKCS1_SHA384_NAMESPACE] = RsaPkcs1Sha384;
@@ -2662,12 +2965,14 @@ SignatureAlgorithms[HMAC_SHA1_NAMESPACE] = HmacSha1;
 SignatureAlgorithms[HMAC_SHA256_NAMESPACE] = HmacSha256;
 SignatureAlgorithms[HMAC_SHA384_NAMESPACE] = HmacSha384;
 SignatureAlgorithms[HMAC_SHA512_NAMESPACE] = HmacSha512;
-const HashAlgorithms = {};
+var HashAlgorithms = {};
 HashAlgorithms[SHA1_NAMESPACE] = Sha1;
 HashAlgorithms[SHA256_NAMESPACE] = Sha256;
 HashAlgorithms[SHA384_NAMESPACE] = Sha384;
 HashAlgorithms[SHA512_NAMESPACE] = Sha512;
-class CryptoConfig {
+var CryptoConfig = /** @class */ (function () {
+    function CryptoConfig() {
+    }
     /**
      * Creates Transform from given name
      * if name is not exist then throws error
@@ -2678,8 +2983,8 @@ class CryptoConfig {
      *
      * @memberOf CryptoConfig
      */
-    static CreateFromName(name) {
-        let transform;
+    CryptoConfig.CreateFromName = function (name) {
+        var transform;
         switch (name) {
             case XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform:
                 transform = new XmlDsigBase64Transform();
@@ -2715,47 +3020,47 @@ class CryptoConfig {
                 throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, name);
         }
         return transform;
-    }
-    static CreateSignatureAlgorithm(method) {
-        const alg = SignatureAlgorithms[method.Algorithm] || null;
+    };
+    CryptoConfig.CreateSignatureAlgorithm = function (method) {
+        var alg = SignatureAlgorithms[method.Algorithm] || null;
         if (alg) {
             return new alg();
         }
         else if (method.Algorithm === RSA_PSS_WITH_PARAMS_NAMESPACE) {
-            let pssParams;
-            method.Any.Some((item) => {
-                if (item instanceof exports.PssAlgorithmParams) {
-                    pssParams = item;
+            var pssParams_1;
+            method.Any.Some(function (item) {
+                if (item instanceof PssAlgorithmParams) {
+                    pssParams_1 = item;
                 }
-                return !!pssParams;
+                return !!pssParams_1;
             });
-            if (pssParams) {
-                switch (pssParams.DigestMethod.Algorithm) {
+            if (pssParams_1) {
+                switch (pssParams_1.DigestMethod.Algorithm) {
                     case SHA1_NAMESPACE:
-                        return new RsaPssSha1(pssParams.SaltLength);
+                        return new RsaPssSha1(pssParams_1.SaltLength);
                     case SHA256_NAMESPACE:
-                        return new RsaPssSha256(pssParams.SaltLength);
+                        return new RsaPssSha256(pssParams_1.SaltLength);
                     case SHA384_NAMESPACE:
-                        return new RsaPssSha384(pssParams.SaltLength);
+                        return new RsaPssSha384(pssParams_1.SaltLength);
                     case SHA512_NAMESPACE:
-                        return new RsaPssSha512(pssParams.SaltLength);
+                        return new RsaPssSha512(pssParams_1.SaltLength);
                 }
             }
-            throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, `Cannot get params for RSA-PSS algoriithm`);
+            throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Cannot get params for RSA-PSS algoriithm");
         }
-        throw new Error(`signature algorithm '${method.Algorithm}' is not supported`);
-    }
-    static CreateHashAlgorithm(namespace) {
-        const alg = HashAlgorithms[namespace];
+        throw new Error("signature algorithm '" + method.Algorithm + "' is not supported");
+    };
+    CryptoConfig.CreateHashAlgorithm = function (namespace) {
+        var alg = HashAlgorithms[namespace];
         if (alg) {
             return new alg();
         }
         else {
             throw new Error("hash algorithm '" + namespace + "' is not supported");
         }
-    }
-    static GetHashAlgorithm(algorithm) {
-        const alg = typeof algorithm === "string" ? { name: algorithm } : algorithm;
+    };
+    CryptoConfig.GetHashAlgorithm = function (algorithm) {
+        var alg = typeof algorithm === "string" ? { name: algorithm } : algorithm;
         switch (alg.name.toUpperCase()) {
             case SHA1:
                 return new Sha1();
@@ -2768,18 +3073,18 @@ class CryptoConfig {
             default:
                 throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, alg.name);
         }
-    }
-    static GetSignatureAlgorithm(algorithm) {
+    };
+    CryptoConfig.GetSignatureAlgorithm = function (algorithm) {
         if (typeof algorithm.hash === "string") {
             algorithm.hash = {
                 name: algorithm.hash,
             };
         }
-        const hashName = algorithm.hash.name;
+        var hashName = algorithm.hash.name;
         if (!hashName) {
             throw new Error("Signing algorithm doesn't have name for hash");
         }
-        let alg;
+        var alg;
         switch (algorithm.name.toUpperCase()) {
             case RSA_PKCS1.toUpperCase():
                 switch (hashName.toUpperCase()) {
@@ -2796,11 +3101,11 @@ class CryptoConfig {
                         alg = new RsaPkcs1Sha512();
                         break;
                     default:
-                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name + ":" + hashName);
                 }
                 break;
             case RSA_PSS.toUpperCase():
-                const saltLength = algorithm.saltLength;
+                var saltLength = algorithm.saltLength;
                 switch (hashName.toUpperCase()) {
                     case SHA1:
                         alg = new RsaPssSha1(saltLength);
@@ -2815,7 +3120,7 @@ class CryptoConfig {
                         alg = new RsaPssSha512(saltLength);
                         break;
                     default:
-                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name + ":" + hashName);
                 }
                 break;
             case ECDSA:
@@ -2833,7 +3138,7 @@ class CryptoConfig {
                         alg = new EcdsaSha512();
                         break;
                     default:
-                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name + ":" + hashName);
                 }
                 break;
             case HMAC:
@@ -2851,21 +3156,22 @@ class CryptoConfig {
                         alg = new HmacSha512();
                         break;
                     default:
-                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+                        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name + ":" + hashName);
                 }
                 break;
             default:
                 throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name);
         }
         return alg;
-    }
-}
+    };
+    return CryptoConfig;
+}());
 
 // tslint:disable:no-console
 /**
  * Provides a wrapper on a core XML signature object to facilitate creating XML signatures.
  */
-class SignedXml {
+var SignedXml = /** @class */ (function () {
     /**
      * Creates an instance of SignedXml.
      *
@@ -2873,8 +3179,8 @@ class SignedXml {
      *
      * @memberOf SignedXml
      */
-    constructor(node) {
-        this.signature = new exports.Signature();
+    function SignedXml(node) {
+        this.signature = new Signature();
         // constructor();
         if (node && node.nodeType === XmlCore.XmlNodeType.Document) {
             // constructor(node: Document);
@@ -2882,45 +3188,54 @@ class SignedXml {
         }
         else if (node && node.nodeType === XmlCore.XmlNodeType.Element) {
             // constructor(node: Element);
-            const xmlText = new XMLSerializer().serializeToString(node);
+            var xmlText = new XMLSerializer().serializeToString(node);
             this.document = new DOMParser().parseFromString(xmlText, XmlCore.APPLICATION_XML);
         }
     }
-    get XmlSignature() {
-        return this.signature;
-    }
-    get Signature() {
-        return this.XmlSignature.SignatureValue;
-    }
-    Sign(algorithm, key, data, options) {
-        let alg;
-        let signedInfo;
+    Object.defineProperty(SignedXml.prototype, "XmlSignature", {
+        get: function () {
+            return this.signature;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SignedXml.prototype, "Signature", {
+        get: function () {
+            return this.XmlSignature.SignatureValue;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    SignedXml.prototype.Sign = function (algorithm, key, data, options) {
+        var _this = this;
+        var alg;
+        var signedInfo;
         return Promise.resolve()
-            .then(() => {
-            const signingAlg = XmlCore.assign({}, key.algorithm, algorithm);
+            .then(function () {
+            var signingAlg = XmlCore.assign({}, key.algorithm, algorithm);
             alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);
-            return this.ApplySignOptions(this.XmlSignature, algorithm, key, options);
+            return _this.ApplySignOptions(_this.XmlSignature, algorithm, key, options);
         })
-            .then(() => {
-            signedInfo = this.XmlSignature.SignedInfo;
-            return this.DigestReferences(data.documentElement);
+            .then(function () {
+            signedInfo = _this.XmlSignature.SignedInfo;
+            return _this.DigestReferences(data.documentElement);
         })
-            .then(() => {
+            .then(function () {
             // Add signature method
             signedInfo.SignatureMethod.Algorithm = alg.namespaceURI;
             if (RSA_PSS.toUpperCase() === algorithm.name.toUpperCase()) {
                 // Add RSA-PSS params
-                const alg2 = XmlCore.assign({}, key.algorithm, algorithm);
+                var alg2 = XmlCore.assign({}, key.algorithm, algorithm);
                 if (typeof alg2.hash === "string") {
                     alg2.hash = { name: alg2.hash };
                 }
-                const params = new exports.PssAlgorithmParams(alg2);
-                this.XmlSignature.SignedInfo.SignatureMethod.Any.Add(params);
+                var params = new PssAlgorithmParams(alg2);
+                _this.XmlSignature.SignedInfo.SignatureMethod.Any.Add(params);
             }
             else if (HMAC.toUpperCase() === algorithm.name.toUpperCase()) {
                 // Add HMAC params
-                let outputLength = 0;
-                const hmacAlg = key.algorithm;
+                var outputLength = 0;
+                var hmacAlg = key.algorithm;
                 switch (hmacAlg.hash.name.toUpperCase()) {
                     case SHA1:
                         outputLength = hmacAlg.length || 160;
@@ -2935,176 +3250,186 @@ class SignedXml {
                         outputLength = hmacAlg.length || 512;
                         break;
                 }
-                this.XmlSignature.SignedInfo.SignatureMethod.HMACOutputLength = outputLength;
+                _this.XmlSignature.SignedInfo.SignatureMethod.HMACOutputLength = outputLength;
             }
-            const si = this.TransformSignedInfo(data);
+            var si = _this.TransformSignedInfo(data);
             return alg.Sign(si, key, algorithm);
         })
-            .then((signature) => {
-            this.Key = key;
-            this.XmlSignature.SignatureValue = new Uint8Array(signature);
-            this.document = data;
-            return this.XmlSignature;
+            .then(function (signature) {
+            _this.Key = key;
+            _this.XmlSignature.SignatureValue = new Uint8Array(signature);
+            _this.document = data;
+            return _this.XmlSignature;
         });
-    }
-    Verify(key) {
+    };
+    SignedXml.prototype.Verify = function (key) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
-            const xml = this.document;
+            .then(function () {
+            var xml = _this.document;
             if (!(xml && xml.documentElement)) {
                 throw new XmlCore.XmlError(XmlCore.XE.NULL_PARAM, "SignedXml", "document");
             }
-            return this.ValidateReferences(xml.documentElement);
+            return _this.ValidateReferences(xml.documentElement);
         })
-            .then((res) => {
+            .then(function (res) {
             if (res) {
-                let promise = Promise.resolve([]);
+                var promise = Promise.resolve([]);
                 if (key) {
-                    promise = promise.then(() => [key]);
+                    promise = promise.then(function () {
+                        return [key];
+                    });
                 }
                 else {
-                    promise = promise.then(() => this.GetPublicKeys());
+                    promise = promise.then(function () {
+                        return _this.GetPublicKeys();
+                    });
                 }
-                return promise.then((keys) => {
-                    return this.ValidateSignatureValue(keys);
+                return promise.then(function (keys) {
+                    return _this.ValidateSignatureValue(keys);
                 });
             }
             else {
                 return false;
             }
         });
-    }
-    GetXml() {
+    };
+    SignedXml.prototype.GetXml = function () {
         return this.signature.GetXml();
-    }
+    };
     /**
      * Loads a SignedXml state from an XML element.
      * @param  {Element | string} value The XML to load the SignedXml state from.
      * @returns void
      */
-    LoadXml(value) {
-        this.signature = exports.Signature.LoadXml(value);
-    }
-    toString() {
+    SignedXml.prototype.LoadXml = function (value) {
+        this.signature = Signature.LoadXml(value);
+    };
+    SignedXml.prototype.toString = function () {
         // Check for EnvelopedTransform
-        const signature = this.XmlSignature;
-        const enveloped = signature.SignedInfo.References && signature.SignedInfo.References.Some((r) => r.Transforms && r.Transforms.Some((t) => t instanceof XmlDsigEnvelopedSignatureTransform));
+        var signature = this.XmlSignature;
+        var enveloped = signature.SignedInfo.References && signature.SignedInfo.References.Some(function (r) {
+            return r.Transforms && r.Transforms.Some(function (t) { return t instanceof XmlDsigEnvelopedSignatureTransform; });
+        });
         if (enveloped) {
-            const doc = this.document.documentElement.cloneNode(true);
-            const node = this.XmlSignature.GetXml();
+            var doc = this.document.documentElement.cloneNode(true);
+            var node = this.XmlSignature.GetXml();
             if (!node) {
                 throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot get Xml element from Signature");
             }
             // console.log('Node before clone', node.outerHTML);
-            const sig = node.cloneNode(true);
+            var sig = node.cloneNode(true);
             // console.log('Sig after clone', (sig as Element).outerHTML);
             doc.appendChild(sig);
             // console.log('doc before serializing', (doc as Element).outerHTML);
             return new XMLSerializer().serializeToString(doc);
         }
         return this.XmlSignature.toString();
-    }
+    };
     //#region Protected methods
     /**
      * Returns the public key of a signature.
      */
-    GetPublicKeys() {
-        const keys = [];
+    SignedXml.prototype.GetPublicKeys = function () {
+        var _this = this;
+        var keys = [];
         return Promise.resolve()
-            .then(() => {
-            const pkEnumerator = this.XmlSignature.KeyInfo.GetIterator();
-            const promises = [];
-            pkEnumerator.forEach((kic) => {
-                const alg = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
-                if (kic instanceof exports.KeyInfoX509Data) {
-                    kic.Certificates.forEach((cert) => {
+            .then(function () {
+            var pkEnumerator = _this.XmlSignature.KeyInfo.GetIterator();
+            var promises = [];
+            pkEnumerator.forEach(function (kic) {
+                var alg = CryptoConfig.CreateSignatureAlgorithm(_this.XmlSignature.SignedInfo.SignatureMethod);
+                if (kic instanceof KeyInfoX509Data) {
+                    kic.Certificates.forEach(function (cert) {
                         promises.push(cert.exportKey(alg.algorithm)
-                            .then((key) => { keys.push(key); }));
+                            .then(function (key) { keys.push(key); }));
                     });
                 }
                 else {
                     promises.push(kic.exportKey(alg.algorithm)
-                        .then((key) => { keys.push(key); }));
+                        .then(function (key) { keys.push(key); }));
                 }
             });
             return Promise.all(promises);
         })
-            .then(() => keys);
-    }
+            .then(function () { return keys; });
+    };
     /**
      * Returns dictionary of namespaces used in signature
      */
-    GetSignatureNamespaces() {
-        const namespaces = {};
+    SignedXml.prototype.GetSignatureNamespaces = function () {
+        var namespaces = {};
         if (this.XmlSignature.NamespaceURI) {
             namespaces[this.XmlSignature.Prefix || ""] = this.XmlSignature.NamespaceURI;
         }
         return namespaces;
-    }
+    };
     /**
      * Copies namespaces from source element and its parents into destination element
      */
-    CopyNamespaces(src, dst, ignoreDefault) {
+    SignedXml.prototype.CopyNamespaces = function (src, dst, ignoreDefault) {
         // this.InjectNamespaces(XmlCore.SelectNamespaces(src), dst, ignoreDefault);
         this.InjectNamespaces(SelectRootNamespaces(src), dst, ignoreDefault);
-    }
+    };
     /**
      * Injects namespaces from dictionary to the target element
      */
-    InjectNamespaces(namespaces, target, ignoreDefault) {
-        for (const i in namespaces) {
-            const uri = namespaces[i];
+    SignedXml.prototype.InjectNamespaces = function (namespaces, target, ignoreDefault) {
+        for (var i in namespaces) {
+            var uri = namespaces[i];
             if (ignoreDefault && i === "") {
                 continue;
             }
             target.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
         }
-    }
-    DigestReference(doc, reference, checkHmac) {
+    };
+    SignedXml.prototype.DigestReference = function (doc, reference, checkHmac) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
+            .then(function () {
             if (reference.Uri) {
-                let objectName;
+                var objectName = void 0;
                 if (!reference.Uri.indexOf("#xpointer")) {
-                    let uri = reference.Uri;
+                    var uri = reference.Uri;
                     uri = uri.substring(9).replace(/[\r\n\t\s]/g, "");
-                    if (uri.length < 2 || uri[0] !== `(` || uri[uri.length - 1] !== `)`) {
+                    if (uri.length < 2 || uri[0] !== "(" || uri[uri.length - 1] !== ")") {
                         // FIXME: how to handle invalid xpointer?
                         uri = ""; // String.Empty
                     }
                     else {
                         uri = uri.substring(1, uri.length - 1);
                     }
-                    if (uri.length > 6 && uri.indexOf(`id(`) === 0 && uri[uri.length - 1] === `)`) {
+                    if (uri.length > 6 && uri.indexOf("id(") === 0 && uri[uri.length - 1] === ")") {
                         // id('foo'), id("foo")
                         objectName = uri.substring(4, uri.length - 2);
                     }
                 }
-                else if (reference.Uri[0] === `#`) {
+                else if (reference.Uri[0] === "#") {
                     objectName = reference.Uri.substring(1);
                 }
                 if (objectName) {
-                    let found = null;
-                    const xmlSignatureObjects = [this.XmlSignature.KeyInfo.GetXml()];
-                    this.XmlSignature.ObjectList.ForEach((object) => {
-                        xmlSignatureObjects.push(object.GetXml());
+                    var found = null;
+                    var xmlSignatureObjects_2 = [_this.XmlSignature.KeyInfo.GetXml()];
+                    _this.XmlSignature.ObjectList.ForEach(function (object) {
+                        xmlSignatureObjects_2.push(object.GetXml());
                     });
-                    for (const xmlSignatureObject of xmlSignatureObjects) {
+                    for (var _i = 0, xmlSignatureObjects_1 = xmlSignatureObjects_2; _i < xmlSignatureObjects_1.length; _i++) {
+                        var xmlSignatureObject = xmlSignatureObjects_1[_i];
                         if (xmlSignatureObject) {
                             found = findById(xmlSignatureObject, objectName);
                             if (found) {
-                                const el = found.cloneNode(true);
+                                var el = found.cloneNode(true);
                                 // Copy xmlns from Document
-                                this.CopyNamespaces(doc, el, false);
+                                _this.CopyNamespaces(doc, el, false);
                                 // Copy xmlns from Parent
-                                if (this.Parent) {
-                                    const parent = (this.Parent instanceof XmlCore.XmlObject)
-                                        ? this.Parent.GetXml()
-                                        : this.Parent;
-                                    this.CopyNamespaces(parent, el, true);
+                                if (_this.Parent) {
+                                    var parent = (_this.Parent instanceof XmlCore.XmlObject)
+                                        ? _this.Parent.GetXml()
+                                        : _this.Parent;
+                                    _this.CopyNamespaces(parent, el, true);
                                 }
-                                this.CopyNamespaces(found, el, false);
-                                this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
+                                _this.CopyNamespaces(found, el, false);
+                                _this.InjectNamespaces(_this.GetSignatureNamespaces(), el, true);
                                 doc = el;
                                 break;
                             }
@@ -3113,30 +3438,30 @@ class SignedXml {
                     if (!found && doc) {
                         found = XmlCore.XmlObject.GetElementById(doc, objectName);
                         if (found) {
-                            const el = found.cloneNode(true);
-                            this.CopyNamespaces(found, el, false);
-                            this.CopyNamespaces(doc, el, false);
+                            var el = found.cloneNode(true);
+                            _this.CopyNamespaces(found, el, false);
+                            _this.CopyNamespaces(doc, el, false);
                             doc = el;
                         }
                     }
                     if (found == null) {
-                        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, `Cannot get object by reference: ${objectName}`);
+                        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Cannot get object by reference: " + objectName);
                     }
                 }
             }
-            let canonOutput = null;
+            var canonOutput = null;
             if (reference.Transforms && reference.Transforms.Count) {
-                canonOutput = this.ApplyTransforms(reference.Transforms, doc);
+                canonOutput = _this.ApplyTransforms(reference.Transforms, doc);
             }
             else {
                 // we must not C14N references from outside the document
                 // e.g. non-xml documents
-                if (reference.Uri && reference.Uri[0] !== `#`) {
+                if (reference.Uri && reference.Uri[0] !== "#") {
                     canonOutput = new XMLSerializer().serializeToString(doc.ownerDocument);
                 }
                 else {
                     // apply default C14N transformation
-                    const excC14N = new XmlDsigC14NTransform();
+                    var excC14N = new XmlDsigC14NTransform();
                     excC14N.LoadInnerXml(doc);
                     canonOutput = excC14N.GetOutput();
                 }
@@ -3144,35 +3469,36 @@ class SignedXml {
             if (!reference.DigestMethod.Algorithm) {
                 throw new XmlCore.XmlError(XmlCore.XE.NULL_PARAM, "Reference", "DigestMethod");
             }
-            const digest = CryptoConfig.CreateHashAlgorithm(reference.DigestMethod.Algorithm);
+            var digest = CryptoConfig.CreateHashAlgorithm(reference.DigestMethod.Algorithm);
             return digest.Digest(canonOutput);
         });
-    }
-    DigestReferences(data) {
+    };
+    SignedXml.prototype.DigestReferences = function (data) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
+            .then(function () {
             // we must tell each reference which hash algorithm to use
             // before asking for the SignedInfo XML !
-            const promises = this.XmlSignature.SignedInfo.References.Map((ref) => {
+            var promises = _this.XmlSignature.SignedInfo.References.Map(function (ref) {
                 // assume SHA-256 if nothing is specified
                 if (!ref.DigestMethod.Algorithm) {
                     ref.DigestMethod.Algorithm = new Sha256().namespaceURI;
                 }
-                return this.DigestReference(data, ref, false)
-                    .then((hashValue) => {
+                return _this.DigestReference(data, ref, false)
+                    .then(function (hashValue) {
                     ref.DigestValue = hashValue;
                 });
             }).GetIterator();
             return Promise.all(promises);
         });
-    }
-    TransformSignedInfo(data) {
-        const t = CryptoConfig.CreateFromName(this.XmlSignature.SignedInfo.CanonicalizationMethod.Algorithm);
-        const xml = this.XmlSignature.SignedInfo.GetXml();
+    };
+    SignedXml.prototype.TransformSignedInfo = function (data) {
+        var t = CryptoConfig.CreateFromName(this.XmlSignature.SignedInfo.CanonicalizationMethod.Algorithm);
+        var xml = this.XmlSignature.SignedInfo.GetXml();
         if (!xml) {
             throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot get Xml element from SignedInfo");
         }
-        const node = xml.cloneNode(true);
+        var node = xml.cloneNode(true);
         //#region Get root namespaces
         // Get xmlns from SignedInfo
         this.CopyNamespaces(xml, node, false);
@@ -3187,7 +3513,7 @@ class SignedXml {
         }
         if (this.Parent) {
             // Get xmlns from Parent
-            const parentXml = (this.Parent instanceof XmlCore.XmlObject)
+            var parentXml = (this.Parent instanceof XmlCore.XmlObject)
                 ? this.Parent.GetXml()
                 : this.Parent;
             if (parentXml) {
@@ -3195,31 +3521,31 @@ class SignedXml {
             }
         }
         //#endregion
-        const childNamespaces = XmlCore.SelectNamespaces(xml);
-        for (const i in childNamespaces) {
-            const uri = childNamespaces[i];
+        var childNamespaces = XmlCore.SelectNamespaces(xml);
+        for (var i in childNamespaces) {
+            var uri = childNamespaces[i];
             if (i === node.prefix) {
                 continue;
             }
             node.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
         }
         t.LoadInnerXml(node);
-        const res = t.GetOutput();
+        var res = t.GetOutput();
         return res;
-    }
-    ResolveFilterTransform(transform) {
-        const split = transform.split(" ");
+    };
+    SignedXml.prototype.ResolveFilterTransform = function (transform) {
+        var split = transform.split(" ");
         if (split.length !== 3) {
             throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_TRANSFORM_FILTER, transform);
         }
-        const filterMethod = split[1].trim();
-        const xPath = split[2].trim();
+        var filterMethod = split[1].trim();
+        var xPath = split[2].trim();
         return new XmlDsigDisplayFilterTransform({
             Filter: filterMethod,
             XPath: xPath,
         });
-    }
-    ResolveTransform(transform) {
+    };
+    SignedXml.prototype.ResolveTransform = function (transform) {
         switch (transform) {
             case "enveloped":
                 return new XmlDsigEnvelopedSignatureTransform();
@@ -3236,21 +3562,21 @@ class SignedXml {
             default:
                 throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
         }
-    }
-    ApplyTransforms(transforms, input) {
-        let output = null;
+    };
+    SignedXml.prototype.ApplyTransforms = function (transforms, input) {
+        var output = null;
         // console.log('before applying reordering:');
         // console.log(transforms.items.map(item => item._Algorithm).join(', '));
-        const ordered = new exports.Transforms();
-        transforms.Filter((element) => element instanceof XmlDsigDisplayFilterTransform) //
-            .ForEach((element) => ordered.Add(element));
-        transforms.Filter((element) => element instanceof XmlDsigEnvelopedSignatureTransform) //
-            .ForEach((element) => ordered.Add(element));
-        transforms.Filter((element) => {
+        var ordered = new Transforms();
+        transforms.Filter(function (element) { return element instanceof XmlDsigDisplayFilterTransform; }) //
+            .ForEach(function (element) { return ordered.Add(element); });
+        transforms.Filter(function (element) { return element instanceof XmlDsigEnvelopedSignatureTransform; }) //
+            .ForEach(function (element) { return ordered.Add(element); });
+        transforms.Filter(function (element) {
             return !(element instanceof XmlDsigEnvelopedSignatureTransform || //
                 element instanceof XmlDsigDisplayFilterTransform);
-        }).ForEach((element) => ordered.Add(element));
-        ordered.ForEach((transform) => {
+        }).ForEach(function (element) { return ordered.Add(element); });
+        ordered.ForEach(function (transform) {
             // Apply transforms
             if (transform instanceof XmlDsigC14NWithCommentsTransform) {
                 transform = new XmlDsigC14NTransform(); // TODO: Check RFC for it
@@ -3265,26 +3591,28 @@ class SignedXml {
         // console.log(ordered.items.map(item => item._Algorithm).join(', '));
         // Apply C14N transform if Reference has only one transform EnvelopedSignature
         if (ordered.Count === 1 && ordered.Item(0) instanceof XmlDsigEnvelopedSignatureTransform) {
-            const c14n = new XmlDsigC14NTransform();
+            var c14n = new XmlDsigC14NTransform();
             c14n.LoadInnerXml(input);
             output = c14n.GetOutput();
         }
         return output;
-    }
-    ApplySignOptions(signature, algorithm, key, options = {}) {
+    };
+    SignedXml.prototype.ApplySignOptions = function (signature, algorithm, key, options) {
+        var _this = this;
+        if (options === void 0) { options = {}; }
         return Promise.resolve()
-            .then(() => {
+            .then(function () {
             // id
             if (options.id) {
-                this.XmlSignature.Id = options.id;
+                _this.XmlSignature.Id = options.id;
             }
             // keyValue
             if (options.keyValue && key.algorithm.name.toUpperCase() !== HMAC) {
                 if (!signature.KeyInfo) {
-                    signature.KeyInfo = new exports.KeyInfo();
+                    signature.KeyInfo = new KeyInfo();
                 }
-                const keyInfo = signature.KeyInfo;
-                const keyValue = new exports.KeyValue();
+                var keyInfo = signature.KeyInfo;
+                var keyValue = new KeyValue();
                 keyInfo.Add(keyValue);
                 return keyValue.importKey(options.keyValue);
             }
@@ -3292,26 +3620,26 @@ class SignedXml {
                 return Promise.resolve();
             }
         })
-            .then(() => {
+            .then(function () {
             // x509
             if (options.x509) {
                 if (!signature.KeyInfo) {
-                    signature.KeyInfo = new exports.KeyInfo();
+                    signature.KeyInfo = new KeyInfo();
                 }
-                const keyInfo = signature.KeyInfo;
-                options.x509.forEach((x509) => {
-                    const raw = XmlCore.Convert.FromBase64(x509);
-                    const x509Data = new exports.KeyInfoX509Data(raw);
-                    keyInfo.Add(x509Data);
+                var keyInfo_1 = signature.KeyInfo;
+                options.x509.forEach(function (x509) {
+                    var raw = XmlCore.Convert.FromBase64(x509);
+                    var x509Data = new KeyInfoX509Data(raw);
+                    keyInfo_1.Add(x509Data);
                 });
             }
             return Promise.resolve();
         })
-            .then(() => {
+            .then(function () {
             // references
             if (options.references) {
-                options.references.forEach((item) => {
-                    const reference = new exports.Reference();
+                options.references.forEach(function (item) {
+                    var reference = new Reference();
                     // Id
                     if (item.id) {
                         reference.Id = item.id;
@@ -3325,23 +3653,23 @@ class SignedXml {
                         reference.Type = item.type;
                     }
                     // DigestMethod
-                    const digestAlgorithm = CryptoConfig.GetHashAlgorithm(item.hash);
+                    var digestAlgorithm = CryptoConfig.GetHashAlgorithm(item.hash);
                     reference.DigestMethod.Algorithm = digestAlgorithm.namespaceURI;
                     // transforms
                     if (item.transforms && item.transforms.length) {
-                        const transforms = new exports.Transforms();
-                        item.transforms.forEach((transform) => {
+                        var transforms_1 = new Transforms();
+                        item.transforms.forEach(function (transform) {
                             if (transform.startsWith("filter")) {
-                                transforms.Add(this.ResolveFilterTransform(transform));
+                                transforms_1.Add(_this.ResolveFilterTransform(transform));
                             }
                             else {
-                                transforms.Add(this.ResolveTransform(transform));
+                                transforms_1.Add(_this.ResolveTransform(transform));
                             }
                         });
-                        reference.Transforms = transforms;
+                        reference.Transforms = transforms_1;
                     }
                     if (!signature.SignedInfo.References) {
-                        signature.SignedInfo.References = new exports.References();
+                        signature.SignedInfo.References = new References();
                     }
                     signature.SignedInfo.References.Add(reference);
                 });
@@ -3349,51 +3677,54 @@ class SignedXml {
             // Set default values
             if (!signature.SignedInfo.References.Count) {
                 // Add default Reference
-                const reference = new exports.Reference();
+                var reference = new Reference();
                 signature.SignedInfo.References.Add(reference);
             }
             return Promise.resolve();
         });
-    }
-    ValidateReferences(doc) {
+    };
+    SignedXml.prototype.ValidateReferences = function (doc) {
+        var _this = this;
         return Promise.resolve()
-            .then(() => {
-            return Promise.all(this.XmlSignature.SignedInfo.References.Map((ref) => {
-                return this.DigestReference(doc, ref, false)
-                    .then((digest) => {
-                    const b64Digest = XmlCore.Convert.ToBase64(digest);
-                    const b64DigestValue = XmlCore.Convert.ToString(ref.DigestValue, "base64");
+            .then(function () {
+            return Promise.all(_this.XmlSignature.SignedInfo.References.Map(function (ref) {
+                return _this.DigestReference(doc, ref, false)
+                    .then(function (digest) {
+                    var b64Digest = XmlCore.Convert.ToBase64(digest);
+                    var b64DigestValue = XmlCore.Convert.ToString(ref.DigestValue, "base64");
                     if (b64Digest !== b64DigestValue) {
-                        const errText = `Invalid digest for uri '${ref.Uri}'. Calculated digest is ${b64Digest} but the xml to validate supplies digest ${b64DigestValue}`;
+                        var errText = "Invalid digest for uri '" + ref.Uri + "'. Calculated digest is " + b64Digest + " but the xml to validate supplies digest " + b64DigestValue;
                         throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, errText);
                     }
                     return Promise.resolve(true);
                 });
             }).GetIterator());
         })
-            .then(() => true);
-    }
-    ValidateSignatureValue(keys) {
-        let signer;
-        let signedInfoCanon;
+            .then(function () { return true; });
+    };
+    SignedXml.prototype.ValidateSignatureValue = function (keys) {
+        var _this = this;
+        var signer;
+        var signedInfoCanon;
         return Promise.resolve()
-            .then(() => {
-            signedInfoCanon = this.TransformSignedInfo(this.document);
-            signer = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
+            .then(function () {
+            signedInfoCanon = _this.TransformSignedInfo(_this.document);
+            signer = CryptoConfig.CreateSignatureAlgorithm(_this.XmlSignature.SignedInfo.SignatureMethod);
             // Verify signature for all exported keys
-            let chain = Promise.resolve(false);
-            keys.forEach((key) => {
-                chain = chain.then((v) => {
+            var chain = Promise.resolve(false);
+            keys.forEach(function (key) {
+                chain = chain.then(function (v) {
                     if (!v) {
-                        return signer.Verify(signedInfoCanon, key, this.Signature);
+                        return signer.Verify(signedInfoCanon, key, _this.Signature);
                     }
                     return Promise.resolve(v);
                 });
             });
             return chain;
         });
-    }
-}
+    };
+    return SignedXml;
+}());
 function findById(element, id) {
     if (element.nodeType !== XmlCore.XmlNodeType.Element) {
         return null;
@@ -3402,8 +3733,8 @@ function findById(element, id) {
         return element;
     }
     if (element.childNodes && element.childNodes.length) {
-        for (let i = 0; i < element.childNodes.length; i++) {
-            const el = findById(element.childNodes[i], id);
+        for (var i = 0; i < element.childNodes.length; i++) {
+            var el = findById(element.childNodes[i], id);
             if (el) {
                 return el;
             }
@@ -3424,15 +3755,16 @@ function addNamespace(selectedNodes, name, namespace) {
     }
 }
 // TODO it can be moved to XmlCore
-function _SelectRootNamespaces(node, selectedNodes = {}) {
+function _SelectRootNamespaces(node, selectedNodes) {
+    if (selectedNodes === void 0) { selectedNodes = {}; }
     if (node && node.nodeType === XmlCore.XmlNodeType.Element) {
-        const el = node;
+        var el = node;
         if (el.namespaceURI && el.namespaceURI !== "http://www.w3.org/XML/1998/namespace") {
             addNamespace(selectedNodes, el.prefix ? el.prefix : "", node.namespaceURI);
         }
         //#region Select all xmlns attrs
-        for (let i = 0; i < el.attributes.length; i++) {
-            const attr = el.attributes.item(i);
+        for (var i = 0; i < el.attributes.length; i++) {
+            var attr = el.attributes.item(i);
             if (attr && attr.prefix === "xmlns") {
                 addNamespace(selectedNodes, attr.localName ? attr.localName : "", attr.value);
             }
@@ -3444,7 +3776,7 @@ function _SelectRootNamespaces(node, selectedNodes = {}) {
     }
 }
 function SelectRootNamespaces(node) {
-    const attrs = {};
+    var attrs = {};
     _SelectRootNamespaces(node, attrs);
     return attrs;
 }
@@ -3456,6 +3788,19 @@ exports.Application = Application;
 exports.XmlCanonicalizer = XmlCanonicalizer;
 exports.CryptoConfig = CryptoConfig;
 exports.XmlSignature = XmlSignature;
+exports.XmlSignatureObject = XmlSignatureObject;
+exports.XmlSignatureCollection = XmlSignatureCollection;
+exports.CanonicalizationMethod = CanonicalizationMethod;
+exports.DataObject = DataObject;
+exports.DataObjects = DataObjects;
+exports.DigestMethod = DigestMethod;
+exports.KeyInfo = KeyInfo;
+exports.Reference = Reference;
+exports.References = References;
+exports.Signature = Signature;
+exports.SignatureMethodOther = SignatureMethodOther;
+exports.SignatureMethod = SignatureMethod;
+exports.SignedInfo = SignedInfo;
 exports.XmlDsigBase64Transform = XmlDsigBase64Transform;
 exports.XmlDsigC14NTransform = XmlDsigC14NTransform;
 exports.XmlDsigC14NWithCommentsTransform = XmlDsigC14NWithCommentsTransform;
@@ -3463,7 +3808,20 @@ exports.XmlDsigEnvelopedSignatureTransform = XmlDsigEnvelopedSignatureTransform;
 exports.XmlDsigExcC14NTransform = XmlDsigExcC14NTransform;
 exports.XmlDsigExcC14NWithCommentsTransform = XmlDsigExcC14NWithCommentsTransform;
 exports.XmlDsigDisplayFilterTransform = XmlDsigDisplayFilterTransform;
+exports.Transform = Transform;
+exports.Transforms = Transforms;
 exports.X509Certificate = X509Certificate;
 exports.KeyInfoClause = KeyInfoClause;
+exports.KeyValue = KeyValue;
+exports.EcdsaPublicKey = EcdsaPublicKey;
+exports.NamedCurve = NamedCurve;
+exports.DomainParameters = DomainParameters;
+exports.EcdsaKeyValue = EcdsaKeyValue;
+exports.RsaKeyValue = RsaKeyValue;
+exports.MaskGenerationFunction = MaskGenerationFunction;
+exports.PssAlgorithmParams = PssAlgorithmParams;
+exports.X509IssuerSerial = X509IssuerSerial;
+exports.KeyInfoX509Data = KeyInfoX509Data;
+exports.SPKIData = SPKIData;
 exports.SelectRootNamespaces = SelectRootNamespaces;
 exports.SignedXml = SignedXml;
