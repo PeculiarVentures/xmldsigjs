@@ -10,7 +10,7 @@ function createPackageFile() {
 
     delete packageDataOther['lint-staged'];
 
-    ['asn1js', 'pkijs', 'pvutils', 'tslib', 'xml-core'].forEach(package => {
+    ['asn1js', 'pkijs', 'pvutils', 'tslib'].forEach(package => {
       delete packageDataOther.dependencies[package];
     });
 

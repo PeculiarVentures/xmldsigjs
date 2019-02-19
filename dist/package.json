@@ -1,6 +1,6 @@
 {
   "name": "xmldsigjs",
-  "version": "2.0.240",
+  "version": "2.0.241",
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "./index.js",
   "module": "lib/index.js",
@@ -23,7 +23,9 @@
     "url": "https://github.com/PeculiarVentures/xadesjs/issues"
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
-  "dependencies": {},
+  "dependencies": {
+    "xml-core": "^1.0.15"
+  },
   "types": "./index.d.ts",
   "private": false
 }
