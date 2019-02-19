@@ -6,6 +6,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -14017,73 +14019,137 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 		}, {
 			key: 'verify',
-			value: async function verify(logs, data) {
-				var dataType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+			value: function () {
+				var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(logs, data) {
+					var dataType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
-				var logId = toBase64(arrayBufferToString(this.logID));
+					var logId, publicKeyBase64, publicKeyInfo, stream, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, log, asn1, timeBuffer, timeView, baseArray;
 
-				var publicKeyBase64 = null;
-				var publicKeyInfo = void 0;
+					return regeneratorRuntime.wrap(function _callee$(_context) {
+						while (1) {
+							switch (_context.prev = _context.next) {
+								case 0:
+									logId = toBase64(arrayBufferToString(this.logID));
+									publicKeyBase64 = null;
+									publicKeyInfo = void 0;
+									stream = new SeqStream();
+									_iteratorNormalCompletion20 = true;
+									_didIteratorError20 = false;
+									_iteratorError20 = undefined;
+									_context.prev = 7;
+									_iterator20 = logs[Symbol.iterator]();
 
-				var stream = new SeqStream();
-				var _iteratorNormalCompletion20 = true;
-				var _didIteratorError20 = false;
-				var _iteratorError20 = undefined;
+								case 9:
+									if (_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done) {
+										_context.next = 17;
+										break;
+									}
 
-				try {
-					for (var _iterator20 = logs[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
-						var log = _step20.value;
+									log = _step20.value;
 
-						if (log.log_id === logId) {
-							publicKeyBase64 = log.key;
-							break;
+									if (!(log.log_id === logId)) {
+										_context.next = 14;
+										break;
+									}
+
+									publicKeyBase64 = log.key;
+									return _context.abrupt('break', 17);
+
+								case 14:
+									_iteratorNormalCompletion20 = true;
+									_context.next = 9;
+									break;
+
+								case 17:
+									_context.next = 23;
+									break;
+
+								case 19:
+									_context.prev = 19;
+									_context.t0 = _context['catch'](7);
+									_didIteratorError20 = true;
+									_iteratorError20 = _context.t0;
+
+								case 23:
+									_context.prev = 23;
+									_context.prev = 24;
+
+									if (!_iteratorNormalCompletion20 && _iterator20.return) {
+										_iterator20.return();
+									}
+
+								case 26:
+									_context.prev = 26;
+
+									if (!_didIteratorError20) {
+										_context.next = 29;
+										break;
+									}
+
+									throw _iteratorError20;
+
+								case 29:
+									return _context.finish(26);
+
+								case 30:
+									return _context.finish(23);
+
+								case 31:
+									if (!(publicKeyBase64 === null)) {
+										_context.next = 33;
+										break;
+									}
+
+									throw new Error('Public key not found for CT with logId: ' + logId);
+
+								case 33:
+									asn1 = fromBER(stringToArrayBuffer(fromBase64(publicKeyBase64)));
+
+									if (!(asn1.offset === -1)) {
+										_context.next = 36;
+										break;
+									}
+
+									throw new Error('Incorrect key value for CT Log with logId: ' + logId);
+
+								case 36:
+
+									publicKeyInfo = new PublicKeyInfo({ schema: asn1.result });
+
+									stream.appendChar(0x00);
+									stream.appendChar(0x00);timeBuffer = new ArrayBuffer(8);
+									timeView = new Uint8Array(timeBuffer);
+									baseArray = utilToBase(this.timestamp.valueOf(), 8);
+
+									timeView.set(new Uint8Array(baseArray), 8 - baseArray.byteLength);
+
+									stream.appendView(timeView);
+
+									stream.appendUint16(dataType);
+
+									if (dataType === 0) stream.appendUint24(data.byteLength);
+
+									stream.appendView(new Uint8Array(data));
+
+									stream.appendUint16(this.extensions.byteLength);
+
+									if (this.extensions.byteLength !== 0) stream.appendView(new Uint8Array(this.extensions));
+									return _context.abrupt('return', getEngine().subtle.verifyWithPublicKey(stream._stream._buffer.slice(0, stream._length), { valueBlock: { valueHex: this.signature.toBER(false) } }, publicKeyInfo, { algorithmId: "" }, "SHA-256"));
+
+								case 50:
+								case 'end':
+									return _context.stop();
+							}
 						}
-					}
-				} catch (err) {
-					_didIteratorError20 = true;
-					_iteratorError20 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion20 && _iterator20.return) {
-							_iterator20.return();
-						}
-					} finally {
-						if (_didIteratorError20) {
-							throw _iteratorError20;
-						}
-					}
+					}, _callee, this, [[7, 19, 23, 31], [24,, 26, 30]]);
+				}));
+
+				function verify(_x225, _x226) {
+					return _ref.apply(this, arguments);
 				}
 
-				if (publicKeyBase64 === null) throw new Error('Public key not found for CT with logId: ' + logId);
-
-				var asn1 = fromBER(stringToArrayBuffer(fromBase64(publicKeyBase64)));
-				if (asn1.offset === -1) throw new Error('Incorrect key value for CT Log with logId: ' + logId);
-
-				publicKeyInfo = new PublicKeyInfo({ schema: asn1.result });
-
-				stream.appendChar(0x00);
-				stream.appendChar(0x00);
-
-				var timeBuffer = new ArrayBuffer(8);
-				var timeView = new Uint8Array(timeBuffer);
-
-				var baseArray = utilToBase(this.timestamp.valueOf(), 8);
-				timeView.set(new Uint8Array(baseArray), 8 - baseArray.byteLength);
-
-				stream.appendView(timeView);
-
-				stream.appendUint16(dataType);
-
-				if (dataType === 0) stream.appendUint24(data.byteLength);
-
-				stream.appendView(new Uint8Array(data));
-
-				stream.appendUint16(this.extensions.byteLength);
-
-				if (this.extensions.byteLength !== 0) stream.appendView(new Uint8Array(this.extensions));
-
-				return getEngine().subtle.verifyWithPublicKey(stream._stream._buffer.slice(0, stream._length), { valueBlock: { valueHex: this.signature.toBER(false) } }, publicKeyInfo, { algorithmId: "" }, "SHA-256");
-			}
+				return verify;
+			}()
 		}], [{
 			key: 'defaultValues',
 			value: function defaultValues(memberName) {
