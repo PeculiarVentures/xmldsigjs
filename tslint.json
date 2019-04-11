@@ -13,7 +13,8 @@
         "interface-name": false,
         "prefer-for-of": false,
         "forin": false,
-        "no-conditional-assignment": false
+        "no-conditional-assignment": false,
+        "no-string-literal": false
     },
     "rulesDirectory": []
 }
