@@ -109,7 +109,10 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         let signedInfo: SignedInfo;
         return Promise.resolve()
             .then(() => {
-                const signingAlg = XmlCore.assign({}, key.algorithm, algorithm);
+                const signingAlg = XmlCore.assign({}, algorithm);
+                if (key.algorithm["hash"]) {
+                    signingAlg.hash = key.algorithm["hash"];
+                }
                 alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);
                 return this.ApplySignOptions(this.XmlSignature, algorithm, key, options);
             })
@@ -361,6 +364,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     // we must not C14N references from outside the document
                     // e.g. non-xml documents
                     if (reference.Uri && reference.Uri[0] !== `#`) {
+                        if (!doc.ownerDocument) {
+                            throw new Error("Cannot get ownerDocument from XML document");
+                        }
                         canonOutput = new XMLSerializer().serializeToString(doc.ownerDocument);
                     } else {
                         // apply default C14N transformation
