@@ -33,7 +33,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined") {
         after(() => {
             // Remove tmp file
             if (fs.existsSync(SIGN_XML_FILE)) {
-                fs.unlink(SIGN_XML_FILE);
+                fs.unlinkSync(SIGN_XML_FILE);
             }
         });
 
