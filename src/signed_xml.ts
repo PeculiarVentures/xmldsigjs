@@ -2,7 +2,7 @@ import * as XmlCore from "xml-core";
 import { XmlNodeType } from "xml-core";
 
 import { ISignatureAlgorithm } from "./algorithm";
-import * as Alg from "./algorithm/index";
+import * as Alg from "./algorithms";
 import { CryptoConfig } from "./crypto_config";
 import { KeyInfo, Reference, References, Signature, SignedInfo, Transform as XmlTransform, Transforms as XmlTransforms } from "./xml";
 import { KeyInfoX509Data, KeyValue } from "./xml/key_infos";

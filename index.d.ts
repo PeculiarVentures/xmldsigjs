@@ -2,7 +2,7 @@ import { XmlCollection, XmlObject } from "xml-core";
 
 declare namespace XmlDSigJs {
 
-    //#region algorithm/ecdsa_sign
+    //#region algorithms/ecdsa_sign
 
     export const ECDSA = "ECDSA";
     export const ECDSA_SHA1_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1";
@@ -29,7 +29,7 @@ declare namespace XmlDSigJs {
 
     //#endregion
 
-    //#region algorithm/hmac_sign
+    //#region algorithms/hmac_sign
 
     export const HMAC = "HMAC";
     export const HMAC_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
@@ -56,7 +56,7 @@ declare namespace XmlDSigJs {
 
     //#endregion
 
-    //#region algorithm/rsa_hash
+    //#region algorithms/rsa_hash
 
     export const SHA1 = "SHA-1";
     export const SHA256 = "SHA-256";
@@ -94,7 +94,7 @@ declare namespace XmlDSigJs {
 
     //#endregion
 
-    //#region algorithm/rsa_pkcs1_sign
+    //#region algorithms/rsa_pkcs1_sign
 
     export const RSA_PKCS1 = "RSASSA-PKCS1-v1_5";
     export const RSA_PKCS1_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
@@ -121,7 +121,7 @@ declare namespace XmlDSigJs {
 
     //#endregion
 
-    //#region algorithm/rsa_pss_sign
+    //#region algorithms/rsa_pss_sign
 
     export const RSA_PSS = "RSA-PSS";
     export const RSA_PSS_WITH_PARAMS_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#rsa-pss";

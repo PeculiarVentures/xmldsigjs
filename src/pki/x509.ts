@@ -4,7 +4,7 @@
 import { Certificate } from "pkijs";
 
 import * as Asn1Js from "asn1js";
-import { ECDSA } from "../algorithm/index";
+import { ECDSA } from "../algorithms";
 import { Application } from "../application";
 
 export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";

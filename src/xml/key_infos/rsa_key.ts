@@ -5,7 +5,7 @@ import {
     XmlObject,
 } from "xml-core";
 
-import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from "../../algorithm/index";
+import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from "../../algorithms";
 import { Application } from "../../application";
 import { CryptoConfig } from "../../crypto_config";
 import { DigestMethod } from "../digest_method";

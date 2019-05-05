@@ -1,7 +1,7 @@
 import * as XmlCore from "xml-core";
 import { XE, XmlElement, XmlError } from "xml-core";
 
-import { ECDSA, RSA_PKCS1, RSA_PSS } from "../../algorithm/index";
+import { ECDSA, RSA_PKCS1, RSA_PSS } from "../../algorithms";
 import { XmlSignature } from "../xml_names";
 import { EcdsaKeyValue } from "./ecdsa_key";
 import { KeyInfoClause } from "./key_info_clause";

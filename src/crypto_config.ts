@@ -10,31 +10,31 @@ import {
     RSA_PKCS1,
     RSA_PKCS1_SHA1_NAMESPACE, RSA_PKCS1_SHA256_NAMESPACE, RSA_PKCS1_SHA384_NAMESPACE, RSA_PKCS1_SHA512_NAMESPACE,
     RsaPkcs1Sha1, RsaPkcs1Sha256, RsaPkcs1Sha384, RsaPkcs1Sha512,
-} from "./algorithm/index";
+} from "./algorithms";
 // rsa pss
 import {
     RSA_PSS,
     RSA_PSS_WITH_PARAMS_NAMESPACE,
     RsaPssSha1, RsaPssSha256, RsaPssSha384, RsaPssSha512,
-} from "./algorithm/index";
+} from "./algorithms";
 // ec dsa
 import {
     ECDSA,
     ECDSA_SHA1_NAMESPACE, ECDSA_SHA256_NAMESPACE, ECDSA_SHA384_NAMESPACE, ECDSA_SHA512_NAMESPACE,
     EcdsaSha1, EcdsaSha256, EcdsaSha384, EcdsaSha512,
-} from "./algorithm/index";
+} from "./algorithms";
 // hmac
 import {
     HMAC,
     HMAC_SHA1_NAMESPACE, HMAC_SHA256_NAMESPACE, HMAC_SHA384_NAMESPACE, HMAC_SHA512_NAMESPACE,
     HmacSha1, HmacSha256, HmacSha384, HmacSha512,
-} from "./algorithm/index";
+} from "./algorithms";
 // Sha
 import {
     SHA1, Sha1, SHA1_NAMESPACE, SHA256,
     Sha256, SHA256_NAMESPACE, SHA384, Sha384,
     SHA384_NAMESPACE, SHA512, Sha512, SHA512_NAMESPACE,
-} from "./algorithm/index";
+} from "./algorithms";
 
 import { HashAlgorithm, IHashAlgorithmConstructable, ISignatureAlgorithmConstructable, SignatureAlgorithm } from "./algorithm";
 import { Transform, XmlSignature } from "./xml";
