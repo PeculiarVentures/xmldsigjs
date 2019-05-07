@@ -3,6 +3,7 @@ import { XmlNodeType } from "xml-core";
 
 import { ISignatureAlgorithm } from "./algorithm";
 import * as Alg from "./algorithms";
+import { RsaPssBase } from "./algorithms";
 import { CryptoConfig } from "./crypto_config";
 import { KeyInfo, Reference, References, Signature, SignedInfo, Transform as XmlTransform, Transforms as XmlTransforms } from "./xml";
 import { KeyInfoX509Data, KeyValue } from "./xml/key_infos";
@@ -107,9 +108,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     public Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsSign): PromiseLike<Signature> {
         let alg: ISignatureAlgorithm;
         let signedInfo: SignedInfo;
+        const signingAlg = XmlCore.assign({}, algorithm);
         return Promise.resolve()
             .then(() => {
-                const signingAlg = XmlCore.assign({}, algorithm);
                 if (key.algorithm["hash"]) {
                     signingAlg.hash = key.algorithm["hash"];
                 }
@@ -124,9 +125,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             .then(() => {
                 // Add signature method
                 signedInfo.SignatureMethod.Algorithm = alg.namespaceURI;
-                if (Alg.RSA_PSS.toUpperCase() === algorithm.name.toUpperCase()) {
+                if (alg instanceof RsaPssBase) {
                     // Add RSA-PSS params
-                    const alg2 = XmlCore.assign({}, key.algorithm, algorithm);
+                    const alg2 = XmlCore.assign({}, key.algorithm, signingAlg);
                     if (typeof alg2.hash === "string") {
                         alg2.hash = { name: alg2.hash };
                     }
@@ -153,7 +154,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                     this.XmlSignature.SignedInfo.SignatureMethod.HMACOutputLength = outputLength;
                 }
                 const si = this.TransformSignedInfo(data);
-                return alg.Sign(si, key, algorithm);
+                return alg.Sign(si, key, signingAlg);
             })
             .then((signature) => {
                 this.Key = key;

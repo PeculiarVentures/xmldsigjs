@@ -145,6 +145,28 @@ declare namespace XmlDSigJs {
     }
 
     //#endregion
+    
+    //#region algorithms/rsa_pss_without_params_sign
+
+    export const RSA_PSS_SHA1_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#sha1-rsa-MGF1";
+    export const RSA_PSS_SHA256_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1";
+    export const RSA_PSS_SHA384_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1";
+    export const RSA_PSS_SHA512_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1";
+
+    export class RsaPssWithoutParamsBase extends SignatureAlgorithm {
+        public algorithm: any;
+        public namespaceURI: string;
+    }
+
+    export class RsaPssWithoutParamsSha1 extends RsaPssWithoutParamsBase { }
+
+    export class RsaPssWithoutParamsSha256 extends RsaPssWithoutParamsBase { }
+
+    export class RsaPssWithoutParamsSha384 extends RsaPssBase { }
+
+    export class RsaPssWithoutParamsSha512 extends RsaPssBase { }
+
+    //#endregion
 
     //#region pki/x509
 
