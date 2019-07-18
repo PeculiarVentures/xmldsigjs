@@ -1,4 +1,5 @@
 import { XmlCollection, XmlObject } from "xml-core";
+import Certificate from "pkijs/src/Certificate";
 
 declare namespace XmlDSigJs {
 
@@ -145,6 +146,14 @@ declare namespace XmlDSigJs {
     }
 
     //#endregion
+
+    export class CustomX509Cert {
+        public readonly decodedCert: Certificate;
+    
+        constructor(buff: string);
+    
+        public getDecodedCert();
+    }
 
     //#region pki/x509
 

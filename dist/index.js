@@ -22313,6 +22313,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}
 	};
 
+	var CustomX509Cert = function () {
+		function CustomX509Cert(buff) {
+			var asn1 = fromBER$1(new Uint8Array(Buffer.from(buff, "base64")).buffer);
+			this.decodedCert = new Certificate({ schema: asn1.result });
+		}
+		CustomX509Cert.prototype.getDecodedCert = function () {
+			return this.decodedCert;
+		};
+		return CustomX509Cert;
+	}();
 	var X509Certificate = function () {
 		function X509Certificate(rawData) {
 			this.publicKey = null;
@@ -23507,6 +23517,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	exports.XmlDsigDisplayFilterTransform = XmlDsigDisplayFilterTransform;
 	exports.Transform = Transform;
 	exports.Transforms = Transforms;
+	exports.CustomX509Cert = CustomX509Cert;
 	exports.X509Certificate = X509Certificate;
 	exports.KeyInfoClause = KeyInfoClause;
 	exports.KeyValue = KeyValue;

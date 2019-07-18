@@ -80,6 +80,21 @@ const OID: { [key: string]: { short?: string, long?: string } } = {
 /**
  * Represents an <X509Certificate> element.
  */
+
+export class CustomX509Cert {
+    protected decodedCert: PkiJs.Certificate;
+
+    constructor(buff: string) {
+        const asn1 = Asn1Js.fromBER(new Uint8Array(Buffer.from(buff, "base64")).buffer);
+        this.decodedCert = new Certificate({ schema: asn1.result });
+    }
+
+    public getDecodedCert() {
+        return this.decodedCert;
+    }
+    
+}
+
 export class X509Certificate {
 
     protected raw: Uint8Array;
