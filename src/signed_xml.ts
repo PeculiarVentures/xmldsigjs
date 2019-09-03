@@ -5,7 +5,7 @@ import { ISignatureAlgorithm } from "./algorithm";
 import * as Alg from "./algorithms";
 import { RsaPssBase } from "./algorithms";
 import { CryptoConfig } from "./crypto_config";
-import { KeyInfo, Reference, References, Signature, SignedInfo, Transform as XmlTransform, Transforms as XmlTransforms } from "./xml";
+import { KeyInfo, Reference, References, Signature, SignedInfo, Transform as XmlTransform, Transforms as XmlTransforms, XmlDsigC14NWithCommentsTransform, XmlDsigExcC14NWithCommentsTransform } from "./xml";
 import { KeyInfoX509Data, KeyValue } from "./xml/key_infos";
 import * as KeyInfos from "./xml/key_infos";
 import * as Transforms from "./xml/transforms";
@@ -466,6 +466,8 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 return new Transforms.XmlDsigExcC14NWithCommentsTransform();
             case "base64":
                 return new Transforms.XmlDsigBase64Transform();
+            case "xpath":
+                return new Transforms.XmlDsigXPathTransform();
             default:
                 throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
         }
@@ -474,22 +476,23 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected ApplyTransforms(transforms: XmlTransforms, input: Element): any {
         let output: any = null;
 
-        // Sort transforms. Enveloped should be first transform
         transforms.Sort((a, b) => {
-            if (b instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+            const c14nTransforms = [Transforms.XmlDsigC14NTransform, XmlDsigC14NWithCommentsTransform,
+            Transforms.XmlDsigExcC14NTransform, XmlDsigExcC14NWithCommentsTransform];
+            if (c14nTransforms.some((t) => a instanceof t)) {
                 return 1;
+            }
+            if (c14nTransforms.some((t) => b instanceof t)) {
+                return -1;
             }
             return 0;
         }).ForEach((transform) => {
-            // Apply transforms
-            if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform) {
-                transform = new Transforms.XmlDsigC14NTransform(); // TODO: Check RFC for it
-            }
-            if (transform instanceof Transforms.XmlDsigExcC14NWithCommentsTransform) {
-                transform = new Transforms.XmlDsigExcC14NTransform(); // TODO: Check RFC for it
-            }
             transform.LoadInnerXml(input);
-            output = transform.GetOutput();
+            if (transform instanceof Transforms.XmlDsigXPathTransform) {
+                transform.GetOutput();
+            } else {
+                output = transform.GetOutput();
+            }
         });
         // Apply C14N transform if Reference has only one transform EnvelopedSignature
         if (transforms.Count === 1 && transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
