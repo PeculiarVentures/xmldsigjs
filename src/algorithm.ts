@@ -13,9 +13,7 @@ export interface IHashAlgorithm extends IAlgorithm {
     Digest(xml: BufferSource | string | Node): PromiseLike<Uint8Array>;
 }
 
-export interface IHashAlgorithmConstructable {
-    new(): IHashAlgorithm;
-}
+export type IHashAlgorithmConstructable = new() => IHashAlgorithm;
 
 export abstract class XmlAlgorithm implements IAlgorithm {
     public algorithm: Algorithm;
@@ -57,9 +55,7 @@ export interface ISignatureAlgorithm extends IAlgorithm {
     Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, algorithm?: Algorithm): PromiseLike<boolean>;
 }
 
-export interface ISignatureAlgorithmConstructable {
-    new(): ISignatureAlgorithm;
-}
+export type ISignatureAlgorithmConstructable = new() => ISignatureAlgorithm;
 
 export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignatureAlgorithm {
     /**

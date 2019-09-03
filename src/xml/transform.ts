@@ -32,9 +32,7 @@ export interface ITransform extends XmlCore.IXmlSerializable {
     GetOutput(): any;
 }
 
-export interface ITransformConstructable {
-    new(): Transform;
-}
+export type ITransformConstructable = new() => Transform;
 
 /**
  * The Transform element contains a single transformation

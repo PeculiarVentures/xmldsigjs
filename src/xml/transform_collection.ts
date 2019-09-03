@@ -30,6 +30,8 @@ export class Transforms extends XmlSignatureCollection<Transform> {
                     return ChangeTransform(item, transforms.XmlDsigExcC14NWithCommentsTransform);
                 case XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform:
                     return ChangeTransform(item, transforms.XmlDsigBase64Transform);
+                case XmlSignature.AlgorithmNamespaces.XmlDsigXPathTransform:
+                    return ChangeTransform(item, transforms.XmlDsigXPathTransform);
                 default:
                     throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, item.Algorithm);
             }
@@ -39,7 +41,7 @@ export class Transforms extends XmlSignatureCollection<Transform> {
 
 function ChangeTransform(t1: Transform, t2: typeof Transform) {
     const t = new t2();
-    (t as any).element = t1.Element;
+    t.LoadXml(t1.Element!);
     return t;
 }
 

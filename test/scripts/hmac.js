@@ -13,8 +13,6 @@ if (typeof module !== "undefined") {
 
 describe("HMAC", function () {
 
-    console.warn("WARN: No check of SignatureLength. Issue node-webcrypto-ossl #85");
-
     // length
     [0, 128].forEach(hmacLength => {
         // hash
