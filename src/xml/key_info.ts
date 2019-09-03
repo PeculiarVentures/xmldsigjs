@@ -46,7 +46,7 @@ export class KeyInfo extends XmlSignatureCollection<KeyInfoClause> {
                 continue;
             }
             let KeyInfoClass: any | null = null;
-            switch (node.localName) {
+            switch ((node as Element).localName) {
                 case XmlSignature.ElementNames.KeyValue:
                     KeyInfoClass = KeyValue;
                     break;

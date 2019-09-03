@@ -49,7 +49,7 @@ export class SPKIData extends KeyInfoClause {
     public exportKey(alg: Algorithm): PromiseLike<CryptoKey> {
         return Promise.resolve()
             .then(() => {
-                return Application.crypto.subtle.importKey("spki", this.SPKIexp!, alg, true, ["verify"]);
+                return Application.crypto.subtle.importKey("spki", this.SPKIexp!, alg as any, true, ["verify"]);
             })
             .then((key) => {
                 this.Key = key;

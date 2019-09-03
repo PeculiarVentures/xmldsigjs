@@ -40,6 +40,9 @@ export class XmlCanonicalizer {
             this.document = node as Document;
             node2 = this.document.documentElement;
         } else {
+            if (!node.ownerDocument) {
+                throw new Error("Cannot get owner document");
+            }
             this.document = node.ownerDocument;
             node2 = node;
         }
@@ -400,8 +403,8 @@ function XmlDsigC14NTransformAttributesComparer(x: Node, y: Node): number {
     if (!x.namespaceURI && y.namespaceURI) { return -1; }
     if (!y.namespaceURI && x.namespaceURI) { return 1; }
 
-    const left = x.namespaceURI! + x.localName;
-    const right = y.namespaceURI! + y.localName;
+    const left = x.namespaceURI! + (x as Element).localName;
+    const right = y.namespaceURI! + (y as Element).localName;
 
     if (left === right) {
         return 0;

@@ -152,20 +152,7 @@ export class X509Certificate {
                 };
                 if (alg.algorithm.name.toUpperCase() === ECDSA) {
                     // Set named curve
-                    const namedCurveOid = this.simpl.subjectPublicKeyInfo.toJSON().algorithm.algorithmParams.valueBlock.value;
-                    switch (namedCurveOid) {
-                        case "1.2.840.10045.3.1.7": // P-256
-                            (alg.algorithm as any).namedCurve = "P-256";
-                            break;
-                        case "1.3.132.0.34": // P-384
-                            (alg.algorithm as any).namedCurve = "P-384";
-                            break;
-                        case "1.3.132.0.35": // P-521
-                            (alg.algorithm as any).namedCurve = "P-521";
-                            break;
-                        default:
-                        throw new Error(`Unsupported named curve OID '${namedCurveOid}'`);
-                    }
+                    (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
                 }
                 return this.simpl.getPublicKey({ algorithm: alg })
                     .then((key) => {
