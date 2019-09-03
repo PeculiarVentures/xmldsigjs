@@ -16,7 +16,7 @@ describe("RSA-SSA", function () {
     // modulusLength
     [1024, 2048].forEach(modulusLength => {
         // publicExponent
-        [new Uint8Array([3]), new Uint8Array([1, 0, 1])].forEach(publicExponent => {
+        [new Uint8Array([1, 0, 1])].forEach(publicExponent => {
             context(`n:${modulusLength} e:${publicExponent[0] === 1 ? 65537 : 3}`, () => {
                 // hash
                 ["SHA-1", "SHA-256", "SHA-384", "SHA-512"].forEach(hash => {

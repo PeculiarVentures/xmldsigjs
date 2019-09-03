@@ -3,7 +3,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined") {
     const fs = require("fs");
     const assert = require("assert");
     const child_process = require("child_process");
-    const WebCrypto = require("node-webcrypto-ossl");
+    const { Crypto } = require("@peculiar/webcrypto");
     const { XMLSerializer } = require("xmldom-alpha");
 
     const xmldsig = require("../../");
@@ -22,8 +22,8 @@ if (typeof module !== "undefined" && typeof exports !== "undefined") {
 
         before((done) => {
             (async () => {
-                crypto = new WebCrypto();
-                xmldsig.Application.setEngine("OpenSSL", crypto);
+                crypto = new Crypto();
+                xmldsig.Application.setEngine("NodeJS", crypto);
 
                 // Generate key
                 keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
