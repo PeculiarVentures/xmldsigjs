@@ -153,7 +153,7 @@ export class X509Certificate {
             // Set named curve
             (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
         }
-        const key = await this.simpl.getPublicKey({ algorithm: alg })
+        const key = await this.simpl.getPublicKey({ algorithm: alg });
         this.publicKey = key;
         return key;
     }

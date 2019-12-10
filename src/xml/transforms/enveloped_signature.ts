@@ -1,4 +1,4 @@
-import { isElement, Select, XE, XmlError } from "xml-core";
+import { isElement, XE, XmlError } from "xml-core";
 
 import { Transform } from "../transform";
 import { XmlSignature } from "../xml_names";
