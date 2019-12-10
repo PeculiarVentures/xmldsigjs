@@ -53,6 +53,7 @@
   "devDependencies": {
     "@peculiar/webcrypto": "1.0.12",
     "@types/asn1js": "^0.0.1",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.16",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",

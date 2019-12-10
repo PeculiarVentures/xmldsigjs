@@ -7,7 +7,7 @@ import * as Asn1Js from "asn1js";
 import { ECDSA } from "../algorithms";
 import { Application } from "../application";
 
-export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
+export type DigestAlgorithm = string | "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
 
 /**
  * List of OIDs
@@ -143,8 +143,7 @@ export class X509Certificate {
      * @param  {Algorithm} algorithm
      * @returns Promise<CryptoKey>
      */
-    public async exportKey(algorithm: Algorithm) {
-
+    public async exportKey(algorithm: Algorithm | EcKeyImportParams | RsaHashedImportParams) {
         const alg = {
             algorithm,
             usages: ["verify"],
@@ -153,6 +152,12 @@ export class X509Certificate {
             // Set named curve
             (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
         }
+        if (this.isHashedAlgorithm(alg.algorithm)) {
+            if (typeof alg.algorithm.hash === "string") {
+                alg.algorithm.hash = { name: alg.algorithm.hash };
+            }
+        }
+
         const key = await this.simpl.getPublicKey({ algorithm: alg });
         this.publicKey = key;
         return key;
@@ -188,4 +193,8 @@ export class X509Certificate {
         this.simpl = new Certificate({ schema: asn1.result });
     }
     //#endregion
+
+    private isHashedAlgorithm(alg: Algorithm): alg is RsaHashedImportParams {
+        return !!alg["hash"];
+    }
 }

@@ -105,7 +105,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         }
     }
 
-    public async Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsSign) {
+    public async Sign(algorithm: Algorithm | EcdsaParams | RsaPssParams, key: CryptoKey, data: Document, options?: OptionsSign) {
         data = data.cloneNode(true) as Document;
         let alg: ISignatureAlgorithm;
         let signedInfo: SignedInfo;
