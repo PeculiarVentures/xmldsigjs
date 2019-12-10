@@ -33,34 +33,29 @@ export class KeyValue extends KeyInfoClause {
         }
     }
 
-    public importKey(key: CryptoKey): PromiseLike<this> {
-        return Promise.resolve()
-            .then(() => {
-                switch (key.algorithm.name!.toUpperCase()) {
-                    case RSA_PSS.toUpperCase():
-                    case RSA_PKCS1.toUpperCase():
-                        this.Value = new RsaKeyValue();
-                        return this.Value.importKey(key);
-                    case ECDSA.toUpperCase():
-                        this.Value = new EcdsaKeyValue();
-                        return this.Value.importKey(key);
-                    default:
-                        throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, key.algorithm.name);
-                }
-            })
-            .then(() => {
-                return this;
-            });
+    public async importKey(key: CryptoKey): Promise<this> {
+        switch (key.algorithm.name.toUpperCase()) {
+            case RSA_PSS.toUpperCase():
+            case RSA_PKCS1.toUpperCase():
+                this.Value = new RsaKeyValue();
+                await this.Value.importKey(key);
+                break;
+            case ECDSA.toUpperCase():
+                this.Value = new EcdsaKeyValue();
+                await this.Value.importKey(key);
+                break;
+            default:
+                throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, key.algorithm.name);
+        }
+        return this;
     }
 
-    public exportKey(alg: Algorithm): PromiseLike<CryptoKey> {
-        return Promise.resolve()
-            .then(() => {
-                if (!this.Value) {
-                    throw new XmlError(XE.NULL_REFERENCE);
-                }
-                return this.Value.exportKey(alg);
-            });
+    public async exportKey(alg: Algorithm) {
+
+        if (!this.Value) {
+            throw new XmlError(XE.NULL_REFERENCE);
+        }
+        return this.Value.exportKey(alg);
     }
 
     protected OnGetXml(element: Element) {

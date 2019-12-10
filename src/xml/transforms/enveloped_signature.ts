@@ -1,6 +1,7 @@
-import { Select, XE, XmlError } from "xml-core";
+import { isElement, Select, XE, XmlError } from "xml-core";
 
 import { Transform } from "../transform";
+import { XmlSignature } from "../xml_names";
 
 /**
  * Represents the enveloped signature transform for an XML digital signature as defined by the W3C.
@@ -18,12 +19,18 @@ export class XmlDsigEnvelopedSignatureTransform extends Transform {
             throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
         }
 
-        const signatures = Select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']");
-        for (let i = 0; i < signatures.length; i++) {
-            const signature = signatures[i];
-            if (signature.parentNode) {
-                signature.parentNode.removeChild(signature);
+        let child = this.innerXml.firstChild;
+        const signatures: Element[] = [];
+        while (child) {
+            if (isElement(child)
+                && child.localName === XmlSignature.ElementNames.Signature
+                && child.namespaceURI === XmlSignature.NamespaceURI) {
+                signatures.push(child);
             }
+            child = child.nextSibling;
+        }
+        for (const signature of signatures) {
+            signature.parentNode?.removeChild(signature);
         }
         return this.innerXml;
     }

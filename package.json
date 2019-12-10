@@ -44,6 +44,7 @@
   "dependencies": {
     "asn1js": "^2.0.26",
     "pkijs": "^2.1.82",
+    "pvtsutils": "^1.0.6",
     "pvutils": "^1.0.17",
     "tslib": "^1.10.0",
     "xml-core": "^1.0.19",

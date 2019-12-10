@@ -112,8 +112,8 @@ export class KeyInfoX509Data extends KeyInfoClause {
         return this.key;
     }
 
-    public importKey(key: CryptoKey) {
-        return Promise.reject(new XmlError(XE.METHOD_NOT_SUPPORTED));
+    public async importKey(key: CryptoKey): Promise<this> {
+        throw new XmlError(XE.METHOD_NOT_SUPPORTED);
     }
 
     /**
@@ -121,18 +121,13 @@ export class KeyInfoX509Data extends KeyInfoClause {
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    public exportKey(alg: Algorithm) {
-        return Promise.resolve()
-            .then(() => {
-                if (this.Certificates.length) {
-                    return this.Certificates[0].exportKey(alg);
-                }
-                throw new XmlError(XE.NULL_REFERENCE);
-            })
-            .then((key) => {
-                this.key = key;
-                return key;
-            });
+    public async exportKey(alg: Algorithm) {
+        if (!this.Certificates.length) {
+            throw new XmlError(XE.NULL_REFERENCE);
+        }
+        const key = await this.Certificates[0].exportKey(alg);
+        this.key = key;
+        return key;
     }
 
     /**

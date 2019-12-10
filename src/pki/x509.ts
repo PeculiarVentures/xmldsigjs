@@ -118,9 +118,9 @@ export class X509Certificate {
     /**
      * Returns a thumbprint of the certificate
      * @param  {DigestAlgorithm="SHA-1"} algName Digest algorithm name
-     * @returns PromiseLike
+     * @returns Promise<ArrayBuffer>
      */
-    public Thumbprint(algName: DigestAlgorithm = "SHA-1"): PromiseLike<ArrayBuffer> {
+    public async Thumbprint(algName: DigestAlgorithm = "SHA-1") {
         return Application.crypto.subtle.digest(algName, this.raw);
     }
 
@@ -141,25 +141,21 @@ export class X509Certificate {
     /**
      * Returns public key from X509Certificate
      * @param  {Algorithm} algorithm
-     * @returns Promise
+     * @returns Promise<CryptoKey>
      */
-    public exportKey(algorithm: Algorithm): PromiseLike<CryptoKey> {
-        return Promise.resolve()
-            .then(() => {
-                const alg = {
-                    algorithm,
-                    usages: ["verify"],
-                };
-                if (alg.algorithm.name.toUpperCase() === ECDSA) {
-                    // Set named curve
-                    (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
-                }
-                return this.simpl.getPublicKey({ algorithm: alg })
-                    .then((key) => {
-                        this.publicKey = key;
-                        return key;
-                    });
-            });
+    public async exportKey(algorithm: Algorithm) {
+
+        const alg = {
+            algorithm,
+            usages: ["verify"],
+        };
+        if (alg.algorithm.name.toUpperCase() === ECDSA) {
+            // Set named curve
+            (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
+        }
+        const key = await this.simpl.getPublicKey({ algorithm: alg })
+        this.publicKey = key;
+        return key;
     }
 
     //#region Protected methods

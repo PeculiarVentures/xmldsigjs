@@ -2,22 +2,26 @@
     "compilerOptions": {
         "module": "commonjs",
         "moduleResolution": "node",
-        "target": "esnext",
+        "target": "es2015",
         "lib": [
             "dom",
             "es2015"
         ],
         "rootDir": "src",
         "outDir": "build",
+        "esModuleInterop": true,
         "noImplicitAny": false,
         "sourceMap": true,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
+        "strict": true,
+        "strictPropertyInitialization": false,
         "strictNullChecks": true,
         "pretty": true,
         "noImplicitReturns": true,
         "experimentalDecorators": true,
-        "importHelpers": true
+        "importHelpers": true,
+        "forceConsistentCasingInFileNames": true
     },
     "files": [
         "src/index.ts"
