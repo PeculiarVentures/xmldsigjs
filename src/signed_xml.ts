@@ -106,6 +106,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     }
 
     public Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsSign): PromiseLike<Signature> {
+        data = data.cloneNode(true) as Document;
         let alg: ISignatureAlgorithm;
         let signedInfo: SignedInfo;
         const signingAlg = XmlCore.assign({}, algorithm);
