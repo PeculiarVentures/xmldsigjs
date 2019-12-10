@@ -18,9 +18,12 @@ export class XmlDsigEnvelopedSignatureTransform extends Transform {
             throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
         }
 
-        const signature = Select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
-        if (signature) {
-            signature.parentNode!.removeChild(signature);
+        const signatures = Select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']");
+        for (let i = 0; i < signatures.length; i++) {
+            const signature = signatures[i];
+            if (signature.parentNode) {
+                signature.parentNode.removeChild(signature);
+            }
         }
         return this.innerXml;
     }
