@@ -1,5 +1,5 @@
 import { XE, XmlError } from "xml-core";
-import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement, IXmlSerializable } from "xml-core";
 
 import { XmlSignature } from "./xml_names";
 import { XmlSignatureObject } from "./xml_object";
@@ -25,7 +25,7 @@ import { XmlSignatureObject } from "./xml_object";
  *
  */
 
-export interface ITransform extends XmlCore.IXmlSerializable {
+export interface ITransform extends IXmlSerializable {
     Algorithm: string;
     LoadInnerXml(node: Node): void;
     GetInnerXml(): Node | null;
