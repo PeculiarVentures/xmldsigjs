@@ -1,4 +1,4 @@
-import { XmlCollection, XmlObject } from "xml-core";
+import { XmlCollection, XmlObject, IXmlSerializable, NamespaceManager, XmlNodeType, AssocArray, SelectNodes } from "xml-core";
 
 declare namespace XmlDSigJs {
 
@@ -735,7 +735,7 @@ declare namespace XmlDSigJs {
 
     //#region xml/transform
 
-    export interface ITransform extends XmlCore.IXmlSerializable {
+    export interface ITransform extends IXmlSerializable {
         Algorithm: string;
         LoadInnerXml(node: Node): void;
         GetInnerXml(): Node | null;
@@ -938,14 +938,14 @@ declare namespace XmlDSigJs {
 
         protected withComments: boolean;
         protected exclusive: boolean;
-        protected propagatedNamespaces: XmlCore.NamespaceManager;
+        protected propagatedNamespaces: NamespaceManager;
         protected document: Document;
         protected result: string[];
-        protected visibleNamespaces: XmlCore.NamespaceManager;
+        protected visibleNamespaces: NamespaceManager;
         protected inclusiveNamespacesPrefixList: string[];
         protected state: XmlCanonicalizerState;
 
-        constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces?: XmlCore.NamespaceManager);
+        constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces?: NamespaceManager);
 
         public Canonicalize(node: Node): string;
 
@@ -957,8 +957,8 @@ declare namespace XmlDSigJs {
         protected WriteElementNode(node: Element): void;
         protected WriteNamespacesAxis(node: Element): number;
         protected WriteAttributesAxis(node: Node): void;
-        protected NormalizeString(input: string | null, type: XmlCore.XmlNodeType): string;
-        protected IsTextNode(type: XmlCore.XmlNodeType): boolean;
+        protected NormalizeString(input: string | null, type: XmlNodeType): string;
+        protected IsTextNode(type: XmlNodeType): boolean;
         protected IsNamespaceInclusive(node: Element, prefix: string | null): boolean;
         protected IsNamespaceRendered(prefix: string | null, uri: string | null): boolean;
     }
@@ -1046,8 +1046,8 @@ declare namespace XmlDSigJs {
     /**
      * Provides a wrapper on a core XML signature object to facilitate creating XML signatures.
      */
-    export class SignedXml implements XmlCore.IXmlSerializable {
-        public Parent?: Element | XmlCore.XmlObject;
+    export class SignedXml implements IXmlSerializable {
+        public Parent?: Element | XmlObject;
         public readonly XmlSignature: Signature;
         public Key?: CryptoKey;
         public Algorithm?: Algorithm | RsaPssParams | EcdsaParams;
@@ -1081,7 +1081,7 @@ declare namespace XmlDSigJs {
         /**
          * Returns dictionary of namespaces used in signature
          */
-        protected GetSignatureNamespaces(): XmlCore.AssocArray<string>;
+        protected GetSignatureNamespaces(): AssocArray<string>;
         /**
          * Copies namespaces from source element and its parents into destination element
          */
@@ -1102,7 +1102,7 @@ declare namespace XmlDSigJs {
     //#endregion
 
     // Methods from xml-core
-    export const Select: XmlCore.SelectNodes;
+    export const Select: SelectNodes;
     export function Parse(xmlString: string): Document;
     export function Stringify(target: Node): string;
 
