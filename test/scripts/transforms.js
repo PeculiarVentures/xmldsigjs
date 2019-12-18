@@ -178,6 +178,17 @@ describe("Transforms", () => {
             assert.equal(new XMLSerializer().serializeToString(out), "<root/>");
         });
 
+        it("GetOutput with nested signature should leave it alone", () => {
+            let transform = new xmldsig.XmlDsigEnvelopedSignatureTransform();
+            let node = xmldsig.Parse(`<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Assertion><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></saml:Assertion></root>`).documentElement;
+
+            transform.LoadInnerXml(node);
+
+            let out = transform.GetOutput();
+
+            assert.equal(new XMLSerializer().serializeToString(out), `<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Assertion><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></saml:Assertion></root>`);
+        });
+
     })
 
 });
