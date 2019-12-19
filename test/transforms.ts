@@ -169,6 +169,28 @@ context("Transforms", () => {
       assert.equal(new XMLSerializer().serializeToString(out), "<root/>");
     });
 
+    it("GetOutput with nested signature should leave it alone", () => {
+      const transform = new xmldsig.XmlDsigEnvelopedSignatureTransform();
+      const node = xmldsig.Parse(`<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Assertion><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></saml:Assertion></root>`).documentElement;
+
+      transform.LoadInnerXml(node);
+
+      const out = transform.GetOutput();
+
+      assert.equal(new XMLSerializer().serializeToString(out), `<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Assertion><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></saml:Assertion></root>`);
+    });
+
+    it("GetOutput must remove all Signature elements from the document", () => {
+      const transform = new xmldsig.XmlDsigEnvelopedSignatureTransform();
+      const node = xmldsig.Parse(`<root><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></root>`).documentElement;
+
+      transform.LoadInnerXml(node);
+
+      const out = transform.GetOutput();
+
+      assert.equal(new XMLSerializer().serializeToString(out), `<root/>`);
+    });
+
   });
 
 });
