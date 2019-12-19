@@ -65,23 +65,21 @@ export class RsaKeyValue extends KeyInfoClause {
      * @param  {CryptoKey} key
      * @returns Promise
      */
-    public importKey(key: CryptoKey) {
-        return new Promise<this>((resolve, reject) => {
-            const algName = key.algorithm.name!.toUpperCase();
-            if (algName !== RSA_PKCS1.toUpperCase() && algName !== RSA_PSS.toUpperCase()) {
-                throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
-            }
-            this.key = key;
-            Application.crypto.subtle.exportKey("jwk", key)
-                .then((jwk: IJwkRsa) => {
-                    this.jwk = jwk;
-                    this.Modulus = Convert.FromBase64Url(jwk.n);
-                    this.Exponent = Convert.FromBase64Url(jwk.e);
-                    this.keyUsage = key.usages;
-                    return Promise.resolve(this);
-                })
-                .then(resolve, reject);
-        });
+    public async importKey(key: CryptoKey) {
+
+        const algName = key.algorithm.name!.toUpperCase();
+        if (algName !== RSA_PKCS1.toUpperCase() && algName !== RSA_PSS.toUpperCase()) {
+            throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
+        }
+        this.key = key;
+        const jwk = await Application.crypto.subtle.exportKey("jwk", key);
+
+        this.jwk = jwk;
+        this.Modulus = Convert.FromBase64Url(jwk.n!);
+        this.Exponent = Convert.FromBase64Url(jwk.e!);
+        this.keyUsage = key.usages;
+
+        return this;
     }
 
     /**
@@ -89,57 +87,54 @@ export class RsaKeyValue extends KeyInfoClause {
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    public exportKey(alg: Algorithm) {
-        return new Promise<CryptoKey>((resolve, reject) => {
-            if (this.key) {
-                return resolve(this.key);
-            }
-            // fill jwk
-            if (!this.Modulus) {
-                throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Modulus");
-            }
-            const modulus = Convert.ToBase64Url(this.Modulus);
-            if (!this.Exponent) {
-                throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Exponent");
-            }
-            const exponent = Convert.ToBase64Url(this.Exponent);
-            let algJwk: string;
-            switch (alg.name.toUpperCase()) {
-                case RSA_PKCS1.toUpperCase():
-                    algJwk = "R";
-                    break;
-                case RSA_PSS.toUpperCase():
-                    algJwk = "P";
-                    break;
-                default:
-                    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, alg.name);
-            }
+    public async exportKey(alg: Algorithm) {
+        if (this.key) {
+            return this.key;
+        }
+        // fill jwk
+        if (!this.Modulus) {
+            throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Modulus");
+        }
+        const modulus = Convert.ToBase64Url(this.Modulus);
+        if (!this.Exponent) {
+            throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Exponent");
+        }
+        const exponent = Convert.ToBase64Url(this.Exponent);
+        let algJwk: string;
+        switch (alg.name.toUpperCase()) {
+            case RSA_PKCS1.toUpperCase():
+                algJwk = "R";
+                break;
+            case RSA_PSS.toUpperCase():
+                algJwk = "P";
+                break;
+            default:
+                throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, alg.name);
+        }
 
-            // Convert hash to JWK name
-            switch ((alg as any).hash.name.toUpperCase()) {
-                case SHA1:
-                    algJwk += "S1";
-                    break;
-                case SHA256:
-                    algJwk += "S256";
-                    break;
-                case SHA384:
-                    algJwk += "S384";
-                    break;
-                case SHA512:
-                    algJwk += "S512";
-                    break;
-            }
-            const jwk: IJwkRsa = {
-                kty: "RSA",
-                alg: algJwk,
-                n: modulus,
-                e: exponent,
-                ext: true,
-            };
-            Application.crypto.subtle.importKey("jwk", jwk as any, alg as any, true, this.keyUsage)
-                .then(resolve, reject);
-        });
+        // Convert hash to JWK name
+        switch ((alg as any).hash.name.toUpperCase()) {
+            case SHA1:
+                algJwk += "S1";
+                break;
+            case SHA256:
+                algJwk += "S256";
+                break;
+            case SHA384:
+                algJwk += "S384";
+                break;
+            case SHA512:
+                algJwk += "S512";
+                break;
+        }
+        const jwk: IJwkRsa = {
+            kty: "RSA",
+            alg: algJwk,
+            n: modulus,
+            e: exponent,
+            ext: true,
+        };
+        return Application.crypto.subtle.importKey("jwk", jwk as any, alg as any, true, this.keyUsage);
     }
 
     /**

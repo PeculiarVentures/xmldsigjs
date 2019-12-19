@@ -33,28 +33,19 @@ export class SPKIData extends KeyInfoClause {
     })
     public SPKIexp: Uint8Array | null;
 
-    public importKey(key: CryptoKey): PromiseLike<this> {
-        return Promise.resolve()
-            .then(() => {
-                return Application.crypto.subtle.exportKey("spki", key);
-            })
-            .then((spki) => {
-                this.SPKIexp = new Uint8Array(spki);
-                this.Key = key;
+    public async importKey(key: CryptoKey) {
+        const spki = await Application.crypto.subtle.exportKey("spki", key);
 
-                return this;
-            });
+        this.SPKIexp = new Uint8Array(spki);
+        this.Key = key;
+
+        return this;
     }
 
-    public exportKey(alg: Algorithm): PromiseLike<CryptoKey> {
-        return Promise.resolve()
-            .then(() => {
-                return Application.crypto.subtle.importKey("spki", this.SPKIexp!, alg as any, true, ["verify"]);
-            })
-            .then((key) => {
-                this.Key = key;
-                return key;
-            });
+    public async exportKey(alg: Algorithm) {
+        const key = await Application.crypto.subtle.importKey("spki", this.SPKIexp!, alg as any, true, ["verify"]);
+        this.Key = key;
+        return key;
     }
 
 }

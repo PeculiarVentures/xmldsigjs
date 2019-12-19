@@ -1,23 +1,127 @@
-import typescript from "rollup-plugin-typescript";
+import resolve from "rollup-plugin-node-resolve";
+import babel from "rollup-plugin-babel";
+import builtins from "rollup-plugin-node-builtins";
+import commonjs from "rollup-plugin-commonjs";
+import typescript from "rollup-plugin-typescript2";
+import { terser } from "rollup-plugin-terser";
 
-let pkg = require("./package.json");
-let external = Object.keys(pkg.dependencies);
-external.push("asn1js");
+const pkg = require("./package.json");
 
-let sourceMap = process.argv.some(item => item.toLowerCase() === "--dev");
+const banner = [].join("\n");
+const input = "src/index.ts";
+const external = Object.keys(pkg.dependencies)
+  .concat(["events"]);
 
-export default {
-    input: "src/index.ts",
-    plugins: [
-        typescript({ typescript: require("typescript") })
-    ],
-    external: external,
-    output: [
-        {
-            file: pkg.main,
-            format: "cjs",
-            name: "XmlDSigJs",
-            sourceMap
+// main
+const main = {
+  input,
+  plugins: [
+    typescript({
+      check: true,
+      clean: true,
+      tsconfigOverride: {
+        compilerOptions: {
+          module: "ES2015",
         }
-    ]
+      },
+    }),
+  ],
+  external,
+  output: [
+    {
+      banner,
+      file: pkg.main,
+      format: "cjs",
+    },
+    {
+      banner,
+      file: pkg.module,
+      format: "es",
+    },
+  ],
 };
+
+const browserExternals = {
+  "xmldom-alpha": "self",
+  "xpath": "self",
+};
+
+const browser = [
+  {
+    input,
+    plugins: [
+      resolve({
+        preferBuiltins: true,
+      }),
+      commonjs(),
+      builtins(),
+      typescript({
+        check: true,
+        clean: true,
+        tsconfigOverride: {
+          compilerOptions: {
+            module: "es2015",
+          }
+        }
+      }),
+    ],
+    external: Object.keys(browserExternals),
+    output: [
+      {
+        file: pkg.browser,
+        format: "es",
+        globals: browserExternals,
+      }
+    ]
+  },
+  {
+    input: pkg.browser,
+    external: Object.keys(browserExternals),
+    plugins: [
+      babel({
+        babelrc: false,
+        runtimeHelpers: true,
+        compact: false,
+        comments: false,
+        presets: [
+          ["@babel/env", {
+            targets: {
+              ie: "11",
+              chrome: "60",
+            },
+            useBuiltIns: "entry",
+            corejs: 3,
+          }],
+        ],
+        plugins: [
+          ["@babel/plugin-proposal-class-properties"],
+          ["@babel/proposal-object-rest-spread"],
+        ]
+      }),
+    ],
+    output: [
+      {
+        banner,
+        file: pkg.browser,
+        globals: browserExternals,
+        format: "iife",
+        name: "XmlDSigJs",
+      },
+      {
+        banner,
+        file: pkg.browserMin,
+        globals: browserExternals,
+        format: "iife",
+        name: "XmlDSigJs",
+        plugins: [
+          terser(),
+        ]
+      },
+    ],
+  },
+];
+
+export default [
+  main,
+  ...browser,
+];

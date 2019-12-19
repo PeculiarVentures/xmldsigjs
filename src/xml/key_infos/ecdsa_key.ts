@@ -134,32 +134,29 @@ export class EcdsaKeyValue extends KeyInfoClause {
     /**
      * Imports key to the ECKeyValue object
      * @param  {CryptoKey} key
-     * @returns Promise
+     * @returns Promise<this>
      */
-    public importKey(key: CryptoKey): PromiseLike<this> {
-        return new Promise((resolve, reject) => {
-            if (key.algorithm.name!.toUpperCase() !== "ECDSA") {
-                throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
-            }
-            this.key = key;
-            Application.crypto.subtle.exportKey("jwk", key)
-                .then((jwk) => {
-                    this.jwk = jwk;
-                    this.PublicKey = new EcdsaPublicKey();
-                    this.PublicKey.X = Convert.FromString(jwk.x!, "base64url");
-                    this.PublicKey.Y = Convert.FromString(jwk.y!, "base64url");
-                    if (!this.DomainParameters) {
-                        this.DomainParameters = new DomainParameters();
-                    }
-                    if (!this.DomainParameters.NamedCurve) {
-                        this.DomainParameters.NamedCurve = new NamedCurve();
-                    }
-                    this.DomainParameters.NamedCurve.Uri = GetNamedCurveOid(jwk.crv! as any);
-                    this.keyUsage = key.usages;
-                    return Promise.resolve(this);
-                })
-                .then(resolve, reject);
-        });
+    public async importKey(key: CryptoKey) {
+        if (key.algorithm.name!.toUpperCase() !== "ECDSA") {
+            throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
+        }
+
+        const jwk = await Application.crypto.subtle.exportKey("jwk", key);
+
+        this.key = key;
+        this.jwk = jwk;
+        this.PublicKey = new EcdsaPublicKey();
+        this.PublicKey.X = Convert.FromString(jwk.x!, "base64url");
+        this.PublicKey.Y = Convert.FromString(jwk.y!, "base64url");
+        if (!this.DomainParameters) {
+            this.DomainParameters = new DomainParameters();
+        }
+        if (!this.DomainParameters.NamedCurve) {
+            this.DomainParameters.NamedCurve = new NamedCurve();
+        }
+        this.DomainParameters.NamedCurve.Uri = GetNamedCurveOid(jwk.crv! as any);
+        this.keyUsage = key.usages;
+        return this;
     }
 
     /**
@@ -167,32 +164,27 @@ export class EcdsaKeyValue extends KeyInfoClause {
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    public exportKey(alg: Algorithm): PromiseLike<CryptoKey> {
-        return Promise.resolve()
-            .then(() => {
-                if (this.key) {
-                    return this.key;
-                }
-                // fill jwk
-                const x = Convert.ToBase64Url(this.PublicKey.X);
-                const y = Convert.ToBase64Url(this.PublicKey.Y);
-                const crv = GetNamedCurveFromOid(this.DomainParameters.NamedCurve.Uri);
-                const jwk: JsonWebKey = {
-                    kty: "EC",
-                    crv: crv as string,
-                    x,
-                    y,
-                    ext: true,
-                };
-                this.keyUsage = ["verify"];
-                return Application.crypto.subtle.importKey("jwk", jwk as any, { name: "ECDSA", namedCurve: crv } as any, true, this.keyUsage);
-            })
-            .then((key) => {
-                this.key = key;
-                return this.key;
-            });
-    }
+    public async exportKey(alg: Algorithm) {
+        if (this.key) {
+            return this.key;
+        }
+        // fill jwk
+        const x = Convert.ToBase64Url(this.PublicKey.X);
+        const y = Convert.ToBase64Url(this.PublicKey.Y);
+        const crv = GetNamedCurveFromOid(this.DomainParameters.NamedCurve.Uri);
+        const jwk: JsonWebKey = {
+            kty: "EC",
+            crv: crv as string,
+            x,
+            y,
+            ext: true,
+        };
+        this.keyUsage = ["verify"];
+        const key = await Application.crypto.subtle.importKey("jwk", jwk as any, { name: "ECDSA", namedCurve: crv } as any, true, this.keyUsage);
 
+        this.key = key;
+        return this.key;
+    }
 }
 
 function GetNamedCurveOid(namedCurve: NamedCurveType | null): string {
