@@ -170,7 +170,7 @@ XmlDSigJs.Application.setEngine("OpenSSL", crypto);
 Get the latest version form [unpkg.com/xmldsigjs](https://unpkg.com/xmldsigjs)
 
 ```html
-<script src="https://unpkg.com/xmldsigjs@<version>/dist/xmldsig.min.js"></script>
+<script src="https://unpkg.com/xmldsigjs@<version>/build/xmldsig.js"></script>
 ```
 
 ### Creating a XMLDSIG Signature
@@ -228,7 +228,7 @@ signedXml.Verify()
     <script src="https://cdnjs.cloudflare.com/ajax/libs/asmCrypto/2.3.2/asmcrypto.all.es5.min.js"></script>
     <script src="https://cdn.rawgit.com/indutny/elliptic/master/dist/elliptic.min.js"></script>
     <script src="https://unpkg.com/webcrypto-liner@1.1.2/build/webcrypto-liner.shim.min.js"></script>
-    <script src="https://unpkg.com/xmldsigjs@2.0.27/dist/xmldsig.min.js"></script>
+    <script src="https://unpkg.com/xmldsigjs@2.0.27/build/xmldsig.js"></script>
     <script type="text/javascript">
         fetch("signature.xml")
         .then(function(response) {
