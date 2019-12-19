@@ -3,6 +3,7 @@ import babel from "rollup-plugin-babel";
 import builtins from "rollup-plugin-node-builtins";
 import commonjs from "rollup-plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
+import { terser } from "rollup-plugin-terser";
 
 const pkg = require("./package.json");
 
@@ -18,6 +19,11 @@ const main = {
     typescript({
       check: true,
       clean: true,
+      tsconfigOverride: {
+        compilerOptions: {
+          module: "ES2015",
+        }
+      },
     }),
   ],
   external,
@@ -36,10 +42,10 @@ const main = {
 };
 
 const browserExternals = {
-  "protobufjs": "protobuf",
-  "ws": "WebSocket",
-  "node-fetch": "fetch",
+  "xmldom-alpha": "self",
+  "xpath": "self",
 };
+
 const browser = [
   {
     input,
@@ -48,13 +54,15 @@ const browser = [
         preferBuiltins: true,
       }),
       commonjs(),
-      builtins({
-        events: true,
-      }),
+      builtins(),
       typescript({
-        typescript: require("typescript"),
         check: true,
         clean: true,
+        tsconfigOverride: {
+          compilerOptions: {
+            module: "es2015",
+          }
+        }
       }),
     ],
     external: Object.keys(browserExternals),
@@ -68,39 +76,50 @@ const browser = [
   },
   {
     input: pkg.browser,
+    external: Object.keys(browserExternals),
     plugins: [
       babel({
         babelrc: false,
         runtimeHelpers: true,
+        compact: false,
+        comments: false,
         presets: [
-          [
-            "@babel/env",
-            {
-              targets: {
-                // ie: "11",
-                chrome: "60",
-              },
-              useBuiltIns: "entry"
-            }
-          ]
+          ["@babel/env", {
+            targets: {
+              ie: "11",
+              chrome: "60",
+            },
+            useBuiltIns: "entry",
+            corejs: 3,
+          }],
         ],
         plugins: [
-          "@babel/proposal-class-properties",
-          "@babel/proposal-object-rest-spread",
-        ],
+          ["@babel/plugin-proposal-class-properties"],
+          ["@babel/proposal-object-rest-spread"],
+        ]
       }),
     ],
-    external: Object.keys(browserExternals),
     output: [
       {
+        banner,
         file: pkg.browser,
-        format: "iife",
-        name: "WebcryptoSocket",
         globals: browserExternals,
+        format: "iife",
+        name: "XmlDSigJs",
+      },
+      {
+        banner,
+        file: pkg.browserMin,
+        globals: browserExternals,
+        format: "iife",
+        name: "XmlDSigJs",
+        plugins: [
+          terser(),
+        ]
       },
     ],
-  }
-]
+  },
+];
 
 export default [
   main,

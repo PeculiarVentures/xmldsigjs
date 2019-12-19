@@ -14,7 +14,7 @@
 npm install xmldsigjs
 ```
 
-The npm module has `dist` folder with the following files:
+The npm module has `build` folder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|

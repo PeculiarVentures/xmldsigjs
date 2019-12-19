@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "commonjs",
         "moduleResolution": "node",
-        "target": "es2015",
+        "target": "ES2018",
         "lib": [
             "dom",
             "es2015"
@@ -10,6 +10,7 @@
         "outDir": "build",
         "esModuleInterop": true,
         "noImplicitAny": false,
+        "removeComments": true,
         "sourceMap": true,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
@@ -23,6 +24,6 @@
         "forceConsistentCasingInFileNames": true
     },
     "exclude": [
-        "dist"
+        "build"
     ]
 }
