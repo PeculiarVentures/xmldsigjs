@@ -1,9 +1,5 @@
-// tslint:disable-next-line:no-reference
-/// <reference path="../../types/pkijs.d.ts" />
-
-import { Certificate } from "pkijs";
-
 import * as Asn1Js from "asn1js";
+import { Certificate } from "pkijs";
 import { ECDSA } from "../algorithms";
 import { Application } from "../application";
 
@@ -83,7 +79,7 @@ const OID: { [key: string]: { short?: string, long?: string } } = {
 export class X509Certificate {
 
     protected raw: Uint8Array;
-    protected simpl: PkiJs.Certificate;
+    protected simpl: any;
     protected publicKey: CryptoKey | null = null;
 
     constructor(rawData?: BufferSource) {
@@ -172,7 +168,7 @@ export class X509Certificate {
      * Example:
      * > C=Some name, O=Some organization name, C=RU
      */
-    protected NameToString(name: PkiJs.RelativeDistinguishedNames, splitter: string = ","): string {
+    protected NameToString(name: any, splitter: string = ","): string {
         const res: string[] = [];
         name.typesAndValues.forEach((typeAndValue) => {
             const type = typeAndValue.type;
