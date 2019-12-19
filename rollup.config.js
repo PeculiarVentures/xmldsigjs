@@ -1,6 +1,5 @@
-import resolve from "rollup-plugin-node-resolve";
+import resolve from "@rollup/plugin-node-resolve";
 import babel from "rollup-plugin-babel";
-import builtins from "rollup-plugin-node-builtins";
 import commonjs from "rollup-plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import { terser } from "rollup-plugin-terser";
@@ -51,10 +50,10 @@ const browser = [
     input,
     plugins: [
       resolve({
+        main: ["jsnext", "module", "main"],
         preferBuiltins: true,
       }),
       commonjs(),
-      builtins(),
       typescript({
         check: true,
         clean: true,
