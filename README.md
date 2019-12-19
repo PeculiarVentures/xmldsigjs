@@ -18,11 +18,10 @@ The npm module has `build` folder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
-| index.js        | 126 Kb | UMD module with external modules. Has comments | 
-| xmldsig.js      | 696 Kb | UMD bundle module. Has comments                | 
-| xmldsig.min.js  | 253 Kb | minified UMD bundled module. No comments       |
-
-There is `lib` folder with ES2015 JS file which you can use with the `rollup` bundler.
+| index.js        | 105 Kb | CJS module with external modules               | 
+| index.es.js     | 100 Kb | ES module with external modules                | 
+| xmldsig.js      | 872 Kb | IIFE bundle module                             | 
+| xmldsig.min.js  | 398 Kb | minified IIFE bundled module                   |
  
 ## COMPATABILITY
 
