@@ -14,16 +14,15 @@
 npm install xmldsigjs
 ```
 
-The npm module has `dist` folder with the following files:
+The npm module has `build` folder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
-| index.js        | 126 Kb | UMD module with external modules. Has comments |
-| xmldsig.js      | 696 Kb | UMD bundle module. Has comments                |
-| xmldsig.min.js  | 253 Kb | minified UMD bundled module. No comments       |
-
-There is `lib` folder with ES2015 JS file which you can use with the `rollup` bundler.
-
+| index.js        | 105 Kb | CJS module with external modules               | 
+| index.es.js     | 100 Kb | ES module with external modules                | 
+| xmldsig.js      | 872 Kb | IIFE bundle module                             | 
+| xmldsig.min.js  | 398 Kb | minified IIFE bundled module                   |
+ 
 ## COMPATABILITY
 
 ### CRYPTOGRAPHIC ALGORITHM SUPPORT
@@ -169,8 +168,10 @@ XmlDSigJs.Application.setEngine("OpenSSL", crypto);
 
 ### Initiating in Browser
 
+Get the latest version form [unpkg.com/xmldsigjs](https://unpkg.com/xmldsigjs)
+
 ```html
-<script src="xmldsig.js"></script>
+<script src="https://unpkg.com/xmldsigjs@<version>/build/xmldsig.js"></script>
 ```
 
 ### Creating a XMLDSIG Signature
@@ -199,9 +200,7 @@ signature.Sign(                                  // Signing document
 ### Checking a XMLDSIG Signature
 
 
-```javascript
-"use strict";
-
+```js
 let doc = XmlDSigJs.Parse(xml);
 let signature = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
@@ -226,11 +225,11 @@ signedXml.Verify()
 </head>
 
 <body>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
-    <script type="text/javascript" src="xmldsig.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.7.0/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/asmCrypto/2.3.2/asmcrypto.all.es5.min.js"></script>
+    <script src="https://cdn.rawgit.com/indutny/elliptic/master/dist/elliptic.min.js"></script>
+    <script src="https://unpkg.com/webcrypto-liner@1.1.2/build/webcrypto-liner.shim.min.js"></script>
+    <script src="https://unpkg.com/xmldsigjs@2.0.27/build/xmldsig.js"></script>
     <script type="text/javascript">
         fetch("signature.xml")
         .then(function(response) {
@@ -284,5 +283,6 @@ This project takes inspiration (style, approach, design and code) from both the 
 - [Exclusive XML Canonicalization](https://www.w3.org/TR/xml-exc-c14n/)
 - [Internet X.509 Public Key Infrastructure Time-Stamp Protocol](https://www.ietf.org/rfc/rfc3161.txt)
 - [PKIjs](pkijs.org)
+- [@peculiar/webcrypto](https://github.com/PeculiarVentures/webcrypto)
 - [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl)
 - [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)

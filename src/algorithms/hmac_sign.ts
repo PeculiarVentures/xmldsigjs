@@ -1,5 +1,5 @@
 import { SignatureAlgorithm } from "../algorithm";
-import { SHA1, SHA256, SHA384, SHA512 } from "../algorithm/rsa_hash";
+import { SHA1, SHA256, SHA384, SHA512 } from "../algorithms/rsa_hash";
 
 export const HMAC = "HMAC";
 export const HMAC_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";

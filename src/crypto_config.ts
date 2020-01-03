@@ -10,31 +10,36 @@ import {
     RSA_PKCS1,
     RSA_PKCS1_SHA1_NAMESPACE, RSA_PKCS1_SHA256_NAMESPACE, RSA_PKCS1_SHA384_NAMESPACE, RSA_PKCS1_SHA512_NAMESPACE,
     RsaPkcs1Sha1, RsaPkcs1Sha256, RsaPkcs1Sha384, RsaPkcs1Sha512,
-} from "./algorithm/index";
-// rsa pss
+} from "./algorithms";
+// rsa pss without params
 import {
     RSA_PSS,
+    RSA_PSS_SHA1_NAMESPACE, RSA_PSS_SHA256_NAMESPACE, RSA_PSS_SHA384_NAMESPACE, RSA_PSS_SHA512_NAMESPACE,
+    RsaPssWithoutParamsSha1, RsaPssWithoutParamsSha256, RsaPssWithoutParamsSha384, RsaPssWithoutParamsSha512,
+} from "./algorithms";
+// rsa pss with params
+import {
     RSA_PSS_WITH_PARAMS_NAMESPACE,
     RsaPssSha1, RsaPssSha256, RsaPssSha384, RsaPssSha512,
-} from "./algorithm/index";
+} from "./algorithms";
 // ec dsa
 import {
     ECDSA,
     ECDSA_SHA1_NAMESPACE, ECDSA_SHA256_NAMESPACE, ECDSA_SHA384_NAMESPACE, ECDSA_SHA512_NAMESPACE,
     EcdsaSha1, EcdsaSha256, EcdsaSha384, EcdsaSha512,
-} from "./algorithm/index";
+} from "./algorithms";
 // hmac
 import {
     HMAC,
     HMAC_SHA1_NAMESPACE, HMAC_SHA256_NAMESPACE, HMAC_SHA384_NAMESPACE, HMAC_SHA512_NAMESPACE,
     HmacSha1, HmacSha256, HmacSha384, HmacSha512,
-} from "./algorithm/index";
+} from "./algorithms";
 // Sha
 import {
     SHA1, Sha1, SHA1_NAMESPACE, SHA256,
     Sha256, SHA256_NAMESPACE, SHA384, Sha384,
     SHA384_NAMESPACE, SHA512, Sha512, SHA512_NAMESPACE,
-} from "./algorithm/index";
+} from "./algorithms";
 
 import { HashAlgorithm, IHashAlgorithmConstructable, ISignatureAlgorithmConstructable, SignatureAlgorithm } from "./algorithm";
 import { Transform, XmlSignature } from "./xml";
@@ -61,6 +66,10 @@ SignatureAlgorithms[HMAC_SHA1_NAMESPACE] = HmacSha1;
 SignatureAlgorithms[HMAC_SHA256_NAMESPACE] = HmacSha256;
 SignatureAlgorithms[HMAC_SHA384_NAMESPACE] = HmacSha384;
 SignatureAlgorithms[HMAC_SHA512_NAMESPACE] = HmacSha512;
+SignatureAlgorithms[RSA_PSS_SHA1_NAMESPACE] = RsaPssWithoutParamsSha1;
+SignatureAlgorithms[RSA_PSS_SHA256_NAMESPACE] = RsaPssWithoutParamsSha256;
+SignatureAlgorithms[RSA_PSS_SHA384_NAMESPACE] = RsaPssWithoutParamsSha384;
+SignatureAlgorithms[RSA_PSS_SHA512_NAMESPACE] = RsaPssWithoutParamsSha512;
 
 const HashAlgorithms: { [namespace: string]: IHashAlgorithmConstructable } = {};
 HashAlgorithms[SHA1_NAMESPACE] = Sha1;
@@ -209,20 +218,21 @@ export class CryptoConfig {
                 const saltLength = (algorithm as any).saltLength;
                 switch (hashName.toUpperCase()) {
                     case SHA1:
-                        alg = new RsaPssSha1(saltLength);
+                        alg = saltLength ? new RsaPssSha1(saltLength) : new RsaPssWithoutParamsSha1();
                         break;
                     case SHA256:
-                        alg = new RsaPssSha256(saltLength);
+                        alg = saltLength ? new RsaPssSha256(saltLength) : new RsaPssWithoutParamsSha256();
                         break;
                     case SHA384:
-                        alg = new RsaPssSha384(saltLength);
+                        alg = saltLength ? new RsaPssSha384(saltLength) : new RsaPssWithoutParamsSha384();
                         break;
                     case SHA512:
-                        alg = new RsaPssSha512(saltLength);
+                        alg = saltLength ? new RsaPssSha512(saltLength) : new RsaPssWithoutParamsSha512();
                         break;
                     default:
                         throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
                 }
+                (algorithm as RsaPssParams).saltLength = (alg.algorithm as RsaPssParams).saltLength;
                 break;
             case ECDSA:
                 switch (hashName.toUpperCase()) {

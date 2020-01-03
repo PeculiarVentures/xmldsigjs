@@ -1,3 +1,4 @@
+export * from "./algorithms";
 export * from "./application";
 export * from "./canonicalizer";
 export * from "./crypto_config";

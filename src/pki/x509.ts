@@ -1,13 +1,9 @@
-// tslint:disable-next-line:no-reference
-/// <reference path="../../types/pkijs.d.ts" />
-
-import { Certificate } from "pkijs";
-
 import * as Asn1Js from "asn1js";
-import { ECDSA } from "../algorithm/index";
+import { Certificate } from "pkijs";
+import { ECDSA } from "../algorithms";
 import { Application } from "../application";
 
-export declare type DigestAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
+export type DigestAlgorithm = string | "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
 
 /**
  * List of OIDs
@@ -83,7 +79,7 @@ const OID: { [key: string]: { short?: string, long?: string } } = {
 export class X509Certificate {
 
     protected raw: Uint8Array;
-    protected simpl: PkiJs.Certificate;
+    protected simpl: any;
     protected publicKey: CryptoKey | null = null;
 
     constructor(rawData?: BufferSource) {
@@ -118,9 +114,9 @@ export class X509Certificate {
     /**
      * Returns a thumbprint of the certificate
      * @param  {DigestAlgorithm="SHA-1"} algName Digest algorithm name
-     * @returns PromiseLike
+     * @returns Promise<ArrayBuffer>
      */
-    public Thumbprint(algName: DigestAlgorithm = "SHA-1"): PromiseLike<ArrayBuffer> {
+    public async Thumbprint(algName: DigestAlgorithm = "SHA-1") {
         return Application.crypto.subtle.digest(algName, this.raw);
     }
 
@@ -141,38 +137,26 @@ export class X509Certificate {
     /**
      * Returns public key from X509Certificate
      * @param  {Algorithm} algorithm
-     * @returns Promise
+     * @returns Promise<CryptoKey>
      */
-    public exportKey(algorithm: Algorithm): PromiseLike<CryptoKey> {
-        return Promise.resolve()
-            .then(() => {
-                const alg = {
-                    algorithm,
-                    usages: ["verify"],
-                };
-                if (alg.algorithm.name.toUpperCase() === ECDSA) {
-                    // Set named curve
-                    const namedCurveOid = this.simpl.subjectPublicKeyInfo.toJSON().algorithm.algorithmParams.valueBlock.value;
-                    switch (namedCurveOid) {
-                        case "1.2.840.10045.3.1.7": // P-256
-                            (alg.algorithm as any).namedCurve = "P-256";
-                            break;
-                        case "1.3.132.0.34": // P-384
-                            (alg.algorithm as any).namedCurve = "P-384";
-                            break;
-                        case "1.3.132.0.35": // P-521
-                            (alg.algorithm as any).namedCurve = "P-521";
-                            break;
-                        default:
-                        throw new Error(`Unsupported named curve OID '${namedCurveOid}'`);
-                    }
-                }
-                return this.simpl.getPublicKey({ algorithm: alg })
-                    .then((key) => {
-                        this.publicKey = key;
-                        return key;
-                    });
-            });
+    public async exportKey(algorithm: Algorithm | EcKeyImportParams | RsaHashedImportParams) {
+        const alg = {
+            algorithm,
+            usages: ["verify"],
+        };
+        if (alg.algorithm.name.toUpperCase() === ECDSA) {
+            // Set named curve
+            (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
+        }
+        if (this.isHashedAlgorithm(alg.algorithm)) {
+            if (typeof alg.algorithm.hash === "string") {
+                alg.algorithm.hash = { name: alg.algorithm.hash };
+            }
+        }
+
+        const key = await this.simpl.getPublicKey({ algorithm: alg });
+        this.publicKey = key;
+        return key;
     }
 
     //#region Protected methods
@@ -184,7 +168,7 @@ export class X509Certificate {
      * Example:
      * > C=Some name, O=Some organization name, C=RU
      */
-    protected NameToString(name: PkiJs.RelativeDistinguishedNames, splitter: string = ","): string {
+    protected NameToString(name: any, splitter: string = ","): string {
         const res: string[] = [];
         name.typesAndValues.forEach((typeAndValue) => {
             const type = typeAndValue.type;
@@ -205,4 +189,8 @@ export class X509Certificate {
         this.simpl = new Certificate({ schema: asn1.result });
     }
     //#endregion
+
+    private isHashedAlgorithm(alg: Algorithm): alg is RsaHashedImportParams {
+        return !!alg["hash"];
+    }
 }

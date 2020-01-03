@@ -1,6 +1,8 @@
 import { SignatureAlgorithm } from "../algorithm";
 import { SHA1, SHA256, SHA384, SHA512 } from "./rsa_hash";
 
+// https://tools.ietf.org/html/rfc6931#section-2.3.9
+
 export const RSA_PSS = "RSA-PSS";
 
 export const RSA_PSS_WITH_PARAMS_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#rsa-pss";
