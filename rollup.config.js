@@ -1,7 +1,7 @@
 import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import typescript from "@rollup/plugin-typescript";
 import babel from "rollup-plugin-babel";
-import commonjs from "rollup-plugin-commonjs";
-import typescript from "rollup-plugin-typescript2";
 import { terser } from "rollup-plugin-terser";
 
 const pkg = require("./package.json");
@@ -16,13 +16,8 @@ const main = {
   input,
   plugins: [
     typescript({
-      check: true,
-      clean: true,
-      tsconfigOverride: {
-        compilerOptions: {
-          module: "ES2015",
-        }
-      },
+      module: "ES2015",
+      removeComments: true,
     }),
   ],
   external,
@@ -50,18 +45,13 @@ const browser = [
     input,
     plugins: [
       resolve({
-        main: ["jsnext", "module", "main"],
+        mainFields: ["jsnext", "module", "main"],
         preferBuiltins: true,
       }),
       commonjs(),
       typescript({
-        check: true,
-        clean: true,
-        tsconfigOverride: {
-          compilerOptions: {
-            module: "es2015",
-          }
-        }
+        module: "ES2015",
+        removeComments: true,
       }),
     ],
     external: Object.keys(browserExternals),
