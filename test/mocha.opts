@@ -1,3 +1,0 @@
-test/config.ts
---require ts-node/register
-test/*.ts

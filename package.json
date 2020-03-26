@@ -92,5 +92,15 @@
       "text-summary",
       "html"
     ]
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "extension": [
+      "ts"
+    ],
+    "file": "test/config.ts",
+    "watch-files": [
+      "test/**/*.ts"
+    ]
   }
 }
