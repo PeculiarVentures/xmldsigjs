@@ -1,4 +1,5 @@
 import * as Asn1Js from "asn1js";
+// @ts-ignore
 import { Certificate } from "pkijs";
 import { ECDSA } from "../algorithms";
 import { Application } from "../application";
@@ -170,7 +171,7 @@ export class X509Certificate {
      */
     protected NameToString(name: any, splitter: string = ","): string {
         const res: string[] = [];
-        name.typesAndValues.forEach((typeAndValue) => {
+        name.typesAndValues.forEach((typeAndValue: any) => {
             const type = typeAndValue.type;
             const oid = OID[type.toString()];
             const name2 = oid ? oid.short : null;
@@ -191,6 +192,7 @@ export class X509Certificate {
     //#endregion
 
     private isHashedAlgorithm(alg: Algorithm): alg is RsaHashedImportParams {
-        return !!alg["hash"];
+        // @ts-ignore
+        return !!(alg)["hash"];
     }
 }

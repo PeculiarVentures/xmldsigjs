@@ -7,7 +7,6 @@
             "dom",
             "es2015"
         ],
-        "outDir": "build",
         "esModuleInterop": true,
         "noImplicitAny": false,
         "removeComments": true,
