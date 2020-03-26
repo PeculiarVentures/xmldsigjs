@@ -1,3 +1,4 @@
+// @ts-ignore
 import { CryptoEngine, setEngine } from "pkijs";
 import { XE, XmlError } from "xml-core";
 
