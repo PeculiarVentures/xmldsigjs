@@ -66,7 +66,7 @@ export class Reference extends XmlSignatureObject {
         required: true,
         parser: DigestMethod,
     })
-    public DigestMethod: DigestMethod;
+    public DigestMethod: DigestMethod = new DigestMethod();
 
     /**
      * Gets or sets the digest value of the current Reference.

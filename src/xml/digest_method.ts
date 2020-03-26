@@ -27,4 +27,11 @@ export class DigestMethod extends XmlSignatureObject {
     })
     public Algorithm: string;
 
+    public constructor(hashNamespace?: string) {
+        super();
+
+        if (hashNamespace) {
+            this.Algorithm = hashNamespace;
+        }
+    }
 }

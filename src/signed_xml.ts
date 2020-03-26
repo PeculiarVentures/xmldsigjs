@@ -111,7 +111,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         let signedInfo: SignedInfo;
         const signingAlg = XmlCore.assign({}, algorithm);
 
+        // @ts-ignore
         if (key.algorithm["hash"]) {
+            // @ts-ignore
             signingAlg.hash = key.algorithm["hash"];
         }
         alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);
@@ -362,6 +364,10 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         // we must tell each reference which hash algorithm to use
         // before asking for the SignedInfo XML !
         for (const ref of this.XmlSignature.SignedInfo.References.GetIterator()) {
+            if (ref.DigestValue) {
+                // Skip digest calculating if reference has got a DigestValue
+                continue;
+            }
             // assume SHA-256 if nothing is specified
             if (!ref.DigestMethod.Algorithm) {
                 ref.DigestMethod.Algorithm = new Alg.Sha256().namespaceURI;
