@@ -35,21 +35,9 @@ export class XmlCanonicalizer {
         if (!node) {
             throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Parameter 1 is not Node");
         }
-        let node2: Node;
-        if (node.nodeType === XmlCore.XmlNodeType.Document) {
-            this.document = node as Document;
-            node2 = this.document.documentElement;
-        } else {
-            if (!node.ownerDocument) {
-                throw new Error("Cannot get owner document");
-            }
-            this.document = node.ownerDocument;
-            node2 = node;
-        }
+        this.WriteNode(node);
         // get nss from document
         // this.nsManager = new XmlNamespaceManager(this.document);
-
-        this.WriteNode(node2);
 
         const res = this.result.join("");
         return res;
@@ -68,7 +56,9 @@ export class XmlCanonicalizer {
             case XmlCore.XmlNodeType.SignificantWhitespace:
             case XmlCore.XmlNodeType.Text:
                 // CDATA sections are processed as text nodes
-                this.WriteTextNode(node);
+                if (!XmlCore.isDocument(node.parentNode)) {
+                    this.WriteTextNode(node);
+                }
                 break;
             case XmlCore.XmlNodeType.Whitespace:
                 if (this.state === XmlCanonicalizerState.InsideDocElement) {
@@ -151,6 +141,10 @@ export class XmlCanonicalizer {
     // order than the document element.
     protected WriteProcessingInstructionNode(node: Node): void {
         // console.log(`WriteProcessingInstructionNode: ${node.nodeName}`);
+        const nodeName = node.nodeName || (node as Element).tagName;
+        if (nodeName === "xml") {
+            return;
+        }
 
         if (this.state === XmlCanonicalizerState.AfterDocElement) {
             this.result.push("\u000A<?");
@@ -158,7 +152,7 @@ export class XmlCanonicalizer {
             this.result.push("<?");
         }
 
-        this.result.push(node.nodeName);
+        this.result.push(nodeName);
         if (node.nodeValue) {
             this.result.push(" ");
             this.result.push(this.NormalizeString(node.nodeValue, XmlCore.XmlNodeType.ProcessingInstruction));
@@ -174,6 +168,7 @@ export class XmlCanonicalizer {
     protected WriteElementNode(node: Element) {
         // console.log(`WriteElementNode: ${node.nodeName}`);
 
+        const state = this.state;
         if (this.state === XmlCanonicalizerState.BeforeDocElement) {
             this.state = XmlCanonicalizerState.InsideDocElement;
         }
@@ -197,7 +192,7 @@ export class XmlCanonicalizer {
         this.result.push(node.nodeName);
         this.result.push(">");
 
-        if ((this.state as any) === XmlCanonicalizerState.BeforeDocElement) {
+        if (state === XmlCanonicalizerState.BeforeDocElement) {
             this.state = XmlCanonicalizerState.AfterDocElement;
         }
 
