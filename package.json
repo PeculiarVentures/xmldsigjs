@@ -99,7 +99,7 @@
       "ts"
     ],
     "file": "test/config.ts",
-    "watch-files": [
+    "spec": [
       "test/**/*.ts"
     ]
   }

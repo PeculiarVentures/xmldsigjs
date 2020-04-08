@@ -16,7 +16,7 @@ context("Canonicalization", () => {
     console.warn("    \x1b[33mWARN:\x1b[0m Test is not supported for %s", name);
   }
 
-  function C14N(xml: string, xpath: string, result: string) {
+  function C14N(xml: string, xpath: string | null, result: string) {
     canon(false, xml, xpath, result, false);
   }
 
@@ -32,9 +32,11 @@ context("Canonicalization", () => {
     canon(true, xml, xpath, result, true, inclusive);
   }
 
-  function canon(exclusive: boolean, xml: string, xpath: string, result: string, comment: boolean = false, inclusive?: string) {
+  function canon(exclusive: boolean, xml: string, xpath: string | null, result: string, comment: boolean = false, inclusive?: string) {
     const doc = new DOMParser().parseFromString(xml, "application/xml");
-    const elem = xmldsig.Select(doc, xpath)[0];
+    const elem = xpath
+      ? xmldsig.Select(doc, xpath)[0]
+      : doc;
     const xmlCanonicalizer = new xmldsig.XmlCanonicalizer(!!comment, exclusive);
     if (inclusive) {
       xmlCanonicalizer.InclusiveNamespacesPrefixList = inclusive;
@@ -373,28 +375,34 @@ context("Canonicalization", () => {
   });
 
   // https://www.w3.org/TR/xml-c14n2-testcases/
-  context.skip("Test cases for Canonical XML 2.0", () => {
+  // TODO: Update test vector when https://github.com/xmldom/xmldom/issues/42 fixed
+  context("Test cases for Canonical XML 2.0", () => {
 
     it("2.1 PIs, Comments, and Outside of Document Element", () => {
       const xml = `<?xml version="1.0"?>
 
-            <?xml-stylesheet   href="doc.xsl"
-               type="text/xsl"   ?>
+<?xml-stylesheet   href="doc.xsl"
+    type="text/xsl"?>
 
-            <!DOCTYPE doc SYSTEM "doc.dtd">
+<!DOCTYPE doc SYSTEM "doc.dtd">
 
-            <doc>Hello, world!<!-- Comment 1 --></doc>
+<doc>Hello, world!<!-- Comment 1 --></doc>
 
-            <?pi-without-data     ?>
+<?pi-without-data     ?>
 
-            <!-- Comment 2 -->
+<!-- Comment 2 -->
 
-            <!-- Comment 3 -->`;
-      const xpath = "//*";
-      C14N(xml, xpath, `<?xml-stylesheet href="doc.xsl"
-            type="text/xsl"   ?>
-         <doc>Hello, world!</doc>
-         <?pi-without-data?>`);
+<!-- Comment 3 -->`;
+      C14N(xml, null, `<?xml-stylesheet href="doc.xsl"
+    type="text/xsl"?>
+<doc>Hello, world!</doc>
+<?pi-without-data?>`);
+C14NComment(xml, null, `<?xml-stylesheet href="doc.xsl"
+    type="text/xsl"?>
+<doc>Hello, world!<!-- Comment 1 --></doc>
+<?pi-without-data?>
+<!-- Comment 2 -->
+<!-- Comment 3 -->`);
     });
 
   });
