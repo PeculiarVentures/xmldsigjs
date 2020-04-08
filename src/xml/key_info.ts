@@ -1,4 +1,4 @@
-import { XE, XmlError, XmlNodeType } from "xml-core";
+import { XmlNodeType } from "xml-core";
 import { XmlAttribute, XmlElement } from "xml-core";
 
 import { KeyInfoClause, KeyInfoX509Data, KeyValue, SPKIData } from "./key_infos";
@@ -64,36 +64,9 @@ export class KeyInfo extends XmlSignatureCollection<KeyInfoClause> {
             if (KeyInfoClass) {
                 const item = new KeyInfoClass();
                 item.LoadXml(node);
-                if (item instanceof KeyValue) {
-                    // Read KeyValue
-                    let keyValue: KeyInfoClause | null = null;
-                    [RsaKeyValue, EcdsaKeyValue].some((KeyClass) => {
-                        try {
-                            const k = new KeyClass();
-                            for (let j = 0; j < node.childNodes.length; j++) {
-                                const nodeKey = node.childNodes.item(j);
-                                if (nodeKey.nodeType !== XmlNodeType.Element) {
-                                    continue;
-                                }
-                                k.LoadXml(nodeKey as Element);
-                                keyValue = k;
-                                return true;
-                            }
-                        } catch (e) { /* none */ }
-                        return false;
-                    });
-                    if (keyValue) {
-                        item.Value = keyValue;
-                    } else {
-                        throw new XmlError(XE.CRYPTOGRAPHIC, "Unsupported KeyValue in use");
-                    }
-                    item.GetXml();
-                }
                 this.Add(item);
             }
         }
     }
 
 }
-
-import { EcdsaKeyValue, RsaKeyValue } from "./key_infos";
