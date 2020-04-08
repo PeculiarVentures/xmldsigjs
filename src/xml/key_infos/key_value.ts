@@ -69,4 +69,23 @@ export class KeyValue extends KeyInfoClause {
         }
     }
 
+    protected OnLoadXml(element: Element) {
+        const keyValueTypes = [RsaKeyValue, EcdsaKeyValue];
+        for (const keyValueType of keyValueTypes) {
+            try {
+                const keyValue = new keyValueType();
+                for (let i = 0; i < element.childNodes.length; i++) {
+                    const nodeKey = element.childNodes.item(i);
+                    if (!XmlCore.isElement(nodeKey)) {
+                        continue;
+                    }
+                    keyValue.LoadXml(nodeKey);
+                    this.value = keyValue;
+                    return;
+                }
+            } catch (e) { /* none */ }
+        }
+        throw new XmlError(XE.CRYPTOGRAPHIC, "Unsupported KeyValue in use");
+    }
+
 }
