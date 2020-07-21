@@ -180,7 +180,7 @@ export class EcdsaKeyValue extends KeyInfoClause {
             ext: true,
         };
         this.keyUsage = ["verify"];
-        const key = await Application.crypto.subtle.importKey("jwk", jwk as any, { name: "ECDSA", namedCurve: crv } as any, true, this.keyUsage);
+        const key = await Application.crypto.subtle.importKey("jwk", jwk as any, { name: "ECDSA", namedCurve: crv } as any, true, this.keyUsage as KeyUsage[]);
 
         this.key = key;
         return this.key;

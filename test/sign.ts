@@ -17,7 +17,7 @@ context("XML Signing + XMLSEC verification", () => {
 
   before(async () => {
     // Generate key
-    keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
+    keys = (await crypto.subtle.generateKey(alg, false, ["sign", "verify"])) as CryptoKeyPair;
   });
 
   after(() => {
