@@ -108,7 +108,8 @@ export class KeyInfoX509Data extends KeyInfoClause {
     /**
      * Gets public key of the X509Data
      */
-    get Key() {
+    // @ts-ignore
+    public get Key(): CryptoKey | null {
         return this.key;
     }
 

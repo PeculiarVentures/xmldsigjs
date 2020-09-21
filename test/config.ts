@@ -1,6 +1,6 @@
 import { Crypto } from "@peculiar/webcrypto";
 import * as fs from "fs";
-import { DOMParser, XMLSerializer } from "xmldom-alpha";
+import { DOMParser, XMLSerializer } from "xmldom";
 import * as xmldsig from "../src";
 // tslint:disable-next-line: no-var-requires
 
