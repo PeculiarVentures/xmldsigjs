@@ -24,6 +24,22 @@ export class XmlDsigExcC14NTransform extends Transform {
         this.xmlCanonicalizer.InclusiveNamespacesPrefixList = value;
     }
 
+    public LoadXml(param: string | Element) {
+        super.LoadXml(param);
+        if (this.Element && this.Element.childNodes) {
+            for (let i = 0; i < this.Element.childNodes.length; i++) {
+                const element = this.Element.childNodes[i] as HTMLElement;
+                if (element && element.nodeType === 1) {
+                    switch (element.localName) {
+                        case 'InclusiveNamespaces':
+                            this.setInclusiveNamespacesElement(element);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Returns the output of the current XmlDsigExcC14NTransform object
      */
@@ -34,6 +50,12 @@ export class XmlDsigExcC14NTransform extends Transform {
         return this.xmlCanonicalizer.Canonicalize(this.innerXml);
     }
 
+    private setInclusiveNamespacesElement(element: HTMLElement) {
+        const prefixList = element.getAttribute('PrefixList');
+        if (prefixList && prefixList.length > 0) {
+            this.xmlCanonicalizer.InclusiveNamespacesPrefixList = prefixList;
+        }
+    }
 }
 
 /**
