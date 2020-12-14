@@ -372,6 +372,13 @@ context("Canonicalization", () => {
       ExcC14N(xml, xpath, '<root xmlns="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" saml:a="1" samlp:a="1"></root>');
     });
 
+    it("#37 Canonicalization sorts upper case namespaces before lower case", () => {
+      const xml = '<root xmlns:a="urn:a.example.com" xmlns:Z="urn:z.example.com" a:a="1" Z:a="2"></root>';
+      const xpath = '//*[local-name(.)="root"]';
+      C14N(xml, xpath, '<root xmlns:Z="urn:z.example.com" xmlns:a="urn:a.example.com" a:a="1" Z:a="2"></root>');
+      ExcC14N(xml, xpath, '<root xmlns:Z="urn:z.example.com" xmlns:a="urn:a.example.com" a:a="1" Z:a="2"></root>');
+    });
+
   });
 
   // https://www.w3.org/TR/xml-c14n2-testcases/

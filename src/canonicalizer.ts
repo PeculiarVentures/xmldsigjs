@@ -389,9 +389,13 @@ function XmlDsigC14NTransformNamespacesComparer(x: XmlCore.XmlNamespace, y: XmlC
         return -1;
     } else if (!y.prefix) {
         return 1;
+    } else if (x.prefix < y.prefix) {
+        return -1;
+    } else if (x.prefix > y.prefix) {
+        return 1;
+    } else {
+        return 0;
     }
-
-    return x.prefix.localeCompare(y.prefix);
 }
 
 function XmlDsigC14NTransformAttributesComparer(x: Node, y: Node): number {
