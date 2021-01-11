@@ -28,7 +28,7 @@ context("XML Signing + XMLSEC verification", () => {
   });
 
   async function checkXMLSEC(xml: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       // console.log("%s\n", xml);
       fs.writeFileSync(SIGN_XML_FILE, xml, { flag: "w+" });
 
