@@ -51,7 +51,7 @@
     "pvtsutils": "^1.1.1",
     "pvutils": "^1.0.17",
     "tslib": "^2.1.0",
-    "xml-core": "^1.1.0",
+    "xml-core": "^1.1.2",
     "xpath": "^0.0.27"
   },
   "devDependencies": {
