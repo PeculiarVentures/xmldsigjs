@@ -11,7 +11,7 @@
         "noImplicitAny": false,
         "removeComments": true,
         "sourceMap": true,
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
         "noUnusedParameters": false,
         "strict": true,
         "strictPropertyInitialization": false,
