@@ -18,7 +18,7 @@ context("ECDSA", () => {
               namedCurve,
             },
             true,
-            ["sign", "verify"]);
+            ["sign", "verify"]) as Required<CryptoKeyPair>;
 
           await signature.Sign(
             { name: "ECDSA", hash } as EcdsaParams,                         // algorithm

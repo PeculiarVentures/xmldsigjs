@@ -22,7 +22,7 @@ context("RSA-SSA", () => {
                 publicExponent,
               },
               true,
-              ["sign", "verify"]);
+              ["sign", "verify"]) as Required<CryptoKeyPair>;
 
             await signature.Sign(
               { name: "RSASSA-PKCS1-v1_5" },                                  // algorithm

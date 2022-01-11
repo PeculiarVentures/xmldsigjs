@@ -7,7 +7,7 @@ const SIGN_XML_FILE = "sign.xml";
 
 context("XML Signing + XMLSEC verification", () => {
 
-  let keys: CryptoKeyPair;
+  let keys: Required<CryptoKeyPair>;
   const alg = {
     name: "RSASSA-PKCS1-v1_5",
     hash: "SHA-256",
@@ -17,7 +17,7 @@ context("XML Signing + XMLSEC verification", () => {
 
   before(async () => {
     // Generate key
-    keys = (await crypto.subtle.generateKey(alg, false, ["sign", "verify"])) as CryptoKeyPair;
+    keys = (await crypto.subtle.generateKey(alg, false, ["sign", "verify"])) as Required<CryptoKeyPair>;
   });
 
   after(() => {

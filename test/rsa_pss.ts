@@ -29,7 +29,7 @@ describe("RSA-PSS", () => {
                   publicExponent,
                 },
                 true,
-                ["sign", "verify"]);
+                ["sign", "verify"]) as Required<CryptoKeyPair>;
 
               const alg = { name: "RSA-PSS" };
               if (saltLength) {

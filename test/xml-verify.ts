@@ -13,9 +13,9 @@ context('Verify XML with InclusiveNamespaces', () => {
         signedXml.LoadXml(xmlSignature[0]);
         const valid = await signedXml.Verify();
         assert.strictEqual(valid, true);
-    })
+    });
 
-})
+});
 
 context("Verify XML signatures", function () {
 
