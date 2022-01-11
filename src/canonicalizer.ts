@@ -398,12 +398,12 @@ function XmlDsigC14NTransformNamespacesComparer(x: XmlCore.XmlNamespace, y: XmlC
     }
 }
 
-function XmlDsigC14NTransformAttributesComparer(x: Node, y: Node): number {
+function XmlDsigC14NTransformAttributesComparer(x: Attr, y: Attr): number {
     if (!x.namespaceURI && y.namespaceURI) { return -1; }
     if (!y.namespaceURI && x.namespaceURI) { return 1; }
 
-    const left = x.namespaceURI! + (x as Element).localName;
-    const right = y.namespaceURI! + (y as Element).localName;
+    const left = x.namespaceURI! + x.localName;
+    const right = y.namespaceURI! + y.localName;
 
     if (left === right) {
         return 0;
