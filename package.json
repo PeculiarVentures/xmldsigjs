@@ -4,8 +4,8 @@
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "build/index.js",
   "module": "build/index.es.js",
-  "browser": "build/xmldsig.js",
-  "browserMin": "build/xmldsig.min.js",
+  "unpkg": "build/xmldsig.js",
+  "unpkgMin": "build/xmldsig.min.js",
   "types": "build/types/index.d.ts",
   "scripts": {
     "prepare": "npm run build",

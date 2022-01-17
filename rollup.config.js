@@ -57,14 +57,14 @@ const browser = [
     external: Object.keys(browserExternals),
     output: [
       {
-        file: pkg.browser,
+        file: pkg.unpkg,
         format: "es",
         globals: browserExternals,
       }
     ]
   },
   {
-    input: pkg.browser,
+    input: pkg.unpkg,
     external: Object.keys(browserExternals),
     plugins: [
       babel({
@@ -91,14 +91,14 @@ const browser = [
     output: [
       {
         banner,
-        file: pkg.browser,
+        file: pkg.unpkg,
         globals: browserExternals,
         format: "iife",
         name: "XmlDSigJs",
       },
       {
         banner,
-        file: pkg.browserMin,
+        file: pkg.unpkgMin,
         globals: browserExternals,
         format: "iife",
         name: "XmlDSigJs",
