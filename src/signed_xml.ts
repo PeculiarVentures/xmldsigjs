@@ -29,7 +29,6 @@ export interface OptionsSignReference {
      */
     id?: string;
     uri?: string;
-    data?: BufferSource;
     type?: string;
     /**
      * Hash algorithm
@@ -84,6 +83,8 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     public get XmlSignature() {
         return this.signature;
     }
+
+    public contentHandler?: (reference: Reference, target: this) => Promise<Document | DigestReferenceSource | null>;
 
     public Parent?: Element | XmlCore.XmlObject;
     public Key?: CryptoKey;
@@ -306,6 +307,15 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     // }
 
     protected async DigestReference(source: DigestReferenceSource, reference: Reference, checkHmac: boolean) {
+        if (this.contentHandler) {
+            const content = await this.contentHandler(reference, this);
+            if (content) {
+                source = isDocument(content)
+                    ? content.documentElement
+                    : content;
+            }
+        }
+
         if (reference.Uri) {
             let objectName: string | undefined;
             if (!reference.Uri.indexOf("#xpointer")) {

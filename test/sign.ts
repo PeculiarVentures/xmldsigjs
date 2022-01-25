@@ -2,6 +2,8 @@ import * as assert from "assert";
 import * as child_process from "child_process";
 import * as fs from "fs";
 import * as xmldsig from "../src";
+import { Crypto } from "@peculiar/webcrypto";
+import { Convert } from "pvtsutils";
 
 const SIGN_XML_FILE = "sign.xml";
 
@@ -103,6 +105,53 @@ context("XML Signing + XMLSEC verification", () => {
     it("child with repeated namespace", async () => {
       test(`<root xmlns="http://namespace1" xmlns:ns2="http://namespace3"><ns2:first id="id-1" xmlns:ns2="http://namespace2"/><ns2:second/></root>`, "id-1");
     });
+  });
+
+  it("Sign multiple contents", async () => {
+    const crypto = new Crypto();
+    // tslint:disable-next-line: no-shadowed-variable
+    const alg: RsaHashedKeyGenParams = {
+      name: "RSASSA-PKCS1-v1_5",
+      hash: "SHA-256",
+      publicExponent: new Uint8Array([1, 0, 1]),
+      modulusLength: 2048,
+    };
+    // tslint:disable-next-line: no-shadowed-variable
+    const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]) as Required<CryptoKeyPair>;
+    const dataHex = Convert.ToHex(crypto.getRandomValues(new Uint8Array(20)));
+    const data = Convert.FromBinary(dataHex);
+    const dataHex2 = Buffer.from(crypto.getRandomValues(new Uint8Array(20))).toString("hex");
+    const data2 = Buffer.from(dataHex2);
+
+    const signedXml = new xmldsig.SignedXml();
+    signedXml.contentHandler = async (ref: xmldsig.Reference) => {
+      switch (ref.Uri) {
+        case "some-file.txt":
+          return data;
+        case "some-file-2.txt":
+          return data2;
+      }
+      return null;
+    };
+    const signature = await signedXml.Sign(alg, keys.privateKey, data, {
+      keyValue: keys.publicKey,
+      references: [
+        {
+          hash: "sha-256",
+          uri: "some-file.txt"
+        },
+        {
+          hash: "sha-256",
+          uri: "some-file-2.txt"
+        },
+      ]
+    });
+
+    const ok = await signedXml.Verify({
+      content: data,
+    });
+
+    assert.strictEqual(ok, true);
   });
 
 });
