@@ -1,4 +1,3 @@
-// @ts-ignore
 import { CryptoEngine, setEngine } from "pkijs";
 import { XE, XmlError } from "xml-core";
 
@@ -17,12 +16,8 @@ export class Application {
      * @returns void
      */
     public static setEngine(name: string, crypto: Crypto): void {
-        engineCrypto = {
-            getRandomValues: crypto.getRandomValues.bind(crypto),
-            subtle: crypto.subtle,
-            name,
-        };
-        setEngine(name, new CryptoEngine({ name, crypto, subtle: crypto.subtle }), new CryptoEngine({ name, crypto, subtle: crypto.subtle }));
+        engineCrypto = Object.assign(crypto, {name});
+        setEngine(name, crypto, new CryptoEngine({ name, crypto, subtle: crypto.subtle }));
     }
 
     /**
