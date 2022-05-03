@@ -50,7 +50,7 @@ export class KeyValue extends KeyInfoClause {
         return this;
     }
 
-    public async exportKey(alg: Algorithm) {
+    public async exportKey(alg?: Algorithm) {
 
         if (!this.Value) {
             throw new XmlError(XE.NULL_REFERENCE);

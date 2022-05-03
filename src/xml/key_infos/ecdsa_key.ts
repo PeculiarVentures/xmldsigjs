@@ -164,7 +164,7 @@ export class EcdsaKeyValue extends KeyInfoClause {
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    public async exportKey(alg: Algorithm) {
+    public async exportKey(alg?: Algorithm) {
         if (this.key) {
             return this.key;
         }

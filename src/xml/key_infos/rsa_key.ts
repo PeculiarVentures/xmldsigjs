@@ -12,6 +12,13 @@ import { DigestMethod } from "../digest_method";
 import { XmlSignature } from "../xml_names";
 import { KeyInfoClause } from "./key_info_clause";
 
+const DEFAULT_ALGORITHM: RsaHashedImportParams = {
+    name: "RSASSA-PKCS1-v1_5",
+    hash: {
+        name: "SHA-256"
+    }
+}
+
 export interface IJwkRsa {
     alg: string;
     kty: string;
@@ -87,7 +94,7 @@ export class RsaKeyValue extends KeyInfoClause {
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    public async exportKey(alg: Algorithm) {
+    public async exportKey(alg: Algorithm = DEFAULT_ALGORITHM) {
         if (this.key) {
             return this.key;
         }

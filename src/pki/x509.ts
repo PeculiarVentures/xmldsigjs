@@ -1,5 +1,4 @@
 import * as Asn1Js from "asn1js";
-// @ts-ignore
 import { Certificate } from "pkijs";
 import { ECDSA } from "../algorithms";
 import { Application } from "../application";
@@ -10,7 +9,7 @@ export type DigestAlgorithm = string | "SHA-1" | "SHA-256" | "SHA-384" | "SHA-51
  * List of OIDs
  * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx
  */
-const OID: { [key: string]: { short?: string, long?: string } } = {
+const OID: { [key: string]: { short?: string, long?: string; }; } = {
     "2.5.4.3": {
         short: "CN",
         long: "CommonName",
@@ -140,24 +139,36 @@ export class X509Certificate {
      * @param  {Algorithm} algorithm
      * @returns Promise<CryptoKey>
      */
-    public async exportKey(algorithm: Algorithm | EcKeyImportParams | RsaHashedImportParams) {
-        const alg = {
-            algorithm,
-            usages: ["verify"],
-        };
-        if (alg.algorithm.name.toUpperCase() === ECDSA) {
-            // Set named curve
-            (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
-        }
-        if (this.isHashedAlgorithm(alg.algorithm)) {
-            if (typeof alg.algorithm.hash === "string") {
-                alg.algorithm.hash = { name: alg.algorithm.hash };
+    public async exportKey(algorithm?: Algorithm | EcKeyImportParams | RsaHashedImportParams) {
+        if (algorithm) {
+            const alg = {
+                algorithm,
+                usages: ["verify"],
+            };
+            if (alg.algorithm.name.toUpperCase() === ECDSA) {
+                // Set named curve
+                (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
             }
+            if (this.isHashedAlgorithm(alg.algorithm)) {
+                if (typeof alg.algorithm.hash === "string") {
+                    alg.algorithm.hash = { name: alg.algorithm.hash };
+                }
+            }
+
+            const key = await this.simpl.getPublicKey({ algorithm: alg });
+            this.publicKey = key;
+
+            return key;
         }
 
-        const key = await this.simpl.getPublicKey({ algorithm: alg });
-        this.publicKey = key;
-        return key;
+        if (this.simpl.subjectPublicKeyInfo.algorithm.algorithmId === "1.2.840.113549.1.1.1") {
+            // Use default hash algorithm for RSA keys. Otherwise it throws an exception for unsupported mechanism (eg md5WithRSAEncryption)
+            this.publicKey = await this.simpl.getPublicKey({ algorithm: { algorithm: { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } } }, usages: ["verify"] });
+        } else {
+            this.publicKey = await this.simpl.getPublicKey();
+        }
+
+        return this.publicKey;
     }
 
     //#region Protected methods
@@ -165,7 +176,7 @@ export class X509Certificate {
      * Converts X500Name to string
      * @param  {RDN} name X500Name
      * @param  {string} splitter Splitter char. Default ','
-     * @returns string Formated string
+     * @returns string Formatted string
      * Example:
      * > C=Some name, O=Some organization name, C=RU
      */

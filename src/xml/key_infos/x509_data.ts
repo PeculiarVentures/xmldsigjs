@@ -122,7 +122,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
      * @param  {Algorithm} alg
      * @returns Promise
      */
-    public async exportKey(alg: RsaHashedImportParams | EcKeyImportParams) {
+    public async exportKey(alg?: RsaHashedImportParams | EcKeyImportParams) {
         if (!this.Certificates.length) {
             throw new XmlError(XE.NULL_REFERENCE);
         }

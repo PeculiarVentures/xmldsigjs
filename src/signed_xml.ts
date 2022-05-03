@@ -10,6 +10,7 @@ import { KeyInfoX509Data, KeyValue } from "./xml/key_infos";
 import * as KeyInfos from "./xml/key_infos";
 import * as Transforms from "./xml/transforms";
 import { BufferSourceConverter, Convert } from "pvtsutils";
+import { Application } from "./application";
 
 export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
 
@@ -255,16 +256,32 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     protected async GetPublicKeys() {
         const keys: CryptoKey[] = [];
 
+        const alg = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
         for (const kic of this.XmlSignature.KeyInfo.GetIterator()) {
-            const alg = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
             if (kic instanceof KeyInfos.KeyInfoX509Data) {
                 for (const cert of kic.Certificates) {
-                    const key = await cert.exportKey(alg.algorithm);
+                    const key = await cert.exportKey();
                     keys.push(key);
                 }
             } else {
-                const key = await kic.exportKey(alg.algorithm);
+                const key = await kic.exportKey();
                 keys.push(key);
+            }
+        }
+
+        if (alg.algorithm.name.startsWith("RSA")) {
+            // Reimport RSA public keys. They should use the same hash algorithms like Signature.
+            // Note: It's possible toe set hash algorithm for RSA key on key importing only
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                if (key.algorithm.name.startsWith("RSA")) {
+                    // Reimport key
+                    const spki = await Application.crypto.subtle.exportKey("spki", key);
+                    const updatedKey = await  Application.crypto.subtle.importKey("spki", spki, alg.algorithm, true, ["verify"]);
+
+                    // Replace key
+                    keys[i] = updatedKey;
+                }
             }
         }
 
