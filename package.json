@@ -1,6 +1,6 @@
 {
   "name": "xmldsigjs",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
   "main": "build/index.js",
   "module": "build/index.es.js",
