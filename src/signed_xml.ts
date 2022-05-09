@@ -1,5 +1,4 @@
 import * as XmlCore from "xml-core";
-import { isDocument, isElement, Parse, XmlNodeType } from "xml-core";
 
 import { ISignatureAlgorithm } from "./algorithm";
 import * as Alg from "./algorithms";
@@ -12,7 +11,13 @@ import * as Transforms from "./xml/transforms";
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import { Application } from "./application";
 
-export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
+export interface OptionsXPathSignTransform {
+    name: "xpath";
+    selector: string;
+    namespaces?: Record<string, string>;
+}
+
+export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64" | OptionsXPathSignTransform;
 
 export type DigestReferenceSource = Element | BufferSource;
 
@@ -33,16 +38,10 @@ export interface OptionsSignReference {
     type?: string;
     /**
      * Hash algorithm
-     *
-     * @type {AlgorithmIdentifier}
-     * @memberOf OptionsSignReference
      */
     hash: AlgorithmIdentifier;
     /**
      * List of transforms
-     *
-     * @type {OptionsSignTransform[]}
-     * @memberOf OptionsSignReference
      */
     transforms?: OptionsSignTransform[];
 }
@@ -117,9 +116,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     }
 
     public async Sign(algorithm: Algorithm | EcdsaParams | RsaPssParams, key: CryptoKey, data: Document | DigestReferenceSource, options: OptionsSign = {}) {
-        if (isDocument(data)) {
-            data = data.documentElement!.cloneNode(true) as Element;
-        } else if (isElement(data)) {
+        if (XmlCore.isDocument(data)) {
+            data = (data.cloneNode(true) as Document).documentElement;
+        } else if (XmlCore.isElement(data)) {
             data = data.cloneNode(true) as Element;
         }
         let alg: ISignatureAlgorithm;
@@ -173,7 +172,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
         this.Key = key;
         this.XmlSignature.SignatureValue = new Uint8Array(signature);
-        if (isElement(data)) {
+        if (XmlCore.isElement(data)) {
             this.document = data.ownerDocument;
         }
         return this.XmlSignature;
@@ -201,6 +200,9 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 throw new XmlCore.XmlError(XmlCore.XE.NULL_PARAM, "SignedXml", "document");
             }
             content = xml.documentElement;
+        }
+        if (XmlCore.isDocument(content) || XmlCore.isElement(content)) {
+            content = content.cloneNode(true) as Element;
         }
 
         const res = await this.ValidateReferences(content);
@@ -277,7 +279,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 if (key.algorithm.name.startsWith("RSA")) {
                     // Reimport key
                     const spki = await Application.crypto.subtle.exportKey("spki", key);
-                    const updatedKey = await  Application.crypto.subtle.importKey("spki", spki, alg.algorithm, true, ["verify"]);
+                    const updatedKey = await Application.crypto.subtle.importKey("spki", spki, alg.algorithm, true, ["verify"]);
 
                     // Replace key
                     keys[i] = updatedKey;
@@ -327,7 +329,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         if (this.contentHandler) {
             const content = await this.contentHandler(reference, this);
             if (content) {
-                source = isDocument(content)
+                source = XmlCore.isDocument(content)
                     ? content.documentElement
                     : content;
             }
@@ -364,7 +366,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                             const el = found.cloneNode(true) as Element;
 
                             // Copy xmlns from Document
-                            if (isElement(source)) {
+                            if (XmlCore.isElement(source)) {
                                 this.CopyNamespaces(source, el, false);
                             }
 
@@ -383,7 +385,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                         }
                     }
                 }
-                if (!found && (source && isElement(source))) {
+                if (!found && (source && XmlCore.isElement(source))) {
                     found = XmlCore.XmlObject.GetElementById(source, objectName);
                     if (found) {
                         const el = found.cloneNode(true) as Element;
@@ -408,7 +410,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             // we must not apply C14N transform to references out of the document
             // e.g. non-xml documents
             if (reference.Uri && reference.Uri[0] !== `#`) {
-                if (isElement(source)) {
+                if (XmlCore.isElement(source)) {
                     if (!source.ownerDocument) {
                         throw new Error("Cannot get ownerDocument from the XML document");
                     }
@@ -420,7 +422,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 // apply default C14N transformation
                 const excC14N = new Transforms.XmlDsigC14NTransform();
                 if (BufferSourceConverter.isBufferSource(source)) {
-                    source = Parse(Convert.ToUtf8String(source)).documentElement;
+                    source = XmlCore.Parse(Convert.ToUtf8String(source)).documentElement;
                 }
                 excC14N.LoadInnerXml(source);
                 canonOutput = excC14N.GetOutput();
@@ -467,7 +469,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
         if (data && !BufferSourceConverter.isBufferSource(data)) {
             // Get xmlns from Document
-            if (data.nodeType === XmlNodeType.Document) {
+            if (data.nodeType === XmlCore.XmlNodeType.Document) {
                 this.CopyNamespaces((data as Document).documentElement, node, false);
             } else {
                 this.CopyNamespaces(data as Element, node, false);
@@ -498,24 +500,44 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         return res;
     }
 
-    protected ResolveTransform(transform: string): XmlTransform {
-        switch (transform) {
-            case "enveloped":
-                return new Transforms.XmlDsigEnvelopedSignatureTransform();
-            case "c14n":
-                return new Transforms.XmlDsigC14NTransform();
-            case "c14n-com":
-                return new Transforms.XmlDsigC14NWithCommentsTransform();
-            case "exc-c14n":
-                return new Transforms.XmlDsigExcC14NTransform();
-            case "exc-c14n-com":
-                return new Transforms.XmlDsigExcC14NWithCommentsTransform();
-            case "base64":
-                return new Transforms.XmlDsigBase64Transform();
-            case "xpath":
-                return new Transforms.XmlDsigXPathTransform();
+    protected ResolveTransform(transform: OptionsSignTransform): XmlTransform {
+        if (typeof transform === "string") {
+            switch (transform) {
+                case "enveloped":
+                    return new Transforms.XmlDsigEnvelopedSignatureTransform();
+                case "c14n":
+                    return new Transforms.XmlDsigC14NTransform();
+                case "c14n-com":
+                    return new Transforms.XmlDsigC14NWithCommentsTransform();
+                case "exc-c14n":
+                    return new Transforms.XmlDsigExcC14NTransform();
+                case "exc-c14n-com":
+                    return new Transforms.XmlDsigExcC14NWithCommentsTransform();
+                case "base64":
+                    return new Transforms.XmlDsigBase64Transform();
+                default:
+                    throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
+            }
+        }
+
+        switch (transform.name) {
+            case "xpath": {
+                const xpathTransform = new Transforms.XmlDsigXPathTransform();
+                xpathTransform.XPath = transform.selector;
+
+                const transformEl = xpathTransform.GetXml();
+
+                if (transformEl && transform.namespaces) {
+                    for (const [prefix, namespace] of Object.entries(transform.namespaces)) {
+                        // xpathEl.setAttribute(`xmlns:${prefix}`, namespace);
+                        (transformEl.firstChild as Element).setAttributeNS("http://www.w3.org/2000/xmlns/", `xmlns:${prefix}`, namespace);
+                    }
+                }
+
+                return xpathTransform;
+            }
             default:
-                throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
+                throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform.name);
         }
     }
 
@@ -692,7 +714,7 @@ function addNamespace(selectedNodes: XmlCore.AssocArray<string>, name: string, n
 
 // TODO it can be moved to XmlCore
 function _SelectRootNamespaces(node: Node, selectedNodes: XmlCore.AssocArray<string> = {}) {
-    if (isElement(node)) {
+    if (XmlCore.isElement(node)) {
         if (node.namespaceURI && node.namespaceURI !== "http://www.w3.org/XML/1998/namespace") {
             addNamespace(selectedNodes, node.prefix ? node.prefix : "", node.namespaceURI!);
         }
