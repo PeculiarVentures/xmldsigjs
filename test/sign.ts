@@ -1,3 +1,5 @@
+// tslint:disable: no-shadowed-variable
+
 import * as assert from "assert";
 import * as child_process from "child_process";
 import * as fs from "fs";
@@ -9,7 +11,7 @@ const SIGN_XML_FILE = "sign.xml";
 
 context("XML Signing + XMLSEC verification", () => {
 
-  let keys: Required<CryptoKeyPair>;
+  let keys: CryptoKeyPair;
   const alg = {
     name: "RSASSA-PKCS1-v1_5",
     hash: "SHA-256",
@@ -19,7 +21,7 @@ context("XML Signing + XMLSEC verification", () => {
 
   before(async () => {
     // Generate key
-    keys = (await crypto.subtle.generateKey(alg, false, ["sign", "verify"])) as Required<CryptoKeyPair>;
+    keys = (await crypto.subtle.generateKey(alg, false, ["sign", "verify"]));
   });
 
   after(() => {
@@ -117,7 +119,7 @@ context("XML Signing + XMLSEC verification", () => {
       modulusLength: 2048,
     };
     // tslint:disable-next-line: no-shadowed-variable
-    const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]) as Required<CryptoKeyPair>;
+    const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
     const dataHex = Convert.ToHex(crypto.getRandomValues(new Uint8Array(20)));
     const data = Convert.FromBinary(dataHex);
     const dataHex2 = Buffer.from(crypto.getRandomValues(new Uint8Array(20))).toString("hex");
@@ -152,6 +154,69 @@ context("XML Signing + XMLSEC verification", () => {
     });
 
     assert.strictEqual(ok, true);
+  });
+
+  it("xhtml with xpath and multiple signatures", async () => {
+    const crypto = new Crypto();
+
+    async function sign(doc: Document) {
+      const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
+
+      const signedXml = new xmldsig.SignedXml();
+
+      const signature = await signedXml.Sign(alg, keys.privateKey, doc, {
+        keyValue: keys.publicKey,
+        references: [
+          {
+            hash: "sha-256",
+            uri: "#xpointer(/)",
+            transforms: [
+              "c14n",
+              {
+                name: "xpath",
+                selector: "not(ancestor-or-self::ds:Signature)",
+                namespaces: {
+                  ds: xmldsig.XmlSignature.NamespaceURI,
+                }
+              }
+            ]
+          },
+        ]
+      });
+
+      const firstElement = doc.getElementsByTagName("head")[0];
+      if (!firstElement) {
+        throw new Error("Empty element");
+      }
+
+      const signatureXml = signature.GetXml();
+      if (!signatureXml) {
+        throw new Error("Empty Signature XML");
+      }
+      firstElement.appendChild(signatureXml);
+
+      return xmldsig.Stringify(doc);
+    }
+
+    const size = 3;
+
+    const xmlDoc = xmldsig.Parse("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head></head><body></body></html>");
+    let counter = size;
+    while (counter--) {
+      await sign(xmlDoc);
+    }
+
+    const signatures = xmlDoc.getElementsByTagNameNS(xmldsig.XmlSignature.NamespaceURI, "Signature");
+    const signedData = new xmldsig.SignedXml(xmlDoc);
+    for (let i=0; i<signatures.length; i++) {
+      const signature = signatures[i];
+      signedData.LoadXml(signature);
+
+      const ok = await signedData.Verify();
+      assert.ok(ok);
+    }
+    // assert.strictEqual(ok, true);
+
   });
 
 });

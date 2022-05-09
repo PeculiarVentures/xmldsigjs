@@ -1,8 +1,13 @@
-import { XmlChildElement } from "xml-core";
-import { XE, XmlError } from "xml-core";
+import * as XmlCore from "xml-core";
 
 import { Transform } from "../transform";
 import { XmlSignature } from "../xml_names";
+
+function lookupParentNode(node: Node): Node {
+    return node.parentNode
+        ? lookupParentNode(node.parentNode)
+        : node;
+}
 
 /**
  * <complexType name="TransformType" mixed="true">
@@ -19,7 +24,7 @@ export class XmlDsigXPathTransform extends Transform {
 
     public Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigXPathTransform;
 
-    @XmlChildElement({
+    @XmlCore.XmlChildElement({
         localName: XmlSignature.ElementNames.XPath,
         namespaceURI: XmlSignature.NamespaceURI,
         prefix: XmlSignature.DefaultPrefix,
@@ -32,10 +37,10 @@ export class XmlDsigXPathTransform extends Transform {
      */
     public GetOutput(): any {
         if (!this.innerXml) {
-            throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
+            throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, "innerXml");
         }
 
-        this.Filter(this.innerXml.ownerDocument || this.innerXml, this.XPath);
+        this.Filter(lookupParentNode(this.innerXml), this.XPath);
     }
 
     protected Filter(node: Node, xpath: string) {
@@ -71,12 +76,16 @@ export class XmlDsigXPathTransform extends Transform {
     protected Evaluate(node: Node, xpath: string) {
         try {
             const evaluator = this.GetEvaluator(node);
-            const nsResolver = evaluator.createNSResolver(this.GetXml()!.firstChild!);
+            const xpathEl = this.GetXml()!.firstChild!;
             const xPath = `boolean(${xpath})`;
             const xpathResult = evaluator.evaluate(
                 xPath,
                 node,
-                nsResolver,
+                {
+                    lookupNamespaceURI: (prefix: string | null) => {
+                        return xpathEl.lookupNamespaceURI(prefix);
+                    },
+                },
                 (typeof (self) === "undefined" ? require("xpath") : self).XPathResult.ANY_TYPE,
                 null);
             return !xpathResult.booleanValue;
