@@ -17,7 +17,7 @@ export class Application {
      */
     public static setEngine(name: string, crypto: Crypto): void {
         engineCrypto = Object.assign(crypto, {name});
-        setEngine(name, crypto, new CryptoEngine({ name, crypto, subtle: crypto.subtle }));
+        setEngine(name, new CryptoEngine({ name, crypto }));
     }
 
     /**

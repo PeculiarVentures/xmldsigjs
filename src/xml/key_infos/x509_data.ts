@@ -78,7 +78,6 @@ export class KeyInfoX509Data extends KeyInfoClause {
     private SubjectKeyIdList: Uint8Array[] = [];
     private SubjectNameList: string[];
     private X509CertificateList: X509Certificate[];
-    private key: CryptoKey | null = null;
 
     public constructor();
     public constructor(rgbCert: Uint8Array);
@@ -105,14 +104,6 @@ export class KeyInfoX509Data extends KeyInfoClause {
         }
     }
 
-    /**
-     * Gets public key of the X509Data
-     */
-    // @ts-ignore
-    public get Key(): CryptoKey | null {
-        return this.key;
-    }
-
     public async importKey(key: CryptoKey): Promise<this> {
         throw new XmlError(XE.METHOD_NOT_SUPPORTED);
     }
@@ -126,9 +117,9 @@ export class KeyInfoX509Data extends KeyInfoClause {
         if (!this.Certificates.length) {
             throw new XmlError(XE.NULL_REFERENCE);
         }
-        const key = await this.Certificates[0].exportKey(alg);
-        this.key = key;
-        return key;
+        this.Key = await this.Certificates[0].exportKey(alg);
+
+        return this.Key;
     }
 
     /**

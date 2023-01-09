@@ -3,8 +3,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import babel from "rollup-plugin-babel";
 import { terser } from "rollup-plugin-terser";
-
-const pkg = require("./package.json");
+import pkg from "./package.json" assert { type: "json" };
 
 const banner = [].join("\n");
 const input = "src/index.ts";

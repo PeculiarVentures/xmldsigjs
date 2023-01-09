@@ -1,5 +1,5 @@
 import * as Asn1Js from "asn1js";
-import { Certificate } from "pkijs";
+import { Certificate, CryptoEngineAlgorithmParams } from "pkijs";
 import { ECDSA } from "../algorithms";
 import { Application } from "../application";
 
@@ -79,7 +79,7 @@ const OID: { [key: string]: { short?: string, long?: string; }; } = {
 export class X509Certificate {
 
     protected raw: Uint8Array;
-    protected simpl: any;
+    protected simpl: Certificate;
     protected publicKey: CryptoKey | null = null;
 
     constructor(rawData?: BufferSource) {
@@ -146,8 +146,13 @@ export class X509Certificate {
                 usages: ["verify"],
             };
             if (alg.algorithm.name.toUpperCase() === ECDSA) {
-                // Set named curve
-                (alg.algorithm as any).namedCurve = this.simpl.subjectPublicKeyInfo.toJSON().crv;
+                const json = this.simpl.subjectPublicKeyInfo.toJSON();
+                if ("crv" in json && json.crv) {
+                    // Set named curve
+                    (alg.algorithm as any).namedCurve = json.crv;
+                } else {
+                    throw new Error("Cannot get Curved name from the ECDSA public key");
+                }
             }
             if (this.isHashedAlgorithm(alg.algorithm)) {
                 if (typeof alg.algorithm.hash === "string") {
@@ -155,7 +160,7 @@ export class X509Certificate {
                 }
             }
 
-            const key = await this.simpl.getPublicKey({ algorithm: alg });
+            const key = await this.simpl.getPublicKey({ algorithm: alg as CryptoEngineAlgorithmParams });
             this.publicKey = key;
 
             return key;
@@ -163,7 +168,7 @@ export class X509Certificate {
 
         if (this.simpl.subjectPublicKeyInfo.algorithm.algorithmId === "1.2.840.113549.1.1.1") {
             // Use default hash algorithm for RSA keys. Otherwise it throws an exception for unsupported mechanism (eg md5WithRSAEncryption)
-            this.publicKey = await this.simpl.getPublicKey({ algorithm: { algorithm: { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } } }, usages: ["verify"] });
+            this.publicKey = await this.simpl.getPublicKey({ algorithm: { algorithm: { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } }, usages: ["verify"] } });
         } else {
             this.publicKey = await this.simpl.getPublicKey();
         }
@@ -203,7 +208,6 @@ export class X509Certificate {
     //#endregion
 
     private isHashedAlgorithm(alg: Algorithm): alg is RsaHashedImportParams {
-        // @ts-ignore
         return !!(alg)["hash"];
     }
 }
