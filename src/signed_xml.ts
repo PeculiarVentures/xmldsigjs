@@ -125,9 +125,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         let signedInfo: SignedInfo;
         const signingAlg = XmlCore.assign({}, algorithm);
 
-        // @ts-ignore
         if (key.algorithm["hash"]) {
-            // @ts-ignore
             signingAlg.hash = key.algorithm["hash"];
         }
         alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);
