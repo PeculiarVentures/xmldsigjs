@@ -95,6 +95,12 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
     protected signature = new Signature();
     protected document?: Document;
+    /**
+     * If set to true, transformations with comments will be replaced with transformations without comments.
+     * This is a non-standard implementation to ensure compatibility with systems that do not support
+     * canonicalization with comments.
+     */
+    public replaceCanonicalization = false;
 
     /**
      * Creates an instance of SignedXml.
@@ -169,11 +175,20 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         const signature = await alg.Sign(si, key, signingAlg);
 
         this.Key = key;
+        this.Algorithm = algorithm;
         this.XmlSignature.SignatureValue = new Uint8Array(signature);
         if (XmlCore.isElement(data)) {
             this.document = data.ownerDocument;
         }
         return this.XmlSignature;
+    }
+
+    private async reimportKey(key: CryptoKey, alg: Algorithm) {
+        if (key.algorithm.name === alg.name) {
+            return key;
+        }
+        const spki = await Application.crypto.subtle.exportKey("spki", key);
+        return Application.crypto.subtle.importKey("spki", spki, alg, true, ["verify"]);
     }
 
     public Verify(params: OptionsVerify): Promise<boolean>;
@@ -182,7 +197,6 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     public async Verify(params?: CryptoKey | OptionsVerify) {
         let content: DigestReferenceSource | undefined;
         let key: CryptoKey | undefined;
-
         if (params) {
             if ("algorithm" in params && "usages" in params && "type" in params) {
                 key = params;
@@ -190,6 +204,10 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 key = params.key;
                 content = params.content;
             }
+        }
+
+        if (key && this.Algorithm) {
+            key = await this.reimportKey(key, this.Algorithm);
         }
 
         if (!content) {
@@ -227,6 +245,11 @@ export class SignedXml implements XmlCore.IXmlSerializable {
      */
     public LoadXml(value: Element | string) {
         this.signature = Signature.LoadXml(value);
+
+        // Load signature algorithm
+        this.Algorithm = CryptoConfig
+            .CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod)
+            .algorithm;
     }
 
     public toString() {
@@ -553,6 +576,17 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             }
             return 0;
         }).ForEach((transform) => {
+            // Non-standard implementation: If enforceCanonicalization is set to true,
+            // we replace transformations with comments with transformations without comments.
+            // This is done to ensure compatibility with systems that do not support
+            // canonicalization with comments.
+            if (this.replaceCanonicalization) {
+                if (transform instanceof Transforms.XmlDsigExcC14NWithCommentsTransform) {
+                    transform = new Transforms.XmlDsigExcC14NTransform();
+                } else if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform) {
+                    transform = new Transforms.XmlDsigC14NTransform();
+                }
+            }
             transform.LoadInnerXml(input);
             if (transform instanceof Transforms.XmlDsigXPathTransform) {
                 transform.GetOutput();

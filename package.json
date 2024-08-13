@@ -91,7 +91,7 @@
     ],
     "reporter": [
       "text-summary",
-      "html"
+      "lcov"
     ]
   },
   "mocha": {
