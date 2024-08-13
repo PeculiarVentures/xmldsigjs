@@ -169,11 +169,20 @@ export class SignedXml implements XmlCore.IXmlSerializable {
         const signature = await alg.Sign(si, key, signingAlg);
 
         this.Key = key;
+        this.Algorithm = algorithm;
         this.XmlSignature.SignatureValue = new Uint8Array(signature);
         if (XmlCore.isElement(data)) {
             this.document = data.ownerDocument;
         }
         return this.XmlSignature;
+    }
+
+    private async reimportKey(key: CryptoKey, alg: Algorithm) {
+        if (key.algorithm.name === alg.name) {
+            return key;
+        }
+        const spki = await Application.crypto.subtle.exportKey("spki", key);
+        return Application.crypto.subtle.importKey("spki", spki, alg, true, ["verify"]);
     }
 
     public Verify(params: OptionsVerify): Promise<boolean>;
@@ -182,7 +191,6 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     public async Verify(params?: CryptoKey | OptionsVerify) {
         let content: DigestReferenceSource | undefined;
         let key: CryptoKey | undefined;
-
         if (params) {
             if ("algorithm" in params && "usages" in params && "type" in params) {
                 key = params;
@@ -190,6 +198,10 @@ export class SignedXml implements XmlCore.IXmlSerializable {
                 key = params.key;
                 content = params.content;
             }
+        }
+
+        if (key && this.Algorithm) {
+            key = await this.reimportKey(key, this.Algorithm);
         }
 
         if (!content) {
@@ -227,6 +239,11 @@ export class SignedXml implements XmlCore.IXmlSerializable {
      */
     public LoadXml(value: Element | string) {
         this.signature = Signature.LoadXml(value);
+
+        // Load signature algorithm
+        this.Algorithm = CryptoConfig
+            .CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod)
+            .algorithm;
     }
 
     public toString() {
