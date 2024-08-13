@@ -184,9 +184,6 @@ export class SignedXml implements XmlCore.IXmlSerializable {
     }
 
     private async reimportKey(key: CryptoKey, alg: Algorithm) {
-        if (key.algorithm.name === alg.name) {
-            return key;
-        }
         const spki = await Application.crypto.subtle.exportKey("spki", key);
         return Application.crypto.subtle.importKey("spki", spki, alg, true, ["verify"]);
     }
