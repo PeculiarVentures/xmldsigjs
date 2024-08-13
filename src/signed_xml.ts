@@ -203,7 +203,7 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             }
         }
 
-        if (key && this.Algorithm) {
+        if (key && key.type === "public" && this.Algorithm) {
             key = await this.reimportKey(key, this.Algorithm);
         }
 
