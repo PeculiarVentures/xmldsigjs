@@ -95,6 +95,12 @@ export class SignedXml implements XmlCore.IXmlSerializable {
 
     protected signature = new Signature();
     protected document?: Document;
+    /**
+     * If set to true, transformations with comments will be replaced with transformations without comments.
+     * This is a non-standard implementation to ensure compatibility with systems that do not support
+     * canonicalization with comments.
+     */
+    public replaceCanonicalization = false;
 
     /**
      * Creates an instance of SignedXml.
@@ -570,6 +576,17 @@ export class SignedXml implements XmlCore.IXmlSerializable {
             }
             return 0;
         }).ForEach((transform) => {
+            // Non-standard implementation: If enforceCanonicalization is set to true,
+            // we replace transformations with comments with transformations without comments.
+            // This is done to ensure compatibility with systems that do not support
+            // canonicalization with comments.
+            if (this.replaceCanonicalization) {
+                if (transform instanceof Transforms.XmlDsigExcC14NWithCommentsTransform) {
+                    transform = new Transforms.XmlDsigExcC14NTransform();
+                } else if (transform instanceof Transforms.XmlDsigC14NWithCommentsTransform) {
+                    transform = new Transforms.XmlDsigC14NTransform();
+                }
+            }
             transform.LoadInnerXml(input);
             if (transform instanceof Transforms.XmlDsigXPathTransform) {
                 transform.GetOutput();
