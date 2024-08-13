@@ -74,6 +74,9 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish
+        run: |
+          npm set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          npm whoami --registry https://registry.npmjs.org/
+          npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
