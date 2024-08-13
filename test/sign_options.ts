@@ -13,7 +13,7 @@ context("Signing options", () => {
   let keys;
 
   before(async () => {
-    keys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
+    keys = await xmldsig.Application.crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
   });
 
   async function Sign(options) {

@@ -4,10 +4,10 @@ import * as assert from "assert";
 import * as child_process from "child_process";
 import * as fs from "fs";
 import * as xmldsig from "../src";
-import { Crypto } from "@peculiar/webcrypto";
 import { Convert } from "pvtsutils";
 
 const SIGN_XML_FILE = "sign.xml";
+const { crypto } = xmldsig.Application;
 
 context("XML Signing + XMLSEC verification", () => {
 
@@ -110,8 +110,6 @@ context("XML Signing + XMLSEC verification", () => {
   });
 
   it("Sign multiple contents", async () => {
-    const crypto = new Crypto();
-    // tslint:disable-next-line: no-shadowed-variable
     const alg: RsaHashedKeyGenParams = {
       name: "RSASSA-PKCS1-v1_5",
       hash: "SHA-256",
@@ -157,8 +155,6 @@ context("XML Signing + XMLSEC verification", () => {
   });
 
   it("xhtml with xpath and multiple signatures", async () => {
-    const crypto = new Crypto();
-
     async function sign(doc: Document) {
       const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
 
@@ -208,7 +204,7 @@ context("XML Signing + XMLSEC verification", () => {
 
     const signatures = xmlDoc.getElementsByTagNameNS(xmldsig.XmlSignature.NamespaceURI, "Signature");
     const signedData = new xmldsig.SignedXml(xmlDoc);
-    for (let i=0; i<signatures.length; i++) {
+    for (let i = 0; i < signatures.length; i++) {
       const signature = signatures[i];
       signedData.LoadXml(signature);
 
@@ -217,6 +213,84 @@ context("XML Signing + XMLSEC verification", () => {
     }
     // assert.strictEqual(ok, true);
 
+  });
+
+  context("Vector Tests for XML Signing and Verification with Different Algorithms", () => {
+    let keysRSASSA: CryptoKeyPair;
+    let keysRSAPSS: CryptoKeyPair;
+    const algRSASSA = {
+      name: "RSASSA-PKCS1-v1_5",
+      hash: "SHA-1",
+      publicExponent: new Uint8Array([1, 0, 1]),
+      modulusLength: 2048,
+    };
+    const algRSAPSS = {
+      name: "RSA-PSS",
+      hash: "SHA-256",
+      publicExponent: new Uint8Array([1, 0, 1]),
+      modulusLength: 2048,
+      saltLength: 32,
+    };
+
+    before(async () => {
+      // Generate keys for different algorithms
+      keysRSASSA = await crypto.subtle.generateKey(algRSASSA, false, ["sign", "verify"]);
+      keysRSAPSS = await crypto.subtle.generateKey(algRSAPSS, false, ["sign", "verify"]);
+    });
+
+    async function signXML(xml: string, alg: any, keys: CryptoKeyPair) {
+      const signedXml = new xmldsig.SignedXml();
+      const xmlDocument = xmldsig.Parse(xml);
+
+      const signature = await signedXml.Sign(
+        alg,
+        keys.privateKey,
+        xmlDocument,
+        {
+          keyValue: keys.publicKey,
+          references: [
+            {
+              hash: alg.hash,
+              transforms: ["enveloped"],
+            },
+          ],
+        });
+
+      xmlDocument.documentElement.appendChild(signature.GetXml()!);
+
+      // serialize XML
+      const oSerializer = new XMLSerializer();
+      return oSerializer.serializeToString(xmlDocument);
+    }
+
+    async function verifyXML(xml: string, alg: any, keys: CryptoKeyPair) {
+      const vXml = xmldsig.Parse(xml);
+      const vSignature = vXml.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature")[0];
+      const verifyXml = new xmldsig.SignedXml(vXml);
+      verifyXml.LoadXml(vSignature);
+      return await verifyXml.Verify();
+    }
+
+    it("RSASSA-PKCS1-v1_5 with SHA-1 signing and RSASSA-PKCS1-v1_5 with SHA-256 verification", async () => {
+      const xml = `<root><first/><second/></root>`;
+      const signedXML = await signXML(xml, algRSASSA, keysRSASSA);
+      const ok = await verifyXML(signedXML, { ...algRSASSA, hash: "SHA-256" }, keysRSASSA);
+      assert.strictEqual(ok, true);
+    });
+
+    it("RSA-PSS signing and RSASSA-PKCS1-v1_5 verification", async () => {
+      const xml = `<root><first/><second/></root>`;
+      const signedXML = await signXML(xml, algRSAPSS, keysRSAPSS);
+      const ok = await verifyXML(signedXML, algRSASSA, keysRSAPSS);
+      assert.strictEqual(ok, true);
+    });
+
+    it("RSASSA-PKCS1-v1_5 with SHA-256 signing and RSA-PSS verification", async () => {
+      const xml = `<root><first/><second/></root>`;
+      const signedXML = await signXML(xml, { ...algRSASSA, hash: "SHA-256" }, keysRSASSA);
+      const ok = await verifyXML(signedXML, algRSAPSS, keysRSASSA);
+      assert.strictEqual(ok, true);
+    });
   });
 
 });
