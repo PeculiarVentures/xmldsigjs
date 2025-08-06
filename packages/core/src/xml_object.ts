@@ -287,7 +287,8 @@ export class XmlObject implements IXmlSerializable {
 
             if (schema.parser) {
               if ((schema.required && !parser) || (schema.minOccurs && !parser.Count)) {
-                throw new XmlError(XE.ELEMENT_MISSING, parser.localName, localName);
+                const missingElement = parser?.localName || schema.localName;
+                throw new XmlError(XE.ELEMENT_MISSING, missingElement, localName);
               }
 
               if (parser) {
