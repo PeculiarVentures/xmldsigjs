@@ -1,0 +1,44 @@
+{
+  "name": "xadesjs",
+  "version": "2.4.4",
+  "description": "A pure Typescript/Javascript implementation of XAdES based on XMLDSIGjs.",
+  "main": "build/cjs/index.js",
+  "module": "build/esm/index.js",
+  "types": "build/types/index.d.ts",
+  "scripts": {
+    "test": "vitest run",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build": "npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:cjs": "tsc -p tsconfig.build.json --removeComments --outDir build/cjs --module commonjs --moduleResolution node",
+    "build:esm": "tsc -p tsconfig.build.json --removeComments --outDir build/esm --module esnext --moduleResolution bundler",
+    "build:types": "tsc -p tsconfig.build.json --outDir build/types --module esnext --moduleResolution bundler --emitDeclarationOnly --declaration",
+    "clean": "rimraf build/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeculiarVentures/xadesjs.git"
+  },
+  "keywords": [
+    "xml",
+    "xmldsig",
+    "xades",
+    "webcrypto",
+    "signature",
+    "rsa",
+    "ec"
+  ],
+  "author": "Peculiar Ventures, Inc.",
+  "contributors": [
+    "Miroshin Stepan<microshine@mail.ru>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PeculiarVentures/xadesjs/issues"
+  },
+  "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
+  "dependencies": {
+    "xml-core": "^1.1.5",
+    "xmldsigjs": "^2.6.1"
+  }
+}
