@@ -8,7 +8,6 @@ import {
   ISignatureAlgorithmConstructable,
   IHashAlgorithmConstructable,
 } from './algorithm';
-import './xml/key_infos';
 import { SignatureMethod } from './xml/signature_method';
 
 import { Transform, XmlSignature } from './xml';
