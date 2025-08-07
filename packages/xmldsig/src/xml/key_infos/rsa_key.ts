@@ -12,7 +12,6 @@ import {
 
 import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from '../../algorithms';
 import { Application } from '../../application';
-import { CryptoConfig } from '../../crypto_config';
 import { DigestMethod } from '../digest_method';
 import { XmlSignature } from '../xml_names';
 import { KeyInfoClause } from './key_info_clause';
@@ -230,10 +229,6 @@ export class MaskGenerationFunction extends XmlObject {
   namespaceURI: NAMESPACE_URI,
 })
 export class PssAlgorithmParams extends XmlObject {
-  public static FromAlgorithm(algorithm: RsaPSSSignParams) {
-    return new PssAlgorithmParams(algorithm);
-  }
-
   @XmlChildElement({
     parser: DigestMethod,
   })
@@ -255,21 +250,4 @@ export class PssAlgorithmParams extends XmlObject {
     converter: XmlNumberConverter,
   })
   public TrailerField: number;
-
-  constructor(algorithm?: RsaPSSSignParams) {
-    super();
-
-    if (algorithm) {
-      this.FromAlgorithm(algorithm);
-    }
-  }
-
-  public FromAlgorithm(algorithm: RsaPSSSignParams) {
-    this.DigestMethod = new DigestMethod();
-    const digest = CryptoConfig.GetHashAlgorithm(algorithm.hash);
-    this.DigestMethod.Algorithm = digest.namespaceURI;
-    if (algorithm.saltLength) {
-      this.SaltLength = algorithm.saltLength;
-    }
-  }
 }

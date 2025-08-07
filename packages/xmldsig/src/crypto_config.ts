@@ -79,7 +79,7 @@ import {
   SHA512_NAMESPACE,
 } from './algorithms';
 
-import { Transform, XmlSignature } from './xml';
+import { DigestMethod, Transform, XmlSignature } from './xml';
 import {
   XmlDsigBase64Transform,
   XmlDsigC14NTransform,
@@ -303,7 +303,7 @@ export class CryptoConfig {
             );
         }
         break;
-      case HMAC:
+      case HMAC: {
         const hmacAlg = algorithm as HmacKeyAlgorithm;
         switch (hashName.toUpperCase()) {
           case SHA1:
@@ -329,6 +329,7 @@ export class CryptoConfig {
             );
         }
         break;
+      }
       default:
         throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name);
     }
@@ -342,8 +343,14 @@ export class CryptoConfig {
 
     if (webCryptoAlgorithm.name === 'RSA-PSS') {
       const rsaPssAlgorithm = webCryptoAlgorithm as RsaPSSSignParams;
-      const params = new PssAlgorithmParams(rsaPssAlgorithm);
-      signatureMethod.Any.Add(params);
+      const pssParams = new PssAlgorithmParams(rsaPssAlgorithm);
+      pssParams.DigestMethod = new DigestMethod();
+      const digest = CryptoConfig.GetHashAlgorithm(rsaPssAlgorithm.hash);
+      pssParams.DigestMethod.Algorithm = digest.namespaceURI;
+      if (rsaPssAlgorithm.saltLength) {
+        pssParams.SaltLength = rsaPssAlgorithm.saltLength;
+      }
+      signatureMethod.Any.Add(pssParams);
     } else if (HMAC.toUpperCase() === webCryptoAlgorithm.name.toUpperCase()) {
       // Add HMAC params
       let outputLength = 0;
