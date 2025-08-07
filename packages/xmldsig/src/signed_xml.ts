@@ -15,7 +15,6 @@ import {
 
 import { BufferSourceConverter, Convert } from 'pvtsutils';
 import * as Alg from './algorithms';
-import { RsaPssBase } from './algorithms';
 import { CryptoConfig } from './crypto_config';
 import {
   KeyInfo,
@@ -163,48 +162,18 @@ export class SignedXml implements IXmlSerializable {
     } else if (isElement(data)) {
       data = data.cloneNode(true) as Element;
     }
-    const signingAlg = assign({}, algorithm);
-
+    const signingAlg = assign({}, algorithm, key.algorithm);
     if (key.algorithm['hash']) {
       signingAlg.hash = key.algorithm['hash'];
     }
+
     const alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);
     await this.ApplySignOptions(this.XmlSignature, algorithm, key, options);
-
-    const signedInfo = this.XmlSignature.SignedInfo;
-
     await this.DigestReferences(data);
 
-    // Add signature method
-    signedInfo.SignatureMethod.Algorithm = alg.namespaceURI;
-    if (alg instanceof RsaPssBase) {
-      // Add RSA-PSS params
-      const alg2 = assign({}, key.algorithm, signingAlg);
-      if (typeof alg2.hash === 'string') {
-        alg2.hash = { name: alg2.hash };
-      }
-      const params = new KeyInfos.PssAlgorithmParams(alg2);
-      this.XmlSignature.SignedInfo.SignatureMethod.Any.Add(params);
-    } else if (Alg.HMAC.toUpperCase() === algorithm.name.toUpperCase()) {
-      // Add HMAC params
-      let outputLength = 0;
-      const hmacAlg = key.algorithm as any;
-      switch (hmacAlg.hash.name.toUpperCase()) {
-        case Alg.SHA1:
-          outputLength = hmacAlg.length || 160;
-          break;
-        case Alg.SHA256:
-          outputLength = hmacAlg.length || 256;
-          break;
-        case Alg.SHA384:
-          outputLength = hmacAlg.length || 384;
-          break;
-        case Alg.SHA512:
-          outputLength = hmacAlg.length || 512;
-          break;
-      }
-      this.XmlSignature.SignedInfo.SignatureMethod.HMACOutputLength = outputLength;
-    }
+    const signatureMethod = CryptoConfig.CreateSignatureMethod(alg);
+    this.XmlSignature.SignedInfo.SignatureMethod = signatureMethod;
+
     const si = this.TransformSignedInfo(data);
     const signature = await alg.Sign(si, key, signingAlg);
 

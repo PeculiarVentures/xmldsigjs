@@ -9,7 +9,7 @@ import {
   ISignatureAlgorithmConstructable,
   SignatureAlgorithm,
 } from './algorithm';
-import { PssAlgorithmParams } from './xml/key_infos';
+import { PssAlgorithmParams, RsaPSSSignParams } from './xml/key_infos';
 import { SignatureMethod } from './xml/signature_method';
 
 import {
@@ -304,18 +304,23 @@ export class CryptoConfig {
         }
         break;
       case HMAC:
+        const hmacAlg = algorithm as HmacKeyAlgorithm;
         switch (hashName.toUpperCase()) {
           case SHA1:
             alg = new HmacSha1();
+            (alg.algorithm as HmacKeyAlgorithm).length = hmacAlg.length || 160;
             break;
           case SHA256:
             alg = new HmacSha256();
+            (alg.algorithm as HmacKeyAlgorithm).length = hmacAlg.length || 256;
             break;
           case SHA384:
             alg = new HmacSha384();
+            (alg.algorithm as HmacKeyAlgorithm).length = hmacAlg.length || 384;
             break;
           case SHA512:
             alg = new HmacSha512();
+            (alg.algorithm as HmacKeyAlgorithm).length = hmacAlg.length || 512;
             break;
           default:
             throw new XmlCore.XmlError(
@@ -328,5 +333,38 @@ export class CryptoConfig {
         throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name);
     }
     return alg;
+  }
+
+  static CreateSignatureMethod(algorithm: ISignatureAlgorithm): SignatureMethod {
+    const signatureMethod = new SignatureMethod();
+    signatureMethod.Algorithm = algorithm.namespaceURI;
+    const webCryptoAlgorithm = algorithm.algorithm;
+
+    if (webCryptoAlgorithm.name === 'RSA-PSS') {
+      const rsaPssAlgorithm = webCryptoAlgorithm as RsaPSSSignParams;
+      const params = new PssAlgorithmParams(rsaPssAlgorithm);
+      signatureMethod.Any.Add(params);
+    } else if (HMAC.toUpperCase() === webCryptoAlgorithm.name.toUpperCase()) {
+      // Add HMAC params
+      let outputLength = 0;
+      const hmacAlg = webCryptoAlgorithm as HmacKeyAlgorithm;
+      switch (hmacAlg.hash.name.toUpperCase()) {
+        case SHA1:
+          outputLength = hmacAlg.length || 160;
+          break;
+        case SHA256:
+          outputLength = hmacAlg.length || 256;
+          break;
+        case SHA384:
+          outputLength = hmacAlg.length || 384;
+          break;
+        case SHA512:
+          outputLength = hmacAlg.length || 512;
+          break;
+      }
+      signatureMethod.HMACOutputLength = outputLength;
+    }
+
+    return signatureMethod;
   }
 }
