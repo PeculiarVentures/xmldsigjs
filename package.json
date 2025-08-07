@@ -1,107 +1,38 @@
 {
-  "name": "xmldsigjs",
-  "version": "2.6.1",
-  "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
-  "main": "build/index.js",
-  "module": "build/index.es.js",
-  "unpkg": "build/xmldsig.js",
-  "unpkgMin": "build/xmldsig.min.js",
-  "types": "build/types/index.d.ts",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "prepare": "npm run build",
-    "test": "npm run lint && mocha",
-    "clear": "rimraf build/*",
-    "build": "npm run build:module && npm run build:types",
-    "build:module": "rollup -c",
-    "build:types": "tsc -p tsconfig.types.json",
-    "rebuild": "npm run clear && npm run build",
-    "lint": "tslint -p .",
-    "lint:fix": "tslint --fix -p .",
-    "prepub": "npm run lint && npm run build",
-    "postpub": "git push && git push --tags origin master",
-    "pub": "npm version patch && npm publish",
-    "prepub:next": "npm run lint && npm run build",
-    "pub:next": "npm version prerelease --preid=next && npm publish --tag next",
-    "postpub:next": "git push",
-    "sync": "git ac && git pull --rebase && git push",
-    "coverage": "nyc npm test",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint",
+    "test": "vitest run",
+    "build": "lerna run build",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PeculiarVentures/xmldsigjs.git"
   },
-  "keywords": [
-    "xml",
-    "xmldsig",
-    "webcrypto",
-    "signature",
-    "rsa",
-    "ec"
-  ],
-  "author": "Peculiar Ventures, Inc.",
+  "author": "Peculiar Ventures LLC",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PeculiarVentures/xmldsigjs/issues"
   },
   "homepage": "https://github.com/PeculiarVentures/xmldsigjs#readme",
-  "dependencies": {
-    "asn1js": "^3.0.5",
-    "pkijs": "^3.0.10",
-    "pvtsutils": "^1.3.2",
-    "pvutils": "^1.1.3",
-    "tslib": "^2.4.1",
-    "xml-core": "^1.1.5",
-    "xpath": "^0.0.32"
-  },
   "devDependencies": {
-    "@babel/core": "^7.20.12",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
-    "@babel/preset-env": "^7.20.2",
-    "@peculiar/webcrypto": "^1.4.1",
-    "@rollup/plugin-commonjs": "^24.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-typescript": "^11.0.0",
-    "@types/asn1js": "^3.0.7",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.18",
-    "@xmldom/xmldom": "^0.8.6",
-    "coveralls": "^3.1.1",
-    "mocha": "^10.2.0",
-    "nyc": "^15.1.0",
-    "rimraf": "^3.0.2",
-    "rollup": "^3.9.1",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "ts-node": "^10.9.1",
-    "tslint": "^6.1.3",
-    "typescript": "^4.9.4"
-  },
-  "nyc": {
-    "extension": [
-      ".ts",
-      ".tsx"
-    ],
-    "include": [
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      "**/*.d.ts"
-    ],
-    "reporter": [
-      "text-summary",
-      "lcov"
-    ]
-  },
-  "mocha": {
-    "require": "ts-node/register",
-    "extension": [
-      "ts"
-    ],
-    "file": "test/config.ts",
-    "spec": [
-      "test/**/*.ts"
-    ]
+    "@peculiar/eslint-config-base": "^0.2.5",
+    "@peculiar/webcrypto": "^1.5.0",
+    "@types/node": "^24.2.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@xmldom/xmldom": "^0.8.10",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "lerna": "^8.2.4",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }

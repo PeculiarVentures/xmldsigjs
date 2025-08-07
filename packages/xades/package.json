@@ -1,10 +1,15 @@
 {
   "name": "xadesjs",
   "version": "2.4.4",
-  "description": "A pure Typescript/Javascript implementation of XAdES based on XMLDSIGjs.",
+  "description": "XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScript built on XMLDSIGjs",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "types": "build/types/index.d.ts",
+  "files": [
+    "build/cjs",
+    "build/esm",
+    "build/types"
+  ],
   "scripts": {
     "test": "vitest run",
     "lint": "eslint .",
@@ -17,26 +22,27 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/xadesjs.git"
+    "url": "git+https://github.com/PeculiarVentures/xmldsigjs.git"
   },
   "keywords": [
     "xml",
     "xmldsig",
     "xades",
+    "xadesjs",
     "webcrypto",
     "signature",
     "rsa",
     "ec"
   ],
-  "author": "Peculiar Ventures, Inc.",
+  "author": "Peculiar Ventures LLC",
   "contributors": [
-    "Miroshin Stepan<microshine@mail.ru>"
+    "Miroshin Stepan <microshine@mail.ru>"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/PeculiarVentures/xadesjs/issues"
+    "url": "https://github.com/PeculiarVentures/xmldsigjs/issues"
   },
-  "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
+  "homepage": "https://github.com/PeculiarVentures/xmldsigjs/blob/master/packages/xades/README.md",
   "dependencies": {
     "xml-core": "^1.1.5",
     "xmldsigjs": "^2.6.1"

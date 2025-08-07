@@ -1,10 +1,15 @@
 {
   "name": "xmldsigjs",
   "version": "2.6.1",
-  "description": "XMLDSIGjs provides an implementation of XMLDSIG in Typescript/Javascript based on WebCrypto ",
+  "description": "XML Digital Signature implementation in TypeScript/JavaScript using Web Crypto API",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "types": "build/types/index.d.ts",
+  "files": [
+    "build/cjs",
+    "build/esm",
+    "build/types"
+  ],
   "scripts": {
     "test": "vitest run",
     "lint": "eslint .",
@@ -22,17 +27,21 @@
   "keywords": [
     "xml",
     "xmldsig",
+    "xmldsigjs",
     "webcrypto",
     "signature",
     "rsa",
     "ec"
   ],
-  "author": "Peculiar Ventures, Inc.",
+  "author": "Peculiar Ventures LLC",
+  "contributors": [
+    "Miroshin Stepan <microshine@mail.ru>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PeculiarVentures/xmldsigjs/issues"
   },
-  "homepage": "https://github.com/PeculiarVentures/xmldsigjs#readme",
+  "homepage": "https://github.com/PeculiarVentures/xmldsigjs/blob/master/packages/xmldsig/README.md",
   "dependencies": {
     "asn1js": "^3.0.6",
     "pkijs": "^3.2.5",

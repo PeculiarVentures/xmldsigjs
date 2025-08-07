@@ -1,15 +1,15 @@
 {
   "name": "xml-core",
   "version": "1.1.5",
-  "description": "`xml-core` is a set of classes that make it easier to work with XML within the browser and node.",
+  "description": "A foundational library for working with XML in JavaScript/TypeScript with schema validation through decorators",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "types": "build/types/index.d.ts",
-  "dependencies": {
-    "@xmldom/xmldom": "^0.9.8",
-    "tslib": "^2.8.1",
-    "xpath.js": "^1.1.0"
-  },
+  "files": [
+    "build/cjs",
+    "build/esm",
+    "build/types"
+  ],
   "scripts": {
     "test": "vitest run",
     "lint": "eslint .",
@@ -25,12 +25,23 @@
     "url": "git+https://github.com/PeculiarVentures/xmldsigjs.git"
   },
   "keywords": [
-    "xml"
+    "xml",
+    "xml-core",
+    "dom",
+    "xpath"
   ],
-  "author": "Peculiar Ventures, Inc.",
+  "author": "Peculiar Ventures LLC",
+  "contributors": [
+    "Miroshin Stepan <microshine@mail.ru>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PeculiarVentures/xmldsigjs/issues"
   },
-  "homepage": "https://github.com/PeculiarVentures/xmldsigjs#readme"
+  "homepage": "https://github.com/PeculiarVentures/xmldsigjs/blob/master/packages/core/README.md",
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.10",
+    "tslib": "^2.8.1",
+    "xpath.js": "^1.1.0"
+  }
 }
