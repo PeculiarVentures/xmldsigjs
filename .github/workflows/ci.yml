@@ -21,6 +21,9 @@ jobs:
           node-version: '22.x'
           cache: 'npm'
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Run tests with coverage
         run: npm run coverage
 
