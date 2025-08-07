@@ -1,11 +1,10 @@
 import * as XmlCore from 'xml-core';
 import { XE, XmlElement, XmlError } from 'xml-core';
 
-import { ECDSA, RSA_PKCS1, RSA_PSS } from '../../algorithms';
 import { XmlSignature } from '../xml_names';
-import { EcdsaKeyValue } from './ecdsa_key';
 import { KeyInfoClause } from './key_info_clause';
-import { RsaKeyValue } from './rsa_key';
+import { KeyInfoClauseFactory } from './key_info_clause.factory';
+import { keyValueRegistry } from './key_info_clause.registry';
 
 /**
  * Represents the <KeyValue> element of an XML signature.
@@ -33,20 +32,15 @@ export class KeyValue extends KeyInfoClause {
   }
 
   public async importKey(key: CryptoKey): Promise<this> {
-    switch (key.algorithm.name.toUpperCase()) {
-      case RSA_PSS.toUpperCase():
-      case RSA_PKCS1.toUpperCase():
-        this.Value = new RsaKeyValue();
-        await this.Value.importKey(key);
-        break;
-      case ECDSA.toUpperCase():
-        this.Value = new EcdsaKeyValue();
-        await this.Value.importKey(key);
-        break;
-      default:
-        throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, key.algorithm.name);
+    for (const ctor of keyValueRegistry.values()) {
+      if (typeof (ctor as any).canImportKey === 'function' && (ctor as any).canImportKey(key)) {
+        const keyValue = new ctor();
+        await keyValue.importKey(key);
+        this.Value = keyValue;
+        return this;
+      }
     }
-    return this;
+    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, key.algorithm.name);
   }
 
   public async exportKey(alg?: Algorithm) {
@@ -68,21 +62,19 @@ export class KeyValue extends KeyInfoClause {
   }
 
   protected OnLoadXml(element: Element) {
-    const keyValueTypes = [RsaKeyValue, EcdsaKeyValue];
-    for (const keyValueType of keyValueTypes) {
+    for (let i = 0; i < element.childNodes.length; i++) {
+      const nodeKey = element.childNodes.item(i);
+      if (!XmlCore.isElement(nodeKey)) {
+        continue;
+      }
       try {
-        const keyValue = new keyValueType();
-        for (let i = 0; i < element.childNodes.length; i++) {
-          const nodeKey = element.childNodes.item(i);
-          if (!XmlCore.isElement(nodeKey)) {
-            continue;
-          }
-          keyValue.LoadXml(nodeKey);
-          this.value = keyValue;
-          return;
-        }
+        const type = nodeKey.localName;
+        const keyValue = KeyInfoClauseFactory.create(type);
+        keyValue.LoadXml(nodeKey);
+        this.value = keyValue;
+        return;
       } catch {
-        /* none */
+        // Ignore errors and continue to find a valid KeyInfoClause
       }
     }
     throw new XmlError(XE.CRYPTOGRAPHIC, 'Unsupported KeyValue in use');

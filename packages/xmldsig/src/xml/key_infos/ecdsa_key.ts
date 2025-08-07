@@ -10,6 +10,7 @@ import {
 } from 'xml-core';
 
 import { Application } from '../../application';
+import { ECDSA } from '../../algorithms';
 import { XmlSignature } from '../index';
 import { KeyInfoClause } from './key_info_clause';
 
@@ -111,6 +112,11 @@ export class DomainParameters extends XmlObject {
   prefix: PREFIX,
 })
 export class EcdsaKeyValue extends KeyInfoClause {
+  public static canImportKey(key: CryptoKey): boolean {
+    const name = key.algorithm.name.toUpperCase();
+    return name === ECDSA.toUpperCase();
+  }
+
   @XmlChildElement({
     parser: DomainParameters,
   })

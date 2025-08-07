@@ -52,6 +52,7 @@ export enum XE {
   ALGORITHM_NOT_SUPPORTED,
   ALGORITHM_WRONG_NAME,
   XML_EXCEPTION,
+  KEY_INFO_CLAUSE_NOT_SUPPORTED,
 }
 
 type IXmlError = Record<number, string>;
@@ -76,3 +77,4 @@ xes[XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM] = 'Unknown transform %1';
 xes[XE.ALGORITHM_NOT_SUPPORTED] = `Algorithm is not supported '%1'`;
 xes[XE.ALGORITHM_WRONG_NAME] = `Algorithm wrong name in use '%1'`;
 xes[XE.XML_EXCEPTION] = 'XML exception: %1';
+xes[XE.KEY_INFO_CLAUSE_NOT_SUPPORTED] = `KeyInfoClause type '%1' is not supported`;
