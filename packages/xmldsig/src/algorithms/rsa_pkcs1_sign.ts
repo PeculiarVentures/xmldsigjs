@@ -1,4 +1,4 @@
-import { SignatureAlgorithm } from '../algorithm';
+import { ISignatureAlgorithm, SignatureAlgorithm } from '../algorithm';
 import { SHA1, SHA256, SHA384, SHA512 } from './rsa_hash';
 
 export const RSA_PKCS1 = 'RSASSA-PKCS1-v1_5';
@@ -8,7 +8,27 @@ export const RSA_PKCS1_SHA256_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-mor
 export const RSA_PKCS1_SHA384_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384';
 export const RSA_PKCS1_SHA512_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512';
 
+function fromAlgorithm(alg: RsaHashedKeyAlgorithm): ISignatureAlgorithm | null {
+  if (alg.name.toUpperCase() === RSA_PKCS1.toUpperCase()) {
+    switch (alg.hash.name.toUpperCase()) {
+      case SHA1:
+        return new RsaPkcs1Sha1();
+      case SHA256:
+        return new RsaPkcs1Sha256();
+      case SHA384:
+        return new RsaPkcs1Sha384();
+      case SHA512:
+        return new RsaPkcs1Sha512();
+    }
+  }
+  return null;
+}
+
 export class RsaPkcs1Sha1 extends SignatureAlgorithm {
+  public static fromAlgorithm(alg: RsaHashedKeyAlgorithm): ISignatureAlgorithm | null {
+    return fromAlgorithm(alg);
+  }
+
   public algorithm: any = {
     name: RSA_PKCS1,
     hash: {
@@ -20,6 +40,10 @@ export class RsaPkcs1Sha1 extends SignatureAlgorithm {
 }
 
 export class RsaPkcs1Sha256 extends SignatureAlgorithm {
+  public static fromAlgorithm(alg: RsaHashedKeyAlgorithm): ISignatureAlgorithm | null {
+    return fromAlgorithm(alg);
+  }
+
   public algorithm: any = {
     name: RSA_PKCS1,
     hash: {
@@ -31,6 +55,10 @@ export class RsaPkcs1Sha256 extends SignatureAlgorithm {
 }
 
 export class RsaPkcs1Sha384 extends SignatureAlgorithm {
+  public static fromAlgorithm(alg: RsaHashedKeyAlgorithm): ISignatureAlgorithm | null {
+    return fromAlgorithm(alg);
+  }
+
   public algorithm: any = {
     name: RSA_PKCS1,
     hash: {
@@ -42,6 +70,10 @@ export class RsaPkcs1Sha384 extends SignatureAlgorithm {
 }
 
 export class RsaPkcs1Sha512 extends SignatureAlgorithm {
+  public static fromAlgorithm(alg: RsaHashedKeyAlgorithm): ISignatureAlgorithm | null {
+    return fromAlgorithm(alg);
+  }
+
   public algorithm: any = {
     name: RSA_PKCS1,
     hash: {

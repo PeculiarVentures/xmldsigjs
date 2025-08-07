@@ -42,7 +42,7 @@ export interface RsaPSSSignParams extends RsaPssParams, Algorithm {
   localName: XmlSignature.ElementNames.RSAKeyValue,
 })
 export class RsaKeyValue extends KeyInfoClause {
-  public static canImportKey(key: CryptoKey): boolean {
+  public static canImportCryptoKey(key: CryptoKey): boolean {
     const name = key.algorithm.name.toUpperCase();
     return name === RSA_PKCS1.toUpperCase() || name === RSA_PSS.toUpperCase();
   }

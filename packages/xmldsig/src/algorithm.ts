@@ -1,5 +1,6 @@
 import { Convert } from 'xml-core';
 import { Application } from './application';
+import { SignatureMethod } from './xml';
 
 export type BASE64 = string;
 
@@ -48,11 +49,22 @@ export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorit
 }
 
 export interface ISignatureAlgorithm extends IAlgorithm {
+  /**
+   * Optional method to retrieve parameters from a SignatureMethod.
+   */
+  fromMethod?: (method: SignatureMethod) => void;
+  /**
+   * Optional method to set parameters to a SignatureMethod.
+   */
+  toMethod?: (method: SignatureMethod) => void;
   Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): Promise<ArrayBuffer>;
   Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array): Promise<boolean>;
 }
 
-export type ISignatureAlgorithmConstructable = new () => ISignatureAlgorithm;
+export interface ISignatureAlgorithmConstructable {
+  new (): ISignatureAlgorithm;
+  fromAlgorithm(alg: Algorithm): ISignatureAlgorithm | null;
+}
 
 export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignatureAlgorithm {
   /**

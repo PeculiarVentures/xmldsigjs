@@ -1,85 +1,17 @@
 import { XE, XmlError } from 'xml-core';
-import * as XmlCore from 'xml-core';
 
 import {
   IHashAlgorithm,
   ISignatureAlgorithm,
   HashAlgorithm,
-  IHashAlgorithmConstructable,
-  ISignatureAlgorithmConstructable,
   SignatureAlgorithm,
+  ISignatureAlgorithmConstructable,
+  IHashAlgorithmConstructable,
 } from './algorithm';
-import { PssAlgorithmParams, RsaPSSSignParams } from './xml/key_infos';
+import './xml/key_infos';
 import { SignatureMethod } from './xml/signature_method';
 
-import {
-  // rsa pkcs1
-  RSA_PKCS1,
-  RSA_PKCS1_SHA1_NAMESPACE,
-  RSA_PKCS1_SHA256_NAMESPACE,
-  RSA_PKCS1_SHA384_NAMESPACE,
-  RSA_PKCS1_SHA512_NAMESPACE,
-  RsaPkcs1Sha1,
-  RsaPkcs1Sha256,
-  RsaPkcs1Sha384,
-  RsaPkcs1Sha512,
-
-  // rsa pss without params
-  RSA_PSS,
-  RSA_PSS_SHA1_NAMESPACE,
-  RSA_PSS_SHA256_NAMESPACE,
-  RSA_PSS_SHA384_NAMESPACE,
-  RSA_PSS_SHA512_NAMESPACE,
-  RsaPssWithoutParamsSha1,
-  RsaPssWithoutParamsSha256,
-  RsaPssWithoutParamsSha384,
-  RsaPssWithoutParamsSha512,
-
-  // rsa pss with params
-  RSA_PSS_WITH_PARAMS_NAMESPACE,
-  RsaPssSha1,
-  RsaPssSha256,
-  RsaPssSha384,
-  RsaPssSha512,
-
-  // ec dsa
-  ECDSA,
-  ECDSA_SHA1_NAMESPACE,
-  ECDSA_SHA256_NAMESPACE,
-  ECDSA_SHA384_NAMESPACE,
-  ECDSA_SHA512_NAMESPACE,
-  EcdsaSha1,
-  EcdsaSha256,
-  EcdsaSha384,
-  EcdsaSha512,
-
-  // hmac
-  HMAC,
-  HMAC_SHA1_NAMESPACE,
-  HMAC_SHA256_NAMESPACE,
-  HMAC_SHA384_NAMESPACE,
-  HMAC_SHA512_NAMESPACE,
-  HmacSha1,
-  HmacSha256,
-  HmacSha384,
-  HmacSha512,
-
-  // Sha
-  SHA1,
-  Sha1,
-  SHA1_NAMESPACE,
-  SHA256,
-  Sha256,
-  SHA256_NAMESPACE,
-  SHA384,
-  Sha384,
-  SHA384_NAMESPACE,
-  SHA512,
-  Sha512,
-  SHA512_NAMESPACE,
-} from './algorithms';
-
-import { DigestMethod, Transform, XmlSignature } from './xml';
+import { Transform, XmlSignature } from './xml';
 import {
   XmlDsigBase64Transform,
   XmlDsigC14NTransform,
@@ -88,30 +20,10 @@ import {
   XmlDsigExcC14NTransform,
   XmlDsigExcC14NWithCommentsTransform,
 } from './xml/transforms';
-
-const SignatureAlgorithms: Record<string, ISignatureAlgorithmConstructable> = {};
-SignatureAlgorithms[RSA_PKCS1_SHA1_NAMESPACE] = RsaPkcs1Sha1;
-SignatureAlgorithms[RSA_PKCS1_SHA256_NAMESPACE] = RsaPkcs1Sha256;
-SignatureAlgorithms[RSA_PKCS1_SHA384_NAMESPACE] = RsaPkcs1Sha384;
-SignatureAlgorithms[RSA_PKCS1_SHA512_NAMESPACE] = RsaPkcs1Sha512;
-SignatureAlgorithms[ECDSA_SHA1_NAMESPACE] = EcdsaSha1;
-SignatureAlgorithms[ECDSA_SHA256_NAMESPACE] = EcdsaSha256;
-SignatureAlgorithms[ECDSA_SHA384_NAMESPACE] = EcdsaSha384;
-SignatureAlgorithms[ECDSA_SHA512_NAMESPACE] = EcdsaSha512;
-SignatureAlgorithms[HMAC_SHA1_NAMESPACE] = HmacSha1;
-SignatureAlgorithms[HMAC_SHA256_NAMESPACE] = HmacSha256;
-SignatureAlgorithms[HMAC_SHA384_NAMESPACE] = HmacSha384;
-SignatureAlgorithms[HMAC_SHA512_NAMESPACE] = HmacSha512;
-SignatureAlgorithms[RSA_PSS_SHA1_NAMESPACE] = RsaPssWithoutParamsSha1;
-SignatureAlgorithms[RSA_PSS_SHA256_NAMESPACE] = RsaPssWithoutParamsSha256;
-SignatureAlgorithms[RSA_PSS_SHA384_NAMESPACE] = RsaPssWithoutParamsSha384;
-SignatureAlgorithms[RSA_PSS_SHA512_NAMESPACE] = RsaPssWithoutParamsSha512;
-
-const HashAlgorithms: Record<string, IHashAlgorithmConstructable> = {};
-HashAlgorithms[SHA1_NAMESPACE] = Sha1;
-HashAlgorithms[SHA256_NAMESPACE] = Sha256;
-HashAlgorithms[SHA384_NAMESPACE] = Sha384;
-HashAlgorithms[SHA512_NAMESPACE] = Sha512;
+import { AlgorithmFactory } from './algorithm.factory';
+import { algorithmRegistry } from './algorithm.registry';
+import { KeyInfoClauseConstructable } from './xml/key_infos';
+import { keyValueRegistry } from './xml/key_infos/key_info_clause.registry';
 
 export class CryptoConfig {
   /**
@@ -172,206 +84,57 @@ export class CryptoConfig {
    * @throws {XmlError} If the signature algorithm is not supported.
    */
   public static CreateSignatureAlgorithm(method: SignatureMethod): SignatureAlgorithm {
-    const alg = SignatureAlgorithms[method.Algorithm] || null;
-    if (alg) {
-      return new alg();
-    } else if (method.Algorithm === RSA_PSS_WITH_PARAMS_NAMESPACE) {
-      let pssParams: PssAlgorithmParams | undefined;
-      method.Any.Some((item) => {
-        if (item instanceof PssAlgorithmParams) {
-          pssParams = item;
-        }
-        return !!pssParams;
-      });
-      if (pssParams) {
-        switch (pssParams.DigestMethod.Algorithm) {
-          case SHA1_NAMESPACE:
-            return new RsaPssSha1(pssParams.SaltLength);
-          case SHA256_NAMESPACE:
-            return new RsaPssSha256(pssParams.SaltLength);
-          case SHA384_NAMESPACE:
-            return new RsaPssSha384(pssParams.SaltLength);
-          case SHA512_NAMESPACE:
-            return new RsaPssSha512(pssParams.SaltLength);
-        }
-      }
-      throw new XmlError(XE.CRYPTOGRAPHIC, `Cannot get params for RSA-PSS algorithm`);
-    }
-    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, method.Algorithm);
+    return AlgorithmFactory.createSignatureAlgorithmFromMethod(method);
   }
 
   public static CreateHashAlgorithm(namespace: string): HashAlgorithm {
-    const alg = HashAlgorithms[namespace];
-    if (alg) {
-      return new alg();
-    } else {
-      throw new Error(`hash algorithm '${namespace}' is not supported`);
-    }
+    return AlgorithmFactory.createHashAlgorithmFromNamespace(namespace);
   }
 
   public static GetHashAlgorithm(algorithm: AlgorithmIdentifier): IHashAlgorithm {
-    const alg = typeof algorithm === 'string' ? { name: algorithm } : algorithm;
-    switch (alg.name.toUpperCase()) {
-      case SHA1:
-        return new Sha1();
-      case SHA256:
-        return new Sha256();
-      case SHA384:
-        return new Sha384();
-      case SHA512:
-        return new Sha512();
-      default:
-        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, alg.name);
-    }
+    const alg: Algorithm = typeof algorithm === 'string' ? { name: algorithm } : algorithm;
+
+    return AlgorithmFactory.createHashAlgorithmFromAlgorithm(alg);
   }
 
-  public static GetSignatureAlgorithm(algorithm: Algorithm): ISignatureAlgorithm {
-    if (typeof (algorithm as any).hash === 'string') {
-      (algorithm as any).hash = {
-        name: (algorithm as any).hash,
-      };
+  public static GetSignatureAlgorithm(algorithm: AlgorithmIdentifier): ISignatureAlgorithm {
+    const alg: Algorithm = typeof algorithm === 'string' ? { name: algorithm } : algorithm;
+    if ('hash' in alg && typeof alg.hash === 'string') {
+      alg.hash = { name: alg.hash };
     }
-    const hashName: string = (algorithm as any).hash.name;
-    if (!hashName) {
-      throw new Error(`Signing algorithm doesn't have name for hash`);
-    }
-    let alg: ISignatureAlgorithm;
-    switch (algorithm.name.toUpperCase()) {
-      case RSA_PKCS1.toUpperCase():
-        switch (hashName.toUpperCase()) {
-          case SHA1:
-            alg = new RsaPkcs1Sha1();
-            break;
-          case SHA256:
-            alg = new RsaPkcs1Sha256();
-            break;
-          case SHA384:
-            alg = new RsaPkcs1Sha384();
-            break;
-          case SHA512:
-            alg = new RsaPkcs1Sha512();
-            break;
-          default:
-            throw new XmlCore.XmlError(
-              XmlCore.XE.ALGORITHM_NOT_SUPPORTED,
-              `${algorithm.name}:${hashName}`,
-            );
-        }
-        break;
-      case RSA_PSS.toUpperCase(): {
-        const saltLength = (algorithm as any).saltLength;
-        switch (hashName.toUpperCase()) {
-          case SHA1:
-            alg = saltLength ? new RsaPssSha1(saltLength) : new RsaPssWithoutParamsSha1();
-            break;
-          case SHA256:
-            alg = saltLength ? new RsaPssSha256(saltLength) : new RsaPssWithoutParamsSha256();
-            break;
-          case SHA384:
-            alg = saltLength ? new RsaPssSha384(saltLength) : new RsaPssWithoutParamsSha384();
-            break;
-          case SHA512:
-            alg = saltLength ? new RsaPssSha512(saltLength) : new RsaPssWithoutParamsSha512();
-            break;
-          default:
-            throw new XmlCore.XmlError(
-              XmlCore.XE.ALGORITHM_NOT_SUPPORTED,
-              `${algorithm.name}:${hashName}`,
-            );
-        }
-        (algorithm as RsaPssParams).saltLength = (alg.algorithm as RsaPssParams).saltLength;
-        break;
-      }
-      case ECDSA:
-        switch (hashName.toUpperCase()) {
-          case SHA1:
-            alg = new EcdsaSha1();
-            break;
-          case SHA256:
-            alg = new EcdsaSha256();
-            break;
-          case SHA384:
-            alg = new EcdsaSha384();
-            break;
-          case SHA512:
-            alg = new EcdsaSha512();
-            break;
-          default:
-            throw new XmlCore.XmlError(
-              XmlCore.XE.ALGORITHM_NOT_SUPPORTED,
-              `${algorithm.name}:${hashName}`,
-            );
-        }
-        break;
-      case HMAC: {
-        const hmacAlg = algorithm as HmacKeyAlgorithm;
-        switch (hashName.toUpperCase()) {
-          case SHA1:
-            alg = new HmacSha1();
-            (alg.algorithm as HmacKeyAlgorithm).length = hmacAlg.length || 160;
-            break;
-          case SHA256:
-            alg = new HmacSha256();
-            (alg.algorithm as HmacKeyAlgorithm).length = hmacAlg.length || 256;
-            break;
-          case SHA384:
-            alg = new HmacSha384();
-            (alg.algorithm as HmacKeyAlgorithm).length = hmacAlg.length || 384;
-            break;
-          case SHA512:
-            alg = new HmacSha512();
-            (alg.algorithm as HmacKeyAlgorithm).length = hmacAlg.length || 512;
-            break;
-          default:
-            throw new XmlCore.XmlError(
-              XmlCore.XE.ALGORITHM_NOT_SUPPORTED,
-              `${algorithm.name}:${hashName}`,
-            );
-        }
-        break;
-      }
-      default:
-        throw new XmlCore.XmlError(XmlCore.XE.ALGORITHM_NOT_SUPPORTED, algorithm.name);
-    }
-    return alg;
+
+    return AlgorithmFactory.createSignatureAlgorithmFromAlgorithm(alg);
   }
 
   static CreateSignatureMethod(algorithm: ISignatureAlgorithm): SignatureMethod {
     const signatureMethod = new SignatureMethod();
     signatureMethod.Algorithm = algorithm.namespaceURI;
-    const webCryptoAlgorithm = algorithm.algorithm;
 
-    if (webCryptoAlgorithm.name === 'RSA-PSS') {
-      const rsaPssAlgorithm = webCryptoAlgorithm as RsaPSSSignParams;
-      const pssParams = new PssAlgorithmParams(rsaPssAlgorithm);
-      pssParams.DigestMethod = new DigestMethod();
-      const digest = CryptoConfig.GetHashAlgorithm(rsaPssAlgorithm.hash);
-      pssParams.DigestMethod.Algorithm = digest.namespaceURI;
-      if (rsaPssAlgorithm.saltLength) {
-        pssParams.SaltLength = rsaPssAlgorithm.saltLength;
-      }
-      signatureMethod.Any.Add(pssParams);
-    } else if (HMAC.toUpperCase() === webCryptoAlgorithm.name.toUpperCase()) {
-      // Add HMAC params
-      let outputLength = 0;
-      const hmacAlg = webCryptoAlgorithm as HmacKeyAlgorithm;
-      switch (hmacAlg.hash.name.toUpperCase()) {
-        case SHA1:
-          outputLength = hmacAlg.length || 160;
-          break;
-        case SHA256:
-          outputLength = hmacAlg.length || 256;
-          break;
-        case SHA384:
-          outputLength = hmacAlg.length || 384;
-          break;
-        case SHA512:
-          outputLength = hmacAlg.length || 512;
-          break;
-      }
-      signatureMethod.HMACOutputLength = outputLength;
+    if (algorithm.toMethod) {
+      algorithm.toMethod(signatureMethod);
     }
 
     return signatureMethod;
+  }
+
+  static RegisterSignatureAlgorithm(
+    namespace: string,
+    algorithm: ISignatureAlgorithmConstructable,
+  ) {
+    algorithmRegistry.set(namespace, {
+      type: 'signature',
+      algorithm,
+    });
+  }
+
+  static RegisterHashAlgorithm(namespace: string, algorithm: IHashAlgorithmConstructable) {
+    algorithmRegistry.set(namespace, {
+      type: 'hash',
+      algorithm,
+    });
+  }
+
+  static RegisterKeyInfoClause(localName: string, keyValue: KeyInfoClauseConstructable) {
+    keyValueRegistry.set(localName, keyValue);
   }
 }

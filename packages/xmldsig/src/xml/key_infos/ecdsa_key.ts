@@ -112,7 +112,7 @@ export class DomainParameters extends XmlObject {
   prefix: PREFIX,
 })
 export class EcdsaKeyValue extends KeyInfoClause {
-  public static canImportKey(key: CryptoKey): boolean {
+  public static canImportCryptoKey(key: CryptoKey): boolean {
     const name = key.algorithm.name.toUpperCase();
     return name === ECDSA.toUpperCase();
   }

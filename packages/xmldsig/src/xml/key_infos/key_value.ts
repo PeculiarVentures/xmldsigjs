@@ -32,8 +32,8 @@ export class KeyValue extends KeyInfoClause {
   }
 
   public async importKey(key: CryptoKey): Promise<this> {
-    for (const ctor of keyValueRegistry.values()) {
-      if (typeof (ctor as any).canImportKey === 'function' && (ctor as any).canImportKey(key)) {
+    for (const [, ctor] of keyValueRegistry) {
+      if (ctor.canImportCryptoKey(key)) {
         const keyValue = new ctor();
         await keyValue.importKey(key);
         this.Value = keyValue;

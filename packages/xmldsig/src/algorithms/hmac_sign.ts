@@ -1,4 +1,4 @@
-import { SignatureAlgorithm } from '../algorithm';
+import { ISignatureAlgorithm, SignatureAlgorithm } from '../algorithm';
 import { SHA1, SHA256, SHA384, SHA512 } from './rsa_hash';
 
 export const HMAC = 'HMAC';
@@ -7,8 +7,32 @@ export const HMAC_SHA256_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#hma
 export const HMAC_SHA384_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#hmac-sha384';
 export const HMAC_SHA512_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#hmac-sha512';
 
+function fromAlgorithm(alg: HmacKeyAlgorithm): ISignatureAlgorithm | null {
+  if (alg.name.toUpperCase() === HMAC.toUpperCase()) {
+    switch (alg.hash.name.toUpperCase()) {
+      case SHA1:
+        return new HmacSha1();
+      case SHA256:
+        return new HmacSha256();
+      case SHA384:
+        return new HmacSha384();
+      case SHA512:
+        return new HmacSha512();
+    }
+  }
+  return null;
+}
+
+interface HmacKeyAlgorithm extends Algorithm {
+  hash: Algorithm;
+}
+
 export class HmacSha1 extends SignatureAlgorithm {
-  public algorithm: any = {
+  public static fromAlgorithm(alg: HmacKeyAlgorithm): ISignatureAlgorithm | null {
+    return fromAlgorithm(alg);
+  }
+
+  public algorithm: HmacKeyAlgorithm = {
     name: HMAC,
     hash: {
       name: SHA1,
@@ -19,7 +43,11 @@ export class HmacSha1 extends SignatureAlgorithm {
 }
 
 export class HmacSha256 extends SignatureAlgorithm {
-  public algorithm: any = {
+  public static fromAlgorithm(alg: HmacKeyAlgorithm): ISignatureAlgorithm | null {
+    return fromAlgorithm(alg);
+  }
+
+  public algorithm: HmacKeyAlgorithm = {
     name: HMAC,
     hash: {
       name: SHA256,
@@ -30,7 +58,11 @@ export class HmacSha256 extends SignatureAlgorithm {
 }
 
 export class HmacSha384 extends SignatureAlgorithm {
-  public algorithm: any = {
+  public static fromAlgorithm(alg: HmacKeyAlgorithm): ISignatureAlgorithm | null {
+    return fromAlgorithm(alg);
+  }
+
+  public algorithm: HmacKeyAlgorithm = {
     name: HMAC,
     hash: {
       name: SHA384,
@@ -41,7 +73,11 @@ export class HmacSha384 extends SignatureAlgorithm {
 }
 
 export class HmacSha512 extends SignatureAlgorithm {
-  public algorithm: any = {
+  public static fromAlgorithm(alg: HmacKeyAlgorithm): ISignatureAlgorithm | null {
+    return fromAlgorithm(alg);
+  }
+
+  public algorithm: HmacKeyAlgorithm = {
     name: HMAC,
     hash: {
       name: SHA512,
