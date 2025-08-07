@@ -163,6 +163,14 @@ export class CryptoConfig {
     return transform;
   }
 
+  /**
+   * Creates an instance of a signature algorithm based on the provided signature method.
+   *
+   * @param method - The signature method containing algorithm information and optional parameters.
+   * @returns An instance of the resolved `SignatureAlgorithm`.
+   * @throws {XmlError} If RSA-PSS parameters cannot be determined.
+   * @throws {XmlError} If the signature algorithm is not supported.
+   */
   public static CreateSignatureAlgorithm(method: SignatureMethod): SignatureAlgorithm {
     const alg = SignatureAlgorithms[method.Algorithm] || null;
     if (alg) {
@@ -187,9 +195,9 @@ export class CryptoConfig {
             return new RsaPssSha512(pssParams.SaltLength);
         }
       }
-      throw new XmlError(XE.CRYPTOGRAPHIC, `Cannot get params for RSA-PSS algoriithm`);
+      throw new XmlError(XE.CRYPTOGRAPHIC, `Cannot get params for RSA-PSS algorithm`);
     }
-    throw new Error(`signature algorithm '${method.Algorithm}' is not supported`);
+    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, method.Algorithm);
   }
 
   public static CreateHashAlgorithm(namespace: string): HashAlgorithm {

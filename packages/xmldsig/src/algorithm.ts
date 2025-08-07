@@ -49,12 +49,7 @@ export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorit
 
 export interface ISignatureAlgorithm extends IAlgorithm {
   Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): Promise<ArrayBuffer>;
-  Verify(
-    signedInfo: string,
-    key: CryptoKey,
-    signatureValue: Uint8Array,
-    algorithm?: Algorithm,
-  ): Promise<boolean>;
+  Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array): Promise<boolean>;
 }
 
 export type ISignatureAlgorithmConstructable = new () => ISignatureAlgorithm;
@@ -72,13 +67,8 @@ export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignat
   /**
    * Verify the given signature of the given string using key
    */
-  public async Verify(
-    signedInfo: string,
-    key: CryptoKey,
-    signatureValue: Uint8Array,
-    algorithm?: Algorithm,
-  ) {
-    const alg = algorithm || this.algorithm;
+  public async Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array) {
+    const alg = this.algorithm;
     const info = Convert.FromString(signedInfo, 'utf8');
 
     return Application.crypto.subtle.verify(alg, key, signatureValue, info);
