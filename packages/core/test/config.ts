@@ -1,6 +1,6 @@
 import * as xmldom from '@xmldom/xmldom';
-import { setNodeDependencies } from 'xml-core';
 import xpath from 'xpath';
+import { setNodeDependencies } from 'xml-core';
 
 setNodeDependencies({
   XMLSerializer: xmldom.XMLSerializer,
