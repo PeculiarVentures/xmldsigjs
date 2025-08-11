@@ -1,7 +1,7 @@
-import * as XmlCore from 'xml-core';
+import { getNodeDependency, XmlChildElement, XmlError, XE } from 'xml-core';
 
-import { Transform } from '../transform';
-import { XmlSignature } from '../xml_names';
+import { Transform } from '../transform.js';
+import { XmlSignature } from '../xml_names.js';
 
 function lookupParentNode(node: Node): Node {
   return node.parentNode ? lookupParentNode(node.parentNode) : node;
@@ -25,7 +25,7 @@ function lookupParentNode(node: Node): Node {
 export class XmlDsigXPathTransform extends Transform {
   public Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigXPathTransform;
 
-  @XmlCore.XmlChildElement({
+  @XmlChildElement({
     localName: XmlSignature.ElementNames.XPath,
     namespaceURI: XmlSignature.NamespaceURI,
     prefix: XmlSignature.DefaultPrefix,
@@ -38,7 +38,7 @@ export class XmlDsigXPathTransform extends Transform {
    */
   public GetOutput(): any {
     if (!this.innerXml) {
-      throw new XmlCore.XmlError(XmlCore.XE.PARAM_REQUIRED, 'innerXml');
+      throw new XmlError(XE.PARAM_REQUIRED, 'innerXml');
     }
 
     this.Filter(lookupParentNode(this.innerXml), this.XPath);
@@ -69,9 +69,7 @@ export class XmlDsigXPathTransform extends Transform {
       // Browser
       return (node.ownerDocument == null ? node : node.ownerDocument) as any;
     } else {
-      // NodeJS
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      return require('xpath');
+      return getNodeDependency<XPathEvaluator>('xpath');
     }
   }
 
@@ -84,8 +82,7 @@ export class XmlDsigXPathTransform extends Transform {
       }
       const xpathEl = xml.firstChild;
       const xPath = `boolean(${xpath})`;
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const xpathModule = typeof self === 'undefined' ? require('xpath') : self;
+      const xpathModule = typeof self === 'undefined' ? getNodeDependency('xpath') : self;
       const xpathResult = evaluator.evaluate(
         xPath,
         node,

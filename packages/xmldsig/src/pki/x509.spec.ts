@@ -1,7 +1,7 @@
 import { describe, it, assert } from 'vitest';
 import { Convert } from 'pvtsutils';
-import '../../test/config';
-import { X509Certificate } from './x509';
+import '../../test/config.js';
+import { X509Certificate } from './x509.js';
 
 describe('X509Certificate', () => {
   const x509Rsa = Convert.FromBase64(

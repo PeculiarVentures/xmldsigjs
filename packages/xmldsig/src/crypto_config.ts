@@ -7,10 +7,10 @@ import {
   SignatureAlgorithm,
   ISignatureAlgorithmConstructable,
   IHashAlgorithmConstructable,
-} from './algorithm';
-import { SignatureMethod } from './xml/signature_method';
+} from './algorithm.js';
+import { SignatureMethod } from './xml/signature_method.js';
 
-import { Transform, XmlSignature } from './xml';
+import { Transform, XmlSignature } from './xml/index.js';
 import {
   XmlDsigBase64Transform,
   XmlDsigC14NTransform,
@@ -18,11 +18,11 @@ import {
   XmlDsigEnvelopedSignatureTransform,
   XmlDsigExcC14NTransform,
   XmlDsigExcC14NWithCommentsTransform,
-} from './xml/transforms';
-import { AlgorithmFactory } from './algorithm.factory';
-import { algorithmRegistry } from './algorithm.registry';
-import { KeyInfoClauseConstructable } from './xml/key_infos';
-import { keyValueRegistry } from './xml/key_infos/key_info_clause.registry';
+} from './xml/transforms/index.js';
+import { AlgorithmFactory } from './algorithm.factory.js';
+import { algorithmRegistry } from './algorithm.registry.js';
+import { KeyInfoClauseConstructable } from './xml/key_infos/index.js';
+import { keyValueRegistry } from './xml/key_infos/key_info_clause.registry.js';
 
 export class CryptoConfig {
   /**

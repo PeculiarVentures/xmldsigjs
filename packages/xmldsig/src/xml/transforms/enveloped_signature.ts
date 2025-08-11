@@ -1,7 +1,7 @@
 import { isElement, XE, XmlError } from 'xml-core';
 
-import { Transform } from '../transform';
-import { XmlSignature } from '../xml_names';
+import { Transform } from '../transform.js';
+import { XmlSignature } from '../xml_names.js';
 
 /**
  * Represents the enveloped signature transform for an XML digital signature as defined by the W3C.

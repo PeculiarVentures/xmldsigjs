@@ -1,7 +1,7 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { EncapsulatedPKIData } from './encapsulated_pki_data';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { EncapsulatedPKIData } from './encapsulated_pki_data.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <RevocationValues> element of an XML signature.

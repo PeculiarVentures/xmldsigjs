@@ -1,5 +1,5 @@
 import { describe, it, assert } from 'vitest';
-import { XE, XmlError } from './index';
+import { XE, XmlError } from './index.js';
 
 describe('Error', () => {
   it('Throw error', () => {

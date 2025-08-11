@@ -1,7 +1,7 @@
 import { XE, XmlError } from 'xml-core';
 
-import { XmlCanonicalizer } from '../../canonicalizer';
-import { Transform } from '../transform';
+import { XmlCanonicalizer } from '../../canonicalizer.js';
+import { Transform } from '../transform.js';
 
 /**
  * Represents the exclusive C14N XML canonicalization transform for a digital signature

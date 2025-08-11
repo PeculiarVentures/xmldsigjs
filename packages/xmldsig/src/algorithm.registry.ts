@@ -1,4 +1,4 @@
-import { IHashAlgorithmConstructable, ISignatureAlgorithmConstructable } from './algorithm';
+import { IHashAlgorithmConstructable, ISignatureAlgorithmConstructable } from './algorithm.js';
 
 interface IHashAlgorithmRegistryItem {
   type: 'hash';
@@ -54,7 +54,7 @@ import {
   SHA512_NAMESPACE,
   RSA_PSS_WITH_PARAMS_NAMESPACE,
   RsaPssWithParams,
-} from './algorithms';
+} from './algorithms/index.js';
 
 // Register RSA PKCS1 algorithms
 algorithmRegistry.set(RSA_PKCS1_SHA1_NAMESPACE, {

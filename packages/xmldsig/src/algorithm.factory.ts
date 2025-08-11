@@ -1,7 +1,7 @@
 import { XE, XmlError } from 'xml-core';
-import { algorithmRegistry } from './algorithm.registry';
-import { SignatureMethod } from './xml';
-import { IHashAlgorithm, ISignatureAlgorithm } from './algorithm';
+import { algorithmRegistry } from './algorithm.registry.js';
+import { SignatureMethod } from './xml/index.js';
+import { IHashAlgorithm, ISignatureAlgorithm } from './algorithm.js';
 
 export class AlgorithmFactory {
   static createHashAlgorithmFromNamespace(namespace: string): IHashAlgorithm {

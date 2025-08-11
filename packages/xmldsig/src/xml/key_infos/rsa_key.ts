@@ -10,11 +10,11 @@ import {
   XmlObject,
 } from 'xml-core';
 
-import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from '../../algorithms';
-import { Application } from '../../application';
-import { DigestMethod } from '../digest_method';
-import { XmlSignature } from '../xml_names';
-import { KeyInfoClause } from './key_info_clause';
+import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from '../../algorithms/index.js';
+import { Application } from '../../application.js';
+import { DigestMethod } from '../digest_method.js';
+import { XmlSignature } from '../xml_names.js';
+import { KeyInfoClause } from './key_info_clause.js';
 
 const DEFAULT_ALGORITHM: RsaHashedImportParams = {
   name: 'RSASSA-PKCS1-v1_5',

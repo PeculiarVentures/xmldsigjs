@@ -1,8 +1,8 @@
 import { XE, XmlError, XmlElement } from 'xml-core';
 
-import { Transform } from './transform';
-import { XmlSignature } from './xml_names';
-import { XmlSignatureCollection } from './xml_object';
+import { Transform } from './transform.js';
+import { XmlSignature } from './xml_names.js';
+import { XmlSignatureCollection } from './xml_object.js';
 
 /**
  * The Transforms element contains a collection of transformations
@@ -47,4 +47,4 @@ function ChangeTransform(t1: Transform, t2: typeof Transform) {
   return t;
 }
 
-import * as transforms from './transforms';
+import * as transforms from './transforms/index.js';

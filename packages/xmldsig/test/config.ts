@@ -1,10 +1,7 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import { Crypto } from '@peculiar/webcrypto';
-import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
-import * as xmldsig from '../src';
-
-global['DOMParser'] = DOMParser as any;
-global['XMLSerializer'] = XMLSerializer as any;
+import '../../core/test/config.js';
+import * as xmldsig from '../src/index.js';
 
 // Set crypto to XML application
 xmldsig.Application.setEngine('NodeJS', new Crypto());

@@ -1,6 +1,6 @@
 import { describe, it, assert, beforeAll } from 'vitest';
-import * as xmldsig from '../src';
-import './config';
+import * as xmldsig from '../src/index.js';
+import './config.js';
 
 describe('Signing options', () => {
   const xmlDocument = xmldsig.Parse(`<root><child id="child"/></root>`);

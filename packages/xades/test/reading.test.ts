@@ -1,8 +1,9 @@
 import { describe, it, assert } from 'vitest';
 import { Crypto } from '@peculiar/webcrypto';
 import { Application } from 'xmldsigjs';
-import * as XAdES from '../src';
-import { SignedXml, xml } from '../src';
+import '../../core/test/config.js';
+import * as XAdES from '../src/index.js';
+import { SignedXml, xml } from '../src/index.js';
 
 const {
   QualifyingProperties,

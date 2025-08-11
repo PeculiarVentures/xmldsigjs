@@ -1,6 +1,6 @@
 import { describe, it, assert } from 'vitest';
-import * as xmldsig from '../src';
-import './config';
+import * as xmldsig from '../src/index.js';
+import './config.js';
 
 describe('RSA-PSS', () => {
   // modulusLength

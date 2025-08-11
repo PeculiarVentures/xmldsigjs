@@ -100,7 +100,23 @@ Base class for all XML elements.
 - `GetXml()` - Convert object to XML node
 - `toString()` - Convert object to XML string
 
+## Node.js: Registering XML Dependencies
+
+To work with XML in Node.js, you need to register DOM and XPath dependencies:
+
+```typescript
+import * as xmldom from '@xmldom/xmldom';
+import { setNodeDependencies } from 'xml-core';
+import xpath from 'xpath';
+
+setNodeDependencies({
+  XMLSerializer: xmldom.XMLSerializer,
+  DOMParser: xmldom.DOMParser,
+  DOMImplementation: xmldom.DOMImplementation,
+  xpath,
+});
+```
+
 ## License
 
-MIT
-MIT
+  MIT

@@ -1,8 +1,8 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { SignedProperties } from './signed_properties';
-import { UnsignedProperties } from './unsigned_properties';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+import { SignedProperties } from './signed_properties.js';
+import { UnsignedProperties } from './unsigned_properties.js';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 /**
  * Represents the <QualifyingProperties> element of an XML signature.

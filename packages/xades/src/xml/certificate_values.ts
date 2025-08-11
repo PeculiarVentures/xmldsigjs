@@ -1,8 +1,8 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { Any } from './any';
-import { EncapsulatedPKIData } from './encapsulated_pki_data';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { Any } from './any.js';
+import { EncapsulatedPKIData } from './encapsulated_pki_data.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <CertificateValues> element of an XML signature.

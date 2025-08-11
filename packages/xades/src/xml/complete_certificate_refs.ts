@@ -1,8 +1,8 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { CertIDList } from './signing_certificate';
-import { UnsignedSignatureProperty } from './unsigned_signature_properties';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+import { CertIDList } from './signing_certificate.js';
+import { UnsignedSignatureProperty } from './unsigned_signature_properties.js';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 /**
  * Represents the <CompleteCertificateRefs> element of an XML signature.

@@ -1,6 +1,6 @@
 import { describe, it, assert } from 'vitest';
-import '../test/config';
-import * as xmldsig from './index';
+import '../test/config.js';
+import * as xmldsig from './index.js';
 
 describe('CryptoConfig', () => {
   describe('Digest', () => {

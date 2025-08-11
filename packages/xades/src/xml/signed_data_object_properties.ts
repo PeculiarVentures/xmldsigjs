@@ -1,9 +1,9 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { CommitmentTypeIndication } from './commitment_type_indication';
-import { DataObjectFormat } from './data_object_format';
-import { XAdESTimeStamp } from './xades_time_stamp';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { CommitmentTypeIndication } from './commitment_type_indication.js';
+import { DataObjectFormat } from './data_object_format.js';
+import { XAdESTimeStamp } from './xades_time_stamp.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <SignedDataObjectProperties> element of an XML signature.

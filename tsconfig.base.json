@@ -2,9 +2,12 @@
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "node",
-    "target": "ES2018",
+    "target": "ES2022",
     "esModuleInterop": true,
     "removeComments": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
     "strict": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": false,
@@ -15,6 +18,8 @@
     "importHelpers": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
+    "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
   }

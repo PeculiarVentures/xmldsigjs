@@ -1,4 +1,4 @@
-import { HashAlgorithm } from '../algorithm';
+import { HashAlgorithm } from '../algorithm.js';
 
 export const SHA1 = 'SHA-1';
 export const SHA256 = 'SHA-256';

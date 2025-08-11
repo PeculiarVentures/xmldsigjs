@@ -1,8 +1,8 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { SignedDataObjectProperties } from './signed_data_object_properties';
-import { SignedSignatureProperties } from './signed_signature_properties';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+import { SignedDataObjectProperties } from './signed_data_object_properties.js';
+import { SignedSignatureProperties } from './signed_signature_properties.js';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 /**
  * Represents the <SignedProperties> element of an XML signature.

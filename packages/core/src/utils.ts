@@ -1,31 +1,9 @@
-import { type AssocArray } from './types';
+import { type AssocArray } from './types.js';
+import { APPLICATION_XML, XmlNodeType } from './xml.js';
 
 export type SelectNodes = (node: Node, xPath: string) => Node[];
 
-let xpath: SelectNodes = (_node: Node, _xPath: string) => {
-  throw new Error('Not implemented');
-};
-
-// Fix global
-let sWindow: any;
-if (typeof self === 'undefined') {
-  sWindow = global;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const xmldom = require('@xmldom/xmldom');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  xpath = require('xpath.js');
-  sWindow.XMLSerializer = xmldom.XMLSerializer;
-  sWindow.DOMParser = xmldom.DOMParser;
-  sWindow.DOMImplementation = xmldom.DOMImplementation;
-  sWindow.document = new DOMImplementation().createDocument(
-    'http://www.w3.org/1999/xhtml',
-    'html',
-    null,
-  );
-} else {
-  sWindow = self;
-}
-
+// Browser XPath implementation
 function SelectNodesEx(node: Node, xPath: string): Node[] {
   const doc: Document = node.ownerDocument == null ? (node as Document) : node.ownerDocument;
   const nsResolver = document.createNSResolver(
@@ -42,22 +20,36 @@ function SelectNodesEx(node: Node, xPath: string): Node[] {
   return ns;
 }
 
-export const Select: SelectNodes = typeof self !== 'undefined' ? SelectNodesEx : xpath;
+// Node.js XPath implementation
+function SelectNodesNode(node: Node, xPath: string): Node[] {
+  const xpath = getNodeDependency<any>('xpath').select;
+  return xpath(xPath, node);
+}
+
+export const Select: SelectNodes = typeof self !== 'undefined' ? SelectNodesEx : SelectNodesNode;
 
 export function Parse(xmlString: string) {
-  /**
-   * NOTE: https://www.w3.org/TR/REC-xml/#sec-line-ends
-   * The XML processor must behave as if it normalized all line breaks in external parsed
-   * entities (including the document entity) on input, before parsing, by translating both
-   * the two-character sequence #xD #xA and any #xD that is not followed by #xA to a
-   * single #xA character.
-   */
   xmlString = xmlString.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-  return new DOMParser().parseFromString(xmlString, APPLICATION_XML);
+
+  let DOMParserCtor: typeof DOMParser;
+  if (typeof DOMParser !== 'undefined') {
+    DOMParserCtor = DOMParser;
+  } else {
+    DOMParserCtor = getNodeDependency<any>('DOMParser');
+  }
+
+  return new DOMParserCtor().parseFromString(xmlString, APPLICATION_XML);
 }
 
 export function Stringify(target: Node) {
-  return new XMLSerializer().serializeToString(target);
+  let XMLSerializerCtor: typeof XMLSerializer;
+  if (typeof XMLSerializer !== 'undefined') {
+    XMLSerializerCtor = XMLSerializer;
+  } else {
+    XMLSerializerCtor = getNodeDependency<any>('XMLSerializer');
+  }
+
+  return new XMLSerializerCtor().serializeToString(target);
 }
 
 /**
@@ -139,4 +131,41 @@ export function isDocument(obj: any): obj is Document {
   return isNodeType(obj, XmlNodeType.Document);
 }
 
-import { APPLICATION_XML, XmlNodeType } from './xml';
+const nodeDependencies = new Map<string, any>();
+
+/**
+ * Sets multiple node dependencies by updating the internal `nodeDependencies` map
+ * with the provided key-value pairs.
+ *
+ * @param deps - An object containing dependency names as keys and their corresponding values.
+ *
+ * @since 1.2.0
+ */
+export function setNodeDependencies(deps: Record<string, any>) {
+  for (const key in deps) {
+    nodeDependencies.set(key, deps[key]);
+  }
+}
+
+/**
+ * Retrieves a registered node dependency by its key.
+ *
+ * @template T The expected type of the dependency.
+ * @param key - The unique key identifying the dependency.
+ * @returns The dependency associated with the given key, cast to type T.
+ * @throws {Error} If the dependency is not found for the provided key.
+ *
+ * @remarks
+ * Dependencies must be registered using `setNodeDependencies` before retrieval.
+ *
+ * @since 1.2.0
+ */
+export function getNodeDependency<T = any>(key: string): T {
+  const dep = nodeDependencies.get(key);
+  if (!dep) {
+    throw new Error(
+      `Node dependency not found: ${key}. Please use 'setNodeDependencies' to register it.`,
+    );
+  }
+  return dep as T;
+}

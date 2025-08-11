@@ -1,5 +1,6 @@
 import { describe, it, assert } from 'vitest';
-import { DocumentationReference, ObjectIdentifier } from './object_identifier';
+import '../../../core/test/config.js';
+import { DocumentationReference, ObjectIdentifier } from './object_identifier.js';
 
 describe('ObjectIdentifier', () => {
   it('Parse', () => {

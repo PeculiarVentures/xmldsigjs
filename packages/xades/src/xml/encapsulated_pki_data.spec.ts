@@ -1,5 +1,6 @@
 import { describe, it, assert } from 'vitest';
-import { EncapsulatedPKIData } from './encapsulated_pki_data';
+import '../../../core/test/config.js';
+import { EncapsulatedPKIData } from './encapsulated_pki_data.js';
 
 describe('EncapsulatedPKIData', () => {
   it('Parse', () => {

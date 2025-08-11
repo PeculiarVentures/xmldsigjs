@@ -1,6 +1,6 @@
 import { XE, XmlError } from 'xml-core';
-import { KeyInfoClause } from './key_info_clause';
-import { keyValueRegistry } from './key_info_clause.registry';
+import { KeyInfoClause } from './key_info_clause.js';
+import { keyValueRegistry } from './key_info_clause.registry.js';
 
 export class KeyInfoClauseFactory {
   static create(type: string): KeyInfoClause {

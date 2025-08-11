@@ -2,7 +2,6 @@ import {
   IXmlSerializable,
   XmlObject,
   XmlNodeType,
-  APPLICATION_XML,
   isDocument,
   isElement,
   assign,
@@ -11,11 +10,12 @@ import {
   AssocArray,
   Parse,
   SelectNamespaces,
+  Stringify,
 } from 'xml-core';
 
 import { BufferSourceConverter, Convert } from 'pvtsutils';
-import * as Alg from './algorithms';
-import { CryptoConfig } from './crypto_config';
+import * as Alg from './algorithms/index.js';
+import { CryptoConfig } from './crypto_config.js';
 import {
   KeyInfo,
   Reference,
@@ -25,11 +25,11 @@ import {
   Transforms as XmlTransforms,
   XmlDsigC14NWithCommentsTransform,
   XmlDsigExcC14NWithCommentsTransform,
-} from './xml';
-import { KeyInfoX509Data, KeyValue } from './xml/key_infos';
-import * as KeyInfos from './xml/key_infos';
-import * as Transforms from './xml/transforms';
-import { Application } from './application';
+} from './xml/index.js';
+import { KeyInfoX509Data, KeyValue } from './xml/key_infos/index.js';
+import * as KeyInfos from './xml/key_infos/index.js';
+import * as Transforms from './xml/transforms/index.js';
+import { Application } from './application.js';
 
 export interface OptionsXPathSignTransform {
   name: 'xpath';
@@ -146,8 +146,8 @@ export class SignedXml implements IXmlSerializable {
       this.document = node as Document;
     } else if (node && (node as Node).nodeType === XmlNodeType.Element) {
       // constructor(node: Element);
-      const xmlText = new XMLSerializer().serializeToString(node);
-      this.document = new DOMParser().parseFromString(xmlText, APPLICATION_XML);
+      const xmlText = Stringify(node);
+      this.document = Parse(xmlText);
     }
   }
 
@@ -269,7 +269,7 @@ export class SignedXml implements IXmlSerializable {
       }
       const sig = node.cloneNode(true);
       doc.appendChild(sig);
-      return new XMLSerializer().serializeToString(doc);
+      return Stringify(doc);
     }
     return this.XmlSignature.toString();
   }
@@ -452,7 +452,7 @@ export class SignedXml implements IXmlSerializable {
           if (!source.ownerDocument) {
             throw new Error('Cannot get ownerDocument from the XML document');
           }
-          canonOutput = new XMLSerializer().serializeToString(source.ownerDocument);
+          canonOutput = Stringify(source.ownerDocument);
         } else {
           canonOutput = BufferSourceConverter.toArrayBuffer(source);
         }

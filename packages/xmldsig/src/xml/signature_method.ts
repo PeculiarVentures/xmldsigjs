@@ -1,9 +1,9 @@
 import * as XmlCore from 'xml-core';
 import { XmlAttribute, XmlChildElement, XmlElement, XmlObject, XmlNumberConverter } from 'xml-core';
 
-import { PssAlgorithmParams } from './key_infos';
-import { XmlSignature } from './xml_names';
-import { XmlSignatureCollection, XmlSignatureObject } from './xml_object';
+import { PssAlgorithmParams } from './key_infos/rsa_key.js';
+import { XmlSignature } from './xml_names.js';
+import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
 
 /**
  * Represents the <SignatureMethod> element of an XML signature.

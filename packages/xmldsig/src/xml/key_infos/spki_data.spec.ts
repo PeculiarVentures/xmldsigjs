@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import '../../../test/config';
-import { Application } from '../../application';
-import { SPKIData } from './spki_data';
+import '../../../test/config.js';
+import { Application } from '../../application.js';
+import { SPKIData } from './spki_data.js';
 
 // Helper to generate a CryptoKey for testing
 async function generateTestKey(alg: 'RSASSA-PKCS1-v1_5' | 'ECDSA' = 'RSASSA-PKCS1-v1_5') {

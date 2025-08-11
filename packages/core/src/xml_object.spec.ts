@@ -1,5 +1,6 @@
 import { describe, it, assert, beforeAll } from 'vitest';
-import { XmlAttribute, XmlElement, XmlObject } from './index';
+import '../test/config.js';
+import { XmlAttribute, XmlElement, XmlObject } from './index.js';
 
 describe('XmlObject', () => {
   it('IsEmpty', () => {

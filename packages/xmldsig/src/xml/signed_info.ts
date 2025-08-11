@@ -1,10 +1,10 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
 
-import { CanonicalizationMethod } from './canonicalization_method';
-import { References } from './reference';
-import { SignatureMethod } from './signature_method';
-import { XmlSignature } from './xml_names';
-import { XmlSignatureObject } from './xml_object';
+import { CanonicalizationMethod } from './canonicalization_method.js';
+import { References } from './reference.js';
+import { SignatureMethod } from './signature_method.js';
+import { XmlSignature } from './xml_names.js';
+import { XmlSignatureObject } from './xml_object.js';
 
 /**
  * Represents the <SignedInfo> element of an XML signature.

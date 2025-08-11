@@ -1,9 +1,9 @@
-export * from './algorithms';
-export * from './application';
-export * from './canonicalizer';
-export * from './crypto_config';
-export * from './xml';
-export * from './pki';
-export * from './xml/key_infos';
-export * from './signed_xml';
+export * from './algorithms/index.js';
+export * from './application.js';
+export * from './canonicalizer.js';
+export * from './crypto_config.js';
+export * from './xml/index.js';
+export * from './pki/index.js';
+export * from './xml/key_infos/index.js';
+export * from './signed_xml.js';
 export { Select, Parse, Stringify } from 'xml-core';

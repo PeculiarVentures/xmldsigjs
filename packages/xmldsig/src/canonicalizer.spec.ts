@@ -1,5 +1,7 @@
 import { describe, it, assert } from 'vitest';
-import * as xmldsig from './index';
+import { Parse } from 'xml-core';
+import '../test/config.js';
+import * as xmldsig from './index.js';
 
 describe('Canonicalization', () => {
   function isNode() {
@@ -38,7 +40,7 @@ describe('Canonicalization', () => {
     comment = false,
     inclusive?: string,
   ) {
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const doc = Parse(xml);
     const elem = xpath ? xmldsig.Select(doc, xpath)[0] : doc;
     const xmlCanonicalizer = new xmldsig.XmlCanonicalizer(!!comment, exclusive);
     if (inclusive) {

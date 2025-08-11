@@ -2,10 +2,18 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "paths": {
-      "xml-core": ["./packages/core/src"],
-      "xmldsigjs": ["./packages/xmldsig/src"],
-      "xadesjs": ["./packages/xades/src"]
+      "xml-core": [
+        "./packages/core/src"
+      ],
+      "xmldsigjs": [
+        "./packages/xmldsig/src"
+      ],
+      "xadesjs": [
+        "./packages/xades/src"
+      ]
     }
   }
 }

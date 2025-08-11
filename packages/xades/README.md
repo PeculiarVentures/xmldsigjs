@@ -1,6 +1,6 @@
 # XAdESjs
 
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xmldsigjs/master/LICENSE.md)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xmldsigjs/master/LICENSE)
 [![npm version](https://badge.fury.io/js/xadesjs.svg)](https://badge.fury.io/js/xadesjs)
 
 XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScript built on XMLDSIGjs.
@@ -165,6 +165,33 @@ Same as XMLDSIGjs:
 - **Cryptographic**: RSASSA-PKCS1-v1_5, RSA-PSS, ECDSA, HMAC
 - **Hash**: SHA-1, SHA-256, SHA-384, SHA-512
 - **Canonicalization**: C14N, C14N with Comments, Exclusive C14N variants
+
+## Node.js: Registering XML Dependencies
+
+To work with XML in Node.js, you need to register DOM and XPath dependencies:
+
+```typescript
+import * as xmldom from '@xmldom/xmldom';
+import { setNodeDependencies } from 'xadesjs';
+import xpath from 'xpath';
+
+setNodeDependencies({
+  XMLSerializer: xmldom.XMLSerializer,
+  DOMParser: xmldom.DOMParser,
+  DOMImplementation: xmldom.DOMImplementation,
+  xpath,
+});
+```
+
+## WebCrypto Environment
+
+In Node.js >=19 the global `crypto.webcrypto` is available. For earlier versions or broader compatibility, install and set the engine:
+
+```ts
+import { Crypto } from '@peculiar/webcrypto';
+import { Application } from 'xmldsigjs';
+Application.setEngine('NodeJS', new Crypto());
+```
 
 ## License
 

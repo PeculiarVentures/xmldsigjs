@@ -1,8 +1,8 @@
 import { XmlChildElement, XmlContent, XmlElement, IConverter } from 'xml-core';
-import { Any } from './any';
-import { ObjectIdentifier } from './object_identifier';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { Any } from './any.js';
+import { ObjectIdentifier } from './object_identifier.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <CommitmentTypeIndication> element of an XML signature.

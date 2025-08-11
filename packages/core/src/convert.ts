@@ -1,5 +1,5 @@
-import { XE, XmlError } from './error';
-import { XmlBufferEncoding } from './types';
+import { XE, XmlError } from './error.js';
+import { XmlBufferEncoding } from './types.js';
 
 declare let unescape: any;
 declare let escape: any;

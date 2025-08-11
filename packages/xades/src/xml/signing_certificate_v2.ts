@@ -1,7 +1,7 @@
 import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
-import { DigestAlgAndValueType } from './signing_certificate';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
+import { DigestAlgAndValueType } from './signing_certificate.js';
 
 /**
  * Represents the <CertIDTypeV2> element of an XML signature.

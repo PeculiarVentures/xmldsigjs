@@ -1,6 +1,6 @@
 import { XmlChildElement, XmlElement } from 'xml-core';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 /**
  * Represents the <SignatureProductionPlace> element of an XML signature.

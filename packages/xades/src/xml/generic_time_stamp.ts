@@ -1,9 +1,9 @@
 import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
 import { CanonicalizationMethod, DigestMethod, XmlSignature } from 'xmldsigjs';
-import { Any } from './any';
-import { EncapsulatedPKIData } from './encapsulated_pki_data';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { Any } from './any.js';
+import { EncapsulatedPKIData } from './encapsulated_pki_data.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <GenericTimeStamp> element of an XML signature.

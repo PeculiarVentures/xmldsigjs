@@ -1,4 +1,4 @@
-import { ICollection } from './types';
+import { ICollection } from './types.js';
 
 export class Collection<I> implements ICollection<I> {
   protected items: I[] = [];

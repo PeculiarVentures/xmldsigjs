@@ -1,4 +1,5 @@
 import { describe, it, assert } from 'vitest';
+import '../test/config.js';
 import {
   XmlAttribute,
   XmlElement,
@@ -6,7 +7,7 @@ import {
   XmlBase64Converter,
   XmlBooleanConverter,
   XmlNumberConverter,
-} from './index';
+} from './index.js';
 
 describe('Convertors', () => {
   it('String', () => {

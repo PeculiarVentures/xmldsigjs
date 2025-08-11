@@ -1,6 +1,6 @@
 import { XmlChildElement, XmlElement } from 'xml-core';
 import { DataObject as XmlDSigDataObject, XmlSignature } from 'xmldsigjs';
-import { QualifyingProperties } from './qualifying_properties';
+import { QualifyingProperties } from './qualifying_properties.js';
 
 @XmlElement({ localName: XmlSignature.ElementNames.Object })
 export class DataObject extends XmlDSigDataObject {

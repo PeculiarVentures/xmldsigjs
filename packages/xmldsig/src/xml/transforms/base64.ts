@@ -1,7 +1,7 @@
 import { Convert, XE, XmlError } from 'xml-core';
 
-import { Transform } from '../transform';
-import { XmlSignature } from '../xml_names';
+import { Transform } from '../transform.js';
+import { XmlSignature } from '../xml_names.js';
 
 export class XmlDsigBase64Transform extends Transform {
   public Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform;

@@ -1,11 +1,11 @@
-import * as CONST from './const';
+import * as CONST from './const.js';
 import {
   XmlAttributeType,
   XmlChildElementType,
   XmlContentType,
   XmlElementType,
   XmlSchema,
-} from './types';
+} from './types.js';
 
 const MAX = 1e9;
 

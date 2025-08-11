@@ -1,8 +1,7 @@
 import { XE, XmlError } from 'xml-core';
-import { ISignatureAlgorithm, SignatureAlgorithm } from '../algorithm';
-import { SignatureMethod } from '../xml';
-import { PssAlgorithmParams } from '../xml/key_infos';
-// import { AlgorithmFactory } from '../algorithm.factory';
+import { ISignatureAlgorithm, SignatureAlgorithm } from '../algorithm.js';
+import { SignatureMethod } from '../xml/signature_method.js';
+import { PssAlgorithmParams } from '../xml/key_infos/rsa_key.js';
 import {
   SHA1,
   SHA1_NAMESPACE,
@@ -12,7 +11,7 @@ import {
   SHA384_NAMESPACE,
   SHA512,
   SHA512_NAMESPACE,
-} from './rsa_hash';
+} from './rsa_hash.js';
 
 // https://tools.ietf.org/html/rfc6931#section-2.3.9
 

@@ -1,10 +1,10 @@
 import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
 
-import { DataObjects } from './data_object';
-import { KeyInfo } from './key_info';
-import { SignedInfo } from './signed_info';
-import { XmlSignature } from './xml_names';
-import { XmlSignatureObject } from './xml_object';
+import { DataObjects } from './data_object.js';
+import { KeyInfo } from './key_info.js';
+import { SignedInfo } from './signed_info.js';
+import { XmlSignature } from './xml_names.js';
+import { XmlSignatureObject } from './xml_object.js';
 
 /**
  * Represents the <Signature> element of an XML signature.

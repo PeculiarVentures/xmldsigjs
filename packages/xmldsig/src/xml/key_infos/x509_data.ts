@@ -1,9 +1,9 @@
 import { XE, XmlError, Convert, XmlChildElement, XmlElement } from 'xml-core';
 
-import { X509Certificate } from '../../pki';
-import { XmlSignature } from '../xml_names';
-import { XmlSignatureObject } from '../xml_object';
-import { KeyInfoClause } from './key_info_clause';
+import { X509Certificate } from '../../pki/x509.js';
+import { XmlSignature } from '../xml_names.js';
+import { XmlSignatureObject } from '../xml_object.js';
+import { KeyInfoClause } from './key_info_clause.js';
 
 /**
  * Represents the <X509Data> element of an XML signature.

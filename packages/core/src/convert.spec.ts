@@ -1,5 +1,5 @@
 import { describe, it, assert } from 'vitest';
-import { Convert } from './index';
+import { Convert } from './index.js';
 
 describe('Convert', () => {
   it('DateTime', () => {

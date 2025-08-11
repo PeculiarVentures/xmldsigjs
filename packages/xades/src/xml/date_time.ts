@@ -1,7 +1,7 @@
 import { XmlContent, XmlElement } from 'xml-core';
-import { dateFormat } from '../dateformat';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+import { dateFormat } from '../dateformat.js';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 @XmlElement({
   localName: 'XadesDateTime',

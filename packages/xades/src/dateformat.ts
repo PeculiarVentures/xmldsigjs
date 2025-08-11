@@ -116,8 +116,8 @@ const masks: Record<string, string> = {
   longTime: 'h:MM:ss TT Z',
   isoDate: 'yyyy-mm-dd',
   isoTime: 'HH:MM:ss',
-  isoDateTime: 'yyyy-mm-dd\'T\'HH:MM:sso',
-  isoUtcDateTime: 'UTC:yyyy-mm-dd\'T\'HH:MM:ss\'Z\'',
+  isoDateTime: `yyyy-mm-dd'T'HH:MM:sso`,
+  isoUtcDateTime: `UTC:yyyy-mm-dd'T'HH:MM:ss'Z'`,
   expiresHeaderFormat: 'ddd, dd mmm yyyy HH:MM:ss Z',
 };
 

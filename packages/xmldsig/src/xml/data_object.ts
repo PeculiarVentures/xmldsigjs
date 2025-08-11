@@ -1,7 +1,7 @@
 import { XmlAttribute, XmlElement } from 'xml-core';
 
-import { XmlSignature } from './xml_names';
-import { XmlSignatureCollection, XmlSignatureObject } from './xml_object';
+import { XmlSignature } from './xml_names.js';
+import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
 
 // XmlElement part of the signature
 // Note: Looks like KeyInfoNode (but the later is XmlElement inside KeyInfo)

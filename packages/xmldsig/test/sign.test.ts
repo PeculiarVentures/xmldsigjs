@@ -3,8 +3,9 @@ import { promisify } from 'node:util';
 import * as fs from 'node:fs';
 import { describe, it, assert, beforeAll, afterAll } from 'vitest';
 import { Convert } from 'pvtsutils';
-import * as xmldsig from '../src';
-import './config';
+import { Stringify } from 'xml-core';
+import * as xmldsig from '../src/index.js';
+import './config.js';
 
 const exec = promisify(child_process.exec);
 
@@ -95,8 +96,7 @@ describe('XML Signing + XMLSEC verification', () => {
       xmlDocument.documentElement.appendChild(xmlSignature);
 
       // serialize XML
-      const oSerializer = new XMLSerializer();
-      const sXML = oSerializer.serializeToString(xmlDocument);
+      const sXML = Stringify(xmlDocument);
 
       await checkXMLSEC(sXML, keys.publicKey);
 
@@ -297,8 +297,8 @@ describe('XML Signing + XMLSEC verification', () => {
       xmlDocument.documentElement.appendChild(xmlSignature);
 
       // serialize XML
-      const oSerializer = new XMLSerializer();
-      return oSerializer.serializeToString(xmlDocument);
+      const sXML = Stringify(xmlDocument);
+      return sXML;
     }
 
     async function verifyXML(xml: string, _alg: any, _keys: CryptoKeyPair) {

@@ -1,7 +1,7 @@
 import * as Asn1Js from 'asn1js';
 import { Certificate, CryptoEngineAlgorithmParams } from 'pkijs';
-import { ECDSA } from '../algorithms';
-import { Application } from '../application';
+import { ECDSA } from '../algorithms/ecdsa_sign.js';
+import { Application } from '../application.js';
 
 export type DigestAlgorithm = string | 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
 

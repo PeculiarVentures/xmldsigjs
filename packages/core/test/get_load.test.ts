@@ -6,7 +6,8 @@ import {
   XmlCollection,
   XmlObject,
   XmlNumberConverter,
-} from '../src/index';
+} from '../src/index.js';
+import './config.js';
 
 describe('GetXml/LoadXml/HasChanged', () => {
   it('Simple', () => {

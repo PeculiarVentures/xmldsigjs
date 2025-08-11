@@ -1,12 +1,12 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { XadesDateTime } from './date_time';
-import { SignaturePolicyIdentifier } from './signature_policy_identifier';
-import { SignatureProductionPlace } from './signature_product_place';
-import { SignerRole } from './signer_role';
-import { SigningCertificate } from './signing_certificate';
-import { SigningCertificateV2 } from './signing_certificate_v2';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+import { XadesDateTime } from './date_time.js';
+import { SignaturePolicyIdentifier } from './signature_policy_identifier.js';
+import { SignatureProductionPlace } from './signature_product_place.js';
+import { SignerRole } from './signer_role.js';
+import { SigningCertificate } from './signing_certificate.js';
+import { SigningCertificateV2 } from './signing_certificate_v2.js';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 /**
  * Represents the <SignedSignatureProperties> element of an XML signature.

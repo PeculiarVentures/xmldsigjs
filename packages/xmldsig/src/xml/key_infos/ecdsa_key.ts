@@ -9,10 +9,10 @@ import {
   XmlObject,
 } from 'xml-core';
 
-import { Application } from '../../application';
-import { ECDSA } from '../../algorithms';
-import { XmlSignature } from '../index';
-import { KeyInfoClause } from './key_info_clause';
+import { Application } from '../../application.js';
+import { ECDSA } from '../../algorithms/ecdsa_sign.js';
+import { XmlSignature } from '../index.js';
+import { KeyInfoClause } from './key_info_clause.js';
 
 export declare type NamedCurveType = string | 'P-256' | 'P-384' | 'P-521';
 

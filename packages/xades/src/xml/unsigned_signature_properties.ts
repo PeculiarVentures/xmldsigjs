@@ -1,12 +1,12 @@
 import { XmlAttribute, XmlElement, XmlNodeType } from 'xml-core';
-import { CertificateValues } from './certificate_values';
-import { CompleteCertificateRefs } from './complete_certificate_refs';
-import { CompleteRevocationRefs } from './complete_revocation_refs';
-import { CounterSignature } from './counter_signature';
-import { RevocationValues } from './revocation_values';
-import { XAdESTimeStamp } from './xades_time_stamp';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { CertificateValues } from './certificate_values.js';
+import { CompleteCertificateRefs } from './complete_certificate_refs.js';
+import { CompleteRevocationRefs } from './complete_revocation_refs.js';
+import { CounterSignature } from './counter_signature.js';
+import { RevocationValues } from './revocation_values.js';
+import { XAdESTimeStamp } from './xades_time_stamp.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <UnsignedSignatureProperties> element of an XML signature.

@@ -1,7 +1,7 @@
 import { XmlAttribute, XmlElement } from 'xml-core';
-import { Any } from './any';
-import { XmlXades } from './xml';
-import { XadesCollection } from './xml_base';
+import { Any } from './any.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection } from './xml_base.js';
 
 /**
  * Represents the <UnsignedDataObjectProperties> element of an XML signature.

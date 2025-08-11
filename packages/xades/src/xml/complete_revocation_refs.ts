@@ -5,12 +5,12 @@ import {
   XmlBase64Converter,
   XmlNumberConverter,
 } from 'xml-core';
-import { Any } from './any';
-import { XadesDateTime } from './date_time';
-import { DigestAlgAndValueType } from './signing_certificate';
-import { UnsignedSignatureProperty } from './unsigned_signature_properties';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { Any } from './any.js';
+import { XadesDateTime } from './date_time.js';
+import { DigestAlgAndValueType } from './signing_certificate.js';
+import { UnsignedSignatureProperty } from './unsigned_signature_properties.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <CompleteRevocationRefs> element of an XML signature.

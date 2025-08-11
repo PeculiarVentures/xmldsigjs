@@ -1,8 +1,15 @@
-import { describe, it, assert } from 'vitest';
-import { isElement, isDocument } from './utils';
-import { assign, Parse, SelectNamespaces, SelectSingleNode, Stringify } from './index';
+import { describe, it, assert, beforeAll } from 'vitest';
+import '../test/config.js';
+import { isElement, isDocument, getNodeDependency } from './utils.js';
+import { assign, Parse, SelectNamespaces, SelectSingleNode, Stringify } from './index.js';
 
 describe('utils', () => {
+  let document: Document;
+  beforeAll(() => {
+    const domImplementation = getNodeDependency<typeof DOMImplementation>('DOMImplementation');
+    document = new domImplementation().createDocument('http://www.w3.org/1999/xhtml', 'html', null);
+  });
+
   describe('isElement', () => {
     it('returns true for Element', () => {
       const el = document.createElement('test');

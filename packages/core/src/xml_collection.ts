@@ -1,20 +1,20 @@
-import { Collection } from './collection';
-import { XE, XmlError } from './error';
-import { ICollection } from './types';
-import { isElement } from './utils';
-import { XmlObject } from './xml_object';
+import { Collection } from './collection.js';
+import { XE, XmlError } from './error.js';
+import { ICollection } from './types.js';
+import { isElement } from './utils.js';
+import { XmlObject } from './xml_object.js';
 
 export class XmlCollection<I extends XmlObject> extends XmlObject implements ICollection<I> {
   public static parser: any;
 
   /**
-     * The maximum number of elements
-     */
+   * The maximum number of elements
+   */
   public MaxOccurs = Number.MAX_VALUE;
 
   /**
-     * The minimum number of elements
-     */
+   * The minimum number of elements
+   */
   public MinOccurs = 0;
 
   // Collection
@@ -100,13 +100,20 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
   protected OnLoadXml(element: Element) {
     const self = this.GetStatic();
     if (!self.parser) {
-      throw new XmlError(XE.XML_EXCEPTION, `${self.localName} doesn't have required 'parser' in @XmlElement`);
+      throw new XmlError(
+        XE.XML_EXCEPTION,
+        `${self.localName} doesn't have required 'parser' in @XmlElement`,
+      );
     }
     for (let i = 0; i < element.childNodes.length; i++) {
       const node = element.childNodes.item(i);
-      if (!(isElement(node) &&
-        node.localName === (self.parser as any).localName &&
-        node.namespaceURI == self.namespaceURI)) {
+      if (
+        !(
+          isElement(node) &&
+          node.localName === (self.parser as any).localName &&
+          node.namespaceURI == self.namespaceURI
+        )
+      ) {
         // Ignore wrong elements
         continue;
       }

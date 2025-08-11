@@ -1,4 +1,6 @@
-# XMLDSIGjs Monorepo
+# XMLDSIG Monorepo
+
+[![CI](https://github.com/PeculiarVentures/xmldsigjs/actions/workflows/ci.yml/badge.svg)](https://github.com/PeculiarVentures/xmldsigjs/actions/workflows/ci.yml)
 
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xmldsigjs/master/LICENSE)
 

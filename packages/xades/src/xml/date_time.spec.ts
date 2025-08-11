@@ -1,6 +1,7 @@
 import { describe, it, assert } from 'vitest';
-import { XMLSerializer } from '@xmldom/xmldom';
-import { XadesDateTime } from './date_time';
+import { Stringify } from 'xml-core';
+import '../../../core/test/config.js';
+import { XadesDateTime } from './date_time.js';
 
 describe('XadesDateTime', () => {
   const DATE = new Date();
@@ -12,7 +13,8 @@ describe('XadesDateTime', () => {
       dt.Value = DATE;
 
       const xml = dt.GetXml();
-      const test = new XMLSerializer().serializeToString(xml as Node);
+      assert.ok(xml);
+      const test = Stringify(xml);
 
       assert.equal(
         test,
@@ -27,7 +29,8 @@ describe('XadesDateTime', () => {
       dt.Format = 'HH:mm:ss';
 
       const xml = dt.GetXml();
-      const test = new XMLSerializer().serializeToString(xml as Node);
+      assert.ok(xml);
+      const test = Stringify(xml);
 
       assert.equal(
         /<xades:XadesDateTime xmlns:xades="http:\/\/uri\.etsi\.org\/01903\/v1\.3\.2#">\d+:\d+:\d+<\/xades:XadesDateTime>/.test(
@@ -44,7 +47,8 @@ describe('XadesDateTime', () => {
       dt.Format = 'isoDateTime';
 
       const xml = dt.GetXml();
-      const test = new XMLSerializer().serializeToString(xml as Node);
+      assert.ok(xml);
+      const test = Stringify(xml);
 
       assert.equal(
         /<xades:XadesDateTime xmlns:xades="http:\/\/uri\.etsi\.org\/01903\/v1\.3\.2#">\d+-\d+-\d+T\d{2}:\d{2}:\d{2}[+-]\d{4}<\/xades:XadesDateTime>/.test(

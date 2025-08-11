@@ -1,6 +1,6 @@
 import * as XmlCore from 'xml-core';
 import { XmlElement } from 'xml-core';
-import { XmlXades } from './xml';
+import { XmlXades } from './xml.js';
 
 @XmlElement({
   localName: 'xades',

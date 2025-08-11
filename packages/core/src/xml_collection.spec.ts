@@ -1,5 +1,6 @@
 import { describe, it, assert } from 'vitest';
-import { XmlAttribute, XmlCollection, XmlElement, XmlObject } from './index';
+import '../test/config.js';
+import { XmlAttribute, XmlCollection, XmlElement, XmlObject } from './index.js';
 
 describe('XmlCollection', () => {
   @XmlElement({

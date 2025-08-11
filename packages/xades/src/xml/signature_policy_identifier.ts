@@ -1,10 +1,10 @@
 import { XmlChildElement, XmlContent, XmlElement, IConverter, XmlNumberConverter } from 'xml-core';
 import { Transforms } from 'xmldsigjs';
-import { AnyCollection } from './any';
-import { ObjectIdentifier } from './object_identifier';
-import { DigestAlgAndValueType } from './signing_certificate';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { AnyCollection } from './any.js';
+import { ObjectIdentifier } from './object_identifier.js';
+import { DigestAlgAndValueType } from './signing_certificate.js';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <SignaturePolicyIdentifier> element of an XML signature.

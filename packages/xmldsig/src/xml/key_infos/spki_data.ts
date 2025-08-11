@@ -1,8 +1,8 @@
 import { XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
 
-import { Application } from '../../application';
-import { XmlSignature } from '../xml_names';
-import { KeyInfoClause } from './key_info_clause';
+import { Application } from '../../application.js';
+import { XmlSignature } from '../xml_names.js';
+import { KeyInfoClause } from './key_info_clause.js';
 
 /**
  * Represents the <SPKIData> element of an XML signature.

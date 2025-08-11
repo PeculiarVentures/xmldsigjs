@@ -1,8 +1,8 @@
 import { XmlChildElement, XmlElement } from 'xml-core';
 import { Signature } from 'xmldsigjs';
-import { UnsignedSignatureProperty } from './unsigned_signature_properties';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+import { UnsignedSignatureProperty } from './unsigned_signature_properties.js';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 /**
  * Represents the <CounterSignature> element of an XML signature.

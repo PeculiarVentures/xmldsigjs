@@ -1,4 +1,5 @@
 import { describe, it, assert } from 'vitest';
+import '../test/config.js';
 import {
   Parse,
   XmlAttribute,
@@ -9,7 +10,7 @@ import {
   XmlElement,
   XmlNumberConverter,
   XmlObject,
-} from './index';
+} from './index.js';
 
 describe('Decorators', () => {
   it('malformed', () => {

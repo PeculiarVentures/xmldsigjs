@@ -1,11 +1,12 @@
 import { describe, it, assert } from 'vitest';
 import { XmlDsigC14NTransform } from 'xmldsigjs';
+import '../../../core/test/config.js';
 import {
   EncapsulatedTimeStamp,
   GenericTimeStamp,
   ReferenceInfo,
   XMLTimeStamp,
-} from './generic_time_stamp';
+} from './generic_time_stamp.js';
 
 describe('GenericTimeStamp', () => {
   it('Parse', () => {

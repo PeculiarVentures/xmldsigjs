@@ -1,5 +1,7 @@
 import { describe, it, assert } from 'vitest';
-import * as xmldsig from '../src';
+import { Stringify } from 'xml-core';
+import '../test/config.js';
+import * as xmldsig from '../src/index.js';
 
 describe('Transforms', () => {
   describe('base64', () => {
@@ -173,7 +175,7 @@ describe('Transforms', () => {
 
       const out = transform.GetOutput();
 
-      assert.equal(new XMLSerializer().serializeToString(out), '<root/>');
+      assert.equal(Stringify(out), '<root/>');
     });
 
     it('GetOutput without signature', () => {
@@ -184,7 +186,7 @@ describe('Transforms', () => {
 
       const out = transform.GetOutput();
 
-      assert.equal(new XMLSerializer().serializeToString(out), '<root/>');
+      assert.equal(Stringify(out), '<root/>');
     });
 
     it('GetOutput with nested signature should leave it alone', () => {
@@ -198,7 +200,7 @@ describe('Transforms', () => {
       const out = transform.GetOutput();
 
       assert.equal(
-        new XMLSerializer().serializeToString(out),
+        Stringify(out),
         `<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Assertion><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/></saml:Assertion></root>`,
       );
     });
@@ -213,7 +215,7 @@ describe('Transforms', () => {
 
       const out = transform.GetOutput();
 
-      assert.equal(new XMLSerializer().serializeToString(out), `<root/>`);
+      assert.equal(Stringify(out), `<root/>`);
     });
   });
 });

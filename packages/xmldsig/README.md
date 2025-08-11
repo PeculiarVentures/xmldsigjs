@@ -150,6 +150,33 @@ interface OptionsSign {
 Verify(key?: CryptoKey): Promise<boolean>
 ```
 
+## Node.js: Registering XML Dependencies
+
+To work with XML in Node.js, you need to register DOM and XPath dependencies:
+
+```typescript
+import * as xmldom from '@xmldom/xmldom';
+import { setNodeDependencies } from 'xmldsigjs';
+import xpath from 'xpath';
+
+setNodeDependencies({
+  XMLSerializer: xmldom.XMLSerializer,
+  DOMParser: xmldom.DOMParser,
+  DOMImplementation: xmldom.DOMImplementation,
+  xpath,
+});
+```
+
+## WebCrypto Environment
+
+Node.js >=19 ships a built‑in WebCrypto. For Node.js 16/18 or to ensure consistent behavior across environments, you can use:
+
+```ts
+import { Crypto } from '@peculiar/webcrypto';
+import { Application } from 'xmldsigjs';
+Application.setEngine('NodeJS', new Crypto());
+```
+
 ## License
 
 MIT

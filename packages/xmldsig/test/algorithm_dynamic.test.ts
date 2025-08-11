@@ -1,17 +1,14 @@
 import { describe, it, beforeAll, assert } from 'vitest';
-import { Crypto } from '@peculiar/webcrypto';
-import { XmlElement, XmlChildElement } from 'xml-core';
-import * as xmldsig from '../src';
-import { HashAlgorithm, SignatureAlgorithm } from '../src/algorithm';
-import { KeyInfoClause } from '../src/xml/key_infos/key_info_clause';
-
-// Initialize @peculiar/webcrypto
-const crypto = new Crypto();
-xmldsig.Application.setEngine('WebCrypto', crypto);
+import { XmlElement, XmlChildElement, Stringify } from 'xml-core';
+import * as xmldsig from '../src/index.js';
+import { HashAlgorithm, SignatureAlgorithm } from '../src/algorithm.js';
+import { KeyInfoClause } from '../src/xml/key_infos/key_info_clause.js';
+import './config.js';
 
 // Ed25519 signature algorithm namespaces
 const ED25519_NAMESPACE = 'http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519';
 const SHAKE256_NAMESPACE = 'http://www.w3.org/2021/04/xmldsig-more#shake256';
+const crypto = xmldsig.Application.crypto;
 
 /**
  * SHAKE256 hash algorithm implementation
@@ -32,7 +29,7 @@ class Shake256 extends HashAlgorithm {
     } else if (xml instanceof ArrayBuffer) {
       buf = new Uint8Array(xml);
     } else {
-      const txt = new XMLSerializer().serializeToString(xml);
+      const txt = Stringify(xml);
       buf = new TextEncoder().encode(txt);
     }
 

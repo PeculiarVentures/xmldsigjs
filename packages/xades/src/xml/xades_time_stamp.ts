@@ -4,9 +4,9 @@ import {
   EncapsulatedTimeStampCollection,
   Include,
   XMLTimeStampCollection,
-} from './generic_time_stamp';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+} from './generic_time_stamp.js';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 /**
  * Represents the <XAdESTimeStamp> element of an XML signature.

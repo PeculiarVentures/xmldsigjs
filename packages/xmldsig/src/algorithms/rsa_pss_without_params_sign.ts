@@ -1,6 +1,6 @@
-import { SignatureAlgorithm } from '../algorithm';
-import { SHA1, SHA256, SHA384, SHA512 } from './rsa_hash';
-import { RSA_PSS } from './rsa_pss_sign';
+import { SignatureAlgorithm } from '../algorithm.js';
+import { SHA1, SHA256, SHA384, SHA512 } from './rsa_hash.js';
+import { RSA_PSS } from './rsa_pss_sign.js';
 
 // https://tools.ietf.org/html/rfc6931#section-2.3.10
 

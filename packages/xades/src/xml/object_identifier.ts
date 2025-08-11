@@ -1,6 +1,6 @@
 import { XmlAttribute, XmlChildElement, XmlContent, XmlElement } from 'xml-core';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <ObjectIdentifier> element of an XML signature.

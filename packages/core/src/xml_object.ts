@@ -1,5 +1,5 @@
-import * as CONST from './const';
-import { XE, XmlError } from './error';
+import * as CONST from './const.js';
+import { XE, XmlError } from './error.js';
 import {
   AssocArray,
   IXmlSerializable,
@@ -7,9 +7,8 @@ import {
   XmlChildElementType,
   XmlContentType,
   XmlSchema,
-} from './types';
-import { isDocument, isElement, Parse, SelectSingleNode } from './utils';
-import { APPLICATION_XML } from './xml';
+} from './types.js';
+import { isDocument, isElement, Parse, SelectSingleNode, Stringify } from './utils.js';
 
 const DEFAULT_ROOT_NAME = 'xml_root';
 
@@ -98,10 +97,7 @@ export class XmlObject implements IXmlSerializable {
       namespaceUri2 = ` xmlns${nsPrefix}="${namespaceUri}"`;
     }
     const name = `${namePrefix}${root}`;
-    const doc = new DOMParser().parseFromString(
-      `<${name}${namespaceUri2}></${name}>`,
-      APPLICATION_XML,
-    );
+    const doc = Parse(`<${name}${namespaceUri2}></${name}>`);
     return doc;
   }
 
@@ -552,7 +548,7 @@ export class XmlObject implements IXmlSerializable {
    */
   public toString(): string {
     const xml = this.GetXml();
-    return xml ? new XMLSerializer().serializeToString(xml) : '';
+    return xml ? Stringify(xml) : '';
   }
 
   public GetElement(name: string, required = true) {
@@ -649,4 +645,4 @@ export class XmlObject implements IXmlSerializable {
   }
 }
 
-import { XmlCollection } from './xml_collection';
+import { XmlCollection } from './xml_collection.js';

@@ -1,7 +1,7 @@
 import { XmlAttribute, XmlElement } from 'xml-core';
 
-import { XmlSignature } from './xml_names';
-import { XmlSignatureObject } from './xml_object';
+import { XmlSignature } from './xml_names.js';
+import { XmlSignatureObject } from './xml_object.js';
 
 /**
  * Represents the <DigestMethod> element of an XML signature.

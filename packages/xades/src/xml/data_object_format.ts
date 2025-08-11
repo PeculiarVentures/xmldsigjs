@@ -1,7 +1,7 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { ObjectIdentifier } from './object_identifier';
-import { XmlXades } from './xml';
-import { XadesObject } from './xml_base';
+import { ObjectIdentifier } from './object_identifier.js';
+import { XmlXades } from './xml.js';
+import { XadesObject } from './xml_base.js';
 
 /**
  * Represents the <DataObjectFormat> element of an XML signature.

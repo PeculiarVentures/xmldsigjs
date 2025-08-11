@@ -1,6 +1,6 @@
-import { Convert } from 'xml-core';
-import { Application } from './application';
-import { SignatureMethod } from './xml';
+import { Convert, Stringify } from 'xml-core';
+import { Application } from './application.js';
+import { SignatureMethod } from './xml/signature_method.js';
 
 export type BASE64 = string;
 
@@ -40,7 +40,7 @@ export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorit
       buf = new Uint8Array(xml);
     } else {
       // enveloped signature transform
-      const txt = new XMLSerializer().serializeToString(xml);
+      const txt = Stringify(xml);
       buf = Convert.FromString(txt, 'utf8');
     }
     const hash = await Application.crypto.subtle.digest(this.algorithm, buf);

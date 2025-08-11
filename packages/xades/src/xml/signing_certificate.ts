@@ -1,7 +1,7 @@
 import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
 import { DigestMethod, X509IssuerSerial, XmlSignature } from 'xmldsigjs';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { XmlXades } from './xml.js';
+import { XadesCollection, XadesObject } from './xml_base.js';
 
 /**
  * Represents the <SigningCertificate> element of an XML signature.

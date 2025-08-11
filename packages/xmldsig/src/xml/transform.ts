@@ -7,8 +7,8 @@ import {
   IXmlSerializable,
 } from 'xml-core';
 
-import { XmlSignature } from './xml_names';
-import { XmlSignatureObject } from './xml_object';
+import { XmlSignature } from './xml_names.js';
+import { XmlSignatureObject } from './xml_object.js';
 
 /**
  * Represents the <Transform> element of an XML signature.

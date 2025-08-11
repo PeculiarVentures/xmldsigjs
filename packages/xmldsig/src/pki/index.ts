@@ -1,1 +1,1 @@
-export * from './x509';
+export * from './x509.js';

@@ -1,5 +1,5 @@
 import { describe, it, beforeAll, assert } from 'vitest';
-import { NamespaceManager } from './index';
+import { NamespaceManager } from './index.js';
 
 describe('NamespaceManager', () => {
   const nm = new NamespaceManager();

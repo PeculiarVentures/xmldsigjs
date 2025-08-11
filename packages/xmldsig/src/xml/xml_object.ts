@@ -1,6 +1,6 @@
 import { XmlCollection, XmlObject, XmlElement } from 'xml-core';
 
-import { XmlSignature } from './xml_names';
+import { XmlSignature } from './xml_names.js';
 
 @XmlElement({
   localName: 'xmldsig',

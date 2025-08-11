@@ -1,5 +1,5 @@
-import { Collection } from './collection';
-import { XmlNamespace } from './types';
+import { Collection } from './collection.js';
+import { XmlNamespace } from './types.js';
 
 export class NamespaceManager extends Collection<XmlNamespace> {
   public Add(item: XmlNamespace) {

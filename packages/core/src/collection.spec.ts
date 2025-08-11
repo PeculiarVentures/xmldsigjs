@@ -1,5 +1,5 @@
 import { describe, it, assert } from 'vitest';
-import { Collection } from './index';
+import { Collection } from './index.js';
 
 describe('Collection', () => {
   it('New empty Collection', () => {

@@ -1,7 +1,8 @@
 import * as path from 'node:path';
 import { describe, it, assert } from 'vitest';
-import * as xmldsig from '../src';
-import { readXml } from './config';
+import { Parse } from 'xml-core';
+import * as xmldsig from '../src/index.js';
+import { readXml } from './config.js';
 
 describe('Verify XML with InclusiveNamespaces', () => {
   it('Verify XML signed with InclusiveNamespace and attributes with dash', async () => {
@@ -51,7 +52,7 @@ describe('Verify XML signatures', function () {
 
   it('Init SignedXml from Element', () => {
     const xmlText = '<root><first></first><second/></root>';
-    const xmlDoc = new DOMParser().parseFromString(xmlText, 'application/xml');
+    const xmlDoc = Parse(xmlText);
     assert.equal(!!xmlDoc, true);
     assert.equal(xmlDoc.documentElement.nodeName, 'root');
 

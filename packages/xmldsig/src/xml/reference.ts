@@ -1,9 +1,9 @@
 import { XmlAttribute, XmlBase64Converter, XmlChildElement, XmlElement } from 'xml-core';
 
-import { DigestMethod } from './digest_method';
-import { Transforms } from './transform_collection';
-import { XmlSignature } from './xml_names';
-import { XmlSignatureCollection, XmlSignatureObject } from './xml_object';
+import { DigestMethod } from './digest_method.js';
+import { Transforms } from './transform_collection.js';
+import { XmlSignature } from './xml_names.js';
+import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
 
 /**
  * Represents the <Reference> element of an XML signature.

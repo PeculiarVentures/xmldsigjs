@@ -1,6 +1,6 @@
 import { XmlContent, XmlElement } from 'xml-core';
-import { XmlXades } from './xml';
-import { XadesCollection, XadesObject } from './xml_base';
+import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlXades } from './xml.js';
 
 /**
  * Represents the <Any> element of an XML signature.
