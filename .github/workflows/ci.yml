@@ -22,10 +22,13 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run linter
         run: npm run lint
+
+      - name: Build packages
+        run: npm run build
 
       - name: Run tests with coverage
         run: npm run coverage
