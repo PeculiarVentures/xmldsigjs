@@ -1,0 +1,67 @@
+{
+  "name": "xadesjs",
+  "version": "2.4.4",
+  "description": "XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScript built on XMLDSIGjs",
+  "main": "build/cjs/index.js",
+  "module": "build/esm/index.js",
+  "types": "build/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/types/index.d.ts",
+      "import": "./build/esm/index.js",
+      "require": "./build/cjs/index.js",
+      "default": "./build/esm/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "build/cjs",
+    "build/esm",
+    "build/types"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:esm:package && npm run build:types",
+    "build:cjs": "tsc -p tsconfig.build.json --outDir build/cjs --module commonjs --moduleResolution node",
+    "build:esm": "tsc -p tsconfig.build.json --outDir build/esm --module esnext --moduleResolution bundler",
+    "build:types": "tsc -p tsconfig.build.json --outDir build/types --declaration true --emitDeclarationOnly true --removeComments false",
+    "build:esm:package": "echo '{\"type\": \"module\"}' > build/esm/package.json",
+    "clean": "rimraf build/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeculiarVentures/xmldsigjs.git"
+  },
+  "keywords": [
+    "xml",
+    "xmldsig",
+    "xades",
+    "xadesjs",
+    "webcrypto",
+    "signature",
+    "rsa",
+    "ec"
+  ],
+  "author": "Peculiar Ventures LLC",
+  "contributors": [
+    "Miroshin Stepan <microshine@mail.ru>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PeculiarVentures/xmldsigjs/issues"
+  },
+  "homepage": "https://github.com/PeculiarVentures/xmldsigjs/blob/master/packages/xades/README.md",
+  "dependencies": {
+    "xml-core": "^1.1.5",
+    "xmldsigjs": "^2.6.1"
+  }
+}

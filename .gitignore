@@ -3,7 +3,6 @@ build/
 lib/
 .nyc_output/
 coverage/
-.vscode
 **/*.map
 *.log
 test*.js
