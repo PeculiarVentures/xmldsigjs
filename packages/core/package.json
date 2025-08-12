@@ -1,6 +1,6 @@
 {
   "name": "xml-core",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "A foundational library for working with XML in JavaScript/TypeScript with schema validation through decorators",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
