@@ -1,8 +1,5 @@
 import { describe, it, beforeAll, assert } from 'vitest';
-import { XmlElement, XmlChildElement, Stringify } from 'xml-core';
 import * as xmldsig from '../src/index.js';
-import { HashAlgorithm, SignatureAlgorithm } from '../src/algorithm.js';
-import { KeyInfoClause } from '../src/xml/key_infos/key_info_clause.js';
 import './config.js';
 
 // Ed25519 signature algorithm namespaces
@@ -13,7 +10,7 @@ const crypto = xmldsig.Application.crypto;
 /**
  * SHAKE256 hash algorithm implementation
  */
-class Shake256 extends HashAlgorithm {
+class Shake256 extends xmldsig.HashAlgorithm {
   public algorithm: Algorithm = { name: 'SHAKE256' };
   public namespaceURI = SHAKE256_NAMESPACE;
 
@@ -29,7 +26,7 @@ class Shake256 extends HashAlgorithm {
     } else if (xml instanceof ArrayBuffer) {
       buf = new Uint8Array(xml);
     } else {
-      const txt = Stringify(xml);
+      const txt = xmldsig.Stringify(xml);
       buf = new TextEncoder().encode(txt);
     }
 
@@ -43,7 +40,7 @@ class Shake256 extends HashAlgorithm {
 /**
  * Ed25519 signature algorithm implementation
  */
-class Ed25519Signature extends SignatureAlgorithm {
+class Ed25519Signature extends xmldsig.SignatureAlgorithm {
   public static fromAlgorithm(alg: Algorithm): Ed25519Signature | null {
     if (alg.name.toUpperCase() === 'ED25519') {
       return new Ed25519Signature();
@@ -77,17 +74,17 @@ class Ed25519Signature extends SignatureAlgorithm {
 /**
  * Ed25519 KeyValue implementation
  */
-@XmlElement({
+@xmldsig.XmlElement({
   localName: 'Ed25519KeyValue',
   namespaceURI: 'http://www.w3.org/2021/04/xmldsig-more#',
   prefix: 'dsig11',
 })
-class Ed25519KeyValue extends KeyInfoClause {
+class Ed25519KeyValue extends xmldsig.KeyInfoClause {
   public static canImportCryptoKey(key: CryptoKey): boolean {
     return key.algorithm.name === 'Ed25519';
   }
 
-  @XmlChildElement({
+  @xmldsig.XmlChildElement({
     localName: 'PublicKey',
     namespaceURI: 'http://www.w3.org/2021/04/xmldsig-more#',
     prefix: 'dsig11',
