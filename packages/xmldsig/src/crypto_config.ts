@@ -23,6 +23,8 @@ import { AlgorithmFactory } from './algorithm.factory.js';
 import { algorithmRegistry } from './algorithm.registry.js';
 import { KeyInfoClauseConstructable } from './xml/key_infos/index.js';
 import { keyValueRegistry } from './xml/key_infos/key_info_clause.registry.js';
+import { transformRegistry } from './xml/transform.registry.js';
+import { ITransformConstructable } from './xml/transform.js';
 
 export class CryptoConfig {
   /**
@@ -30,12 +32,23 @@ export class CryptoConfig {
    * if name is not exist then throws error
    *
    * @static
-   * @param {(string |)} [name=null]
+   * @param name
    * @returns
    *
    * @memberOf CryptoConfig
    */
   public static CreateFromName(name: string | null): Transform {
+    if (!name) {
+      throw new XmlError(XE.PARAM_REQUIRED, 'name');
+    }
+
+    // First check the dynamic registry
+    const TransformConstructor = transformRegistry.get(name);
+    if (TransformConstructor) {
+      return new TransformConstructor();
+    }
+
+    // Fallback to hardcoded transforms for backward compatibility
     let transform: Transform;
     switch (name) {
       case XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform:
@@ -135,5 +148,29 @@ export class CryptoConfig {
 
   static RegisterKeyInfoClause(localName: string, keyValue: KeyInfoClauseConstructable) {
     keyValueRegistry.set(localName, keyValue);
+  }
+
+  /**
+   * Registers a custom transform implementation with the given namespace URI.
+   * This allows you to extend xmldsigjs with custom transform algorithms.
+   *
+   * @param namespace - The namespace URI that identifies the transform algorithm
+   * @param transform - The Transform class constructor to use for this algorithm
+   *
+   * @example
+   * ```typescript
+   * class MyCustomTransform extends Transform {
+   *   public Algorithm = 'urn:my-custom-transform';
+   *   public GetOutput(): string {
+   *     // Custom transformation logic
+   *     return transformedData;
+   *   }
+   * }
+   *
+   * CryptoConfig.RegisterTransform('urn:my-custom-transform', MyCustomTransform);
+   * ```
+   */
+  static RegisterTransform(namespace: string, transform: ITransformConstructable) {
+    transformRegistry.set(namespace, transform);
   }
 }

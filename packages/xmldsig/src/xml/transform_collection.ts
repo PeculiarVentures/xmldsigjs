@@ -1,5 +1,6 @@
 import { XE, XmlError, XmlElement } from 'xml-core';
 
+import { CryptoConfig } from '../crypto_config.js';
 import { Transform } from './transform.js';
 import { XmlSignature } from './xml_names.js';
 import { XmlSignatureCollection } from './xml_object.js';
@@ -32,7 +33,17 @@ export class Transforms extends XmlSignatureCollection<Transform> {
         case XmlSignature.AlgorithmNamespaces.XmlDsigXPathTransform:
           return ChangeTransform(item, transforms.XmlDsigXPathTransform);
         default:
-          throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, item.Algorithm);
+          // Try to create transform using CryptoConfig for custom transforms
+          try {
+            const customTransform = CryptoConfig.CreateFromName(item.Algorithm);
+            if (!item.Element) {
+              throw new Error('Transform element is not defined');
+            }
+            customTransform.LoadXml(item.Element);
+            return customTransform;
+          } catch {
+            throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, item.Algorithm);
+          }
       }
     });
   }

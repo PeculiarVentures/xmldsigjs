@@ -44,7 +44,8 @@ export type OptionsSignTransform =
   | 'c14n-com'
   | 'exc-c14n-com'
   | 'base64'
-  | OptionsXPathSignTransform;
+  | OptionsXPathSignTransform
+  | string; // Allow custom transform namespace URIs
 
 export type DigestReferenceSource = Element | BufferSource;
 
@@ -554,7 +555,12 @@ export class SignedXml implements IXmlSerializable {
         case 'base64':
           return new Transforms.XmlDsigBase64Transform();
         default:
-          throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
+          // Try to create transform using CryptoConfig for custom transforms
+          try {
+            return CryptoConfig.CreateFromName(transform);
+          } catch {
+            throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, transform);
+          }
       }
     }
 
