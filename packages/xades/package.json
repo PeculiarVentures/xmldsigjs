@@ -1,6 +1,6 @@
 {
   "name": "xadesjs",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScript built on XMLDSIGjs",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
@@ -61,7 +61,7 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xmldsigjs/blob/master/packages/xades/README.md",
   "dependencies": {
-    "xml-core": "^1.2.4",
-    "xmldsigjs": "^2.8.4"
+    "xml-core": "^1.2.5",
+    "xmldsigjs": "^2.8.5"
   }
 }
