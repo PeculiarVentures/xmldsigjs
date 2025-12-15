@@ -390,49 +390,82 @@ export class SignedXml implements IXmlSerializable {
         objectName = reference.Uri.substring(1);
       }
       if (objectName) {
-        let found: Element | null = null;
-        const xmlSignatureObjects = [this.XmlSignature.KeyInfo.GetXml()];
+        const xmlSignatureObjects: (Element | null)[] = [this.XmlSignature.KeyInfo.GetXml()];
         this.XmlSignature.ObjectList.ForEach((object) => {
           xmlSignatureObjects.push(object.GetXml());
         });
+
+        // 1) Resolve against the signed document first
+        const documentCandidates: Element[] = [];
+        if (isElement(source)) {
+          // Exclude ds:Signature subtree from document search to avoid resolving references
+          // against attacker-controlled or signature-internal content.
+          documentCandidates.push(...findAllByIdExcludingSignatures(source, objectName));
+        }
+
+        // 2) Resolve against Signature internal objects (KeyInfo / ds:Object) as fallback
+        const signatureCandidates: Element[] = [];
         for (const xmlSignatureObject of xmlSignatureObjects) {
           if (xmlSignatureObject) {
-            found = findById(xmlSignatureObject, objectName || '');
-            if (found) {
-              const el = found.cloneNode(true) as Element;
+            signatureCandidates.push(...findAllById(xmlSignatureObject, objectName));
+          }
+        }
 
-              // Copy xmlns from Document
-              if (isElement(source)) {
-                this.CopyNamespaces(source, el, false);
-              }
+        // Enforce uniqueness to prevent XSW ambiguity.
+        // If the same Id is present in both the document and the signature objects, reject.
+        if (documentCandidates.length && signatureCandidates.length) {
+          throw new XmlError(
+            XE.CRYPTOGRAPHIC,
+            `Duplicate Id '${objectName}' detected in both the signed document and Signature objects`,
+          );
+        }
+        if (documentCandidates.length > 1) {
+          throw new XmlError(
+            XE.CRYPTOGRAPHIC,
+            `Duplicate Id '${objectName}' detected in the signed document`,
+          );
+        }
+        if (signatureCandidates.length > 1) {
+          throw new XmlError(
+            XE.CRYPTOGRAPHIC,
+            `Duplicate Id '${objectName}' detected in Signature objects`,
+          );
+        }
 
-              // Copy xmlns from Parent
-              if (this.Parent) {
-                const parentXml =
-                  this.Parent instanceof XmlObject ? this.Parent.GetXml() : this.Parent;
-                if (parentXml) {
-                  this.CopyNamespaces(parentXml, el, true);
-                }
-              }
+        const foundInDocument = documentCandidates[0] || null;
+        const foundInSignature = signatureCandidates[0] || null;
+        const found = foundInDocument || foundInSignature;
 
-              this.CopyNamespaces(found, el, false);
-              this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
-              source = el;
-              break;
+        if (!found) {
+          throw new XmlError(XE.CRYPTOGRAPHIC, `Cannot get object by reference: ${objectName}`);
+        }
+
+        const el = found.cloneNode(true) as Element;
+
+        if (foundInSignature) {
+          // Copy xmlns from Document
+          if (isElement(source)) {
+            this.CopyNamespaces(source, el, false);
+          }
+
+          // Copy xmlns from Parent
+          if (this.Parent) {
+            const parentXml = this.Parent instanceof XmlObject ? this.Parent.GetXml() : this.Parent;
+            if (parentXml) {
+              this.CopyNamespaces(parentXml, el, true);
             }
           }
-        }
-        if (!found && source && isElement(source)) {
-          found = XmlObject.GetElementById(source, objectName);
-          if (found) {
-            const el = found.cloneNode(true) as Element;
+
+          this.CopyNamespaces(found, el, false);
+          this.InjectNamespaces(this.GetSignatureNamespaces(), el, true);
+          source = el;
+        } else {
+          // Found in the signed document
+          if (isElement(source)) {
             this.CopyNamespaces(found, el, false);
             this.CopyNamespaces(source, el, false);
-            source = el;
           }
-        }
-        if (found == null) {
-          throw new XmlError(XE.CRYPTOGRAPHIC, `Cannot get object by reference: ${objectName}`);
+          source = el;
         }
       }
     }
@@ -755,22 +788,43 @@ export class SignedXml implements IXmlSerializable {
   }
 }
 
-function findById(element: Element, id: string): Element | null {
+function findAllById(element: Element, id: string, results: Element[] = []): Element[] {
   if (element.nodeType !== XmlNodeType.Element) {
-    return null;
+    return results;
   }
-  if (element.hasAttribute('Id') && element.getAttribute('Id') === id) {
-    return element;
+
+  // xmldsigjs historically accepts different ID attribute casings
+  // (e.g. `Id` in XMLDSIG/XAdES, `id` in some XML payloads)
+  const idAttrNames = ['Id', 'ID', 'id'];
+  for (const attrName of idAttrNames) {
+    if (element.hasAttribute(attrName) && element.getAttribute(attrName) === id) {
+      results.push(element);
+      break;
+    }
   }
+
   if (element.childNodes && element.childNodes.length) {
     for (let i = 0; i < element.childNodes.length; i++) {
-      const el = findById(element.childNodes[i] as Element, id);
-      if (el) {
-        return el;
+      const child = element.childNodes[i];
+      if (child && child.nodeType === XmlNodeType.Element) {
+        findAllById(child as Element, id, results);
       }
     }
   }
-  return null;
+
+  return results;
+}
+
+function findAllByIdExcludingSignatures(element: Element, id: string, results: Element[] = []) {
+  // Do not resolve IDs inside any ds:Signature when searching the signed document.
+  // Those nodes must be resolved via Signature objects (KeyInfo/ds:Object) only.
+  if (
+    element.namespaceURI === 'http://www.w3.org/2000/09/xmldsig#' &&
+    (element.localName || element.nodeName) === 'Signature'
+  ) {
+    return results;
+  }
+  return findAllById(element, id, results);
 }
 
 /**
