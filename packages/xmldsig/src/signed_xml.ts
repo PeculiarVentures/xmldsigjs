@@ -286,11 +286,11 @@ export class SignedXml implements IXmlSerializable {
     for (const kic of this.XmlSignature.KeyInfo.GetIterator()) {
       if (kic instanceof KeyInfos.KeyInfoX509Data) {
         for (const cert of kic.Certificates) {
-          const key = await cert.exportKey();
+          const key = await cert.exportKey(alg.algorithm);
           keys.push(key);
         }
       } else {
-        const key = await kic.exportKey();
+        const key = await kic.exportKey(alg.algorithm);
         keys.push(key);
       }
     }
