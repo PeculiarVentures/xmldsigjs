@@ -52,8 +52,19 @@ import {
   SHA384_NAMESPACE,
   Sha512,
   SHA512_NAMESPACE,
+
+  // RSA PSS with params
   RSA_PSS_WITH_PARAMS_NAMESPACE,
   RsaPssWithParams,
+  // RSA PSS without params
+  RSA_PSS_SHA1_NAMESPACE,
+  RSA_PSS_SHA256_NAMESPACE,
+  RSA_PSS_SHA384_NAMESPACE,
+  RSA_PSS_SHA512_NAMESPACE,
+  RsaPssWithoutParamsSha1,
+  RsaPssWithoutParamsSha256,
+  RsaPssWithoutParamsSha384,
+  RsaPssWithoutParamsSha512,
 } from './algorithms/index.js';
 
 // Register RSA PKCS1 algorithms
@@ -93,6 +104,23 @@ algorithmRegistry.set(RSA_PKCS1_SHA512_NAMESPACE, {
 algorithmRegistry.set(RSA_PSS_WITH_PARAMS_NAMESPACE, {
   type: 'signature',
   algorithm: RsaPssWithParams,
+});
+// Register RSA PSS algorithms without params
+algorithmRegistry.set(RSA_PSS_SHA1_NAMESPACE, {
+  type: 'signature',
+  algorithm: RsaPssWithoutParamsSha1,
+});
+algorithmRegistry.set(RSA_PSS_SHA256_NAMESPACE, {
+  type: 'signature',
+  algorithm: RsaPssWithoutParamsSha256,
+});
+algorithmRegistry.set(RSA_PSS_SHA384_NAMESPACE, {
+  type: 'signature',
+  algorithm: RsaPssWithoutParamsSha384,
+});
+algorithmRegistry.set(RSA_PSS_SHA512_NAMESPACE, {
+  type: 'signature',
+  algorithm: RsaPssWithoutParamsSha512,
 });
 
 // ECDSA algorithms

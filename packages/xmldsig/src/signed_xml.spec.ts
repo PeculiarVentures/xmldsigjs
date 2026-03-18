@@ -64,5 +64,27 @@ describe('SignedXml', () => {
       assert.equal((seenAlgorithm as RsaHashedImportParams).hash.name, 'SHA-256');
       assert.equal((seenAlgorithm as RsaPssParams).saltLength, 32);
     });
+
+    it('supports RSA-PSS no-params URI (sha256-rsa-MGF1) for X509 certificate export', async () => {
+      const method = xmldsig.CryptoConfig.CreateSignatureMethod(
+        new xmldsig.RsaPssWithoutParamsSha256(),
+      );
+      const signedXml = createSignedXmlWithMethod(method);
+      const publicKey = await createRsaPssPublicKey();
+      const getSeenAlgorithm = addX509ExportStub(signedXml, publicKey);
+
+      const keys = await signedXml.getPublicKeys();
+      const seenAlgorithm = getSeenAlgorithm();
+
+      assert.equal(keys.length, 1);
+      assert.equal(
+        signedXml.XmlSignature.SignedInfo.SignatureMethod.Algorithm,
+        xmldsig.RSA_PSS_SHA256_NAMESPACE,
+      );
+      assert.equal(signedXml.XmlSignature.SignedInfo.SignatureMethod.Any.Count, 0);
+      assert.equal(seenAlgorithm?.name, 'RSA-PSS');
+      assert.equal((seenAlgorithm as RsaHashedImportParams).hash.name, 'SHA-256');
+      assert.equal((seenAlgorithm as RsaPssParams).saltLength, 32);
+    });
   });
 });

@@ -111,4 +111,63 @@ describe('RSA-PSS', () => {
       });
     });
   });
+
+  describe('No params URI', () => {
+    const vectors = [
+      {
+        hash: 'SHA-1',
+        saltLength: 20,
+        namespace: xmldsig.RSA_PSS_SHA1_NAMESPACE,
+        algorithm: xmldsig.RsaPssWithoutParamsSha1,
+      },
+      {
+        hash: 'SHA-256',
+        saltLength: 32,
+        namespace: xmldsig.RSA_PSS_SHA256_NAMESPACE,
+        algorithm: xmldsig.RsaPssWithoutParamsSha256,
+      },
+      {
+        hash: 'SHA-384',
+        saltLength: 48,
+        namespace: xmldsig.RSA_PSS_SHA384_NAMESPACE,
+        algorithm: xmldsig.RsaPssWithoutParamsSha384,
+      },
+      {
+        hash: 'SHA-512',
+        saltLength: 64,
+        namespace: xmldsig.RSA_PSS_SHA512_NAMESPACE,
+        algorithm: xmldsig.RsaPssWithoutParamsSha512,
+      },
+    ] as const;
+
+    vectors.forEach((vector) => {
+      it(`resolves ${vector.hash} namespace and signs/verifies`, async () => {
+        const method = xmldsig.CryptoConfig.CreateSignatureMethod(new vector.algorithm());
+        assert.equal(method.Algorithm, vector.namespace);
+        assert.equal(method.Any.Count, 0);
+
+        const resolved = xmldsig.CryptoConfig.CreateSignatureAlgorithm(method);
+        assert.equal(resolved.algorithm.name, 'RSA-PSS');
+        assert.equal((resolved.algorithm as RsaHashedImportParams).hash.name, vector.hash);
+        assert.equal((resolved.algorithm as RsaPssParams).saltLength, vector.saltLength);
+
+        const algorithm = new vector.algorithm();
+        const data = '<SignedInfo />';
+        const keys = (await xmldsig.Application.crypto.subtle.generateKey(
+          {
+            name: 'RSA-PSS',
+            hash: vector.hash,
+            modulusLength: 2048,
+            publicExponent: new Uint8Array([1, 0, 1]),
+          },
+          true,
+          ['sign', 'verify'],
+        )) as Required<CryptoKeyPair>;
+
+        const signature = await algorithm.Sign(data, keys.privateKey, algorithm.algorithm);
+        const ok = await algorithm.Verify(data, keys.publicKey, new Uint8Array(signature));
+        assert.equal(ok, true);
+      });
+    });
+  });
 });
