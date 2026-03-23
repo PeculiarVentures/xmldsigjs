@@ -2,7 +2,6 @@ import { describe, it, assert } from 'vitest';
 import * as xades from '../src/index.js';
 import { Stringify } from '../../xmldsig/src/index.js';
 import './config.js';
-import { stringify } from 'querystring';
 
 describe('Security: XSW (duplicate Id shadowing)', () => {
   it('accepts the signature when added to the signed element itself but rejects signature when same Id exists in document and ds:Object', async () => {
