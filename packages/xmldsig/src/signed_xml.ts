@@ -788,7 +788,9 @@ export class SignedXml implements IXmlSerializable {
   }
 }
 
-function findAllById(element: Element, id: string, results: Element[] = [], finder: (element: Element, id: string, results: Element[]) => Element[] = findAllById): Element[] {
+type ElementFinder = (element: Element, id: string, results: Element[]) => Element[];
+
+function findAllById(element: Element, id: string, results: Element[] = [], finder?: ElementFinder): Element[] {
   if (element.nodeType !== XmlNodeType.Element) {
     return results;
   }
@@ -803,6 +805,7 @@ function findAllById(element: Element, id: string, results: Element[] = [], find
     }
   }
 
+  finder ??= findAllById;
   if (element.childNodes && element.childNodes.length) {
     for (let i = 0; i < element.childNodes.length; i++) {
       const child = element.childNodes[i];
