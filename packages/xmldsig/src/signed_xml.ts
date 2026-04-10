@@ -788,7 +788,9 @@ export class SignedXml implements IXmlSerializable {
   }
 }
 
-function findAllById(element: Element, id: string, results: Element[] = []): Element[] {
+type ElementFinder = (element: Element, id: string, results: Element[]) => void;
+
+function findAllById(element: Element, id: string, results: Element[] = [], finder?: ElementFinder): Element[] {
   if (element.nodeType !== XmlNodeType.Element) {
     return results;
   }
@@ -803,11 +805,12 @@ function findAllById(element: Element, id: string, results: Element[] = []): Ele
     }
   }
 
+  finder ??= findAllById;
   if (element.childNodes && element.childNodes.length) {
     for (let i = 0; i < element.childNodes.length; i++) {
       const child = element.childNodes[i];
       if (child && child.nodeType === XmlNodeType.Element) {
-        findAllById(child as Element, id, results);
+        finder(child as Element, id, results);
       }
     }
   }
@@ -824,7 +827,7 @@ function findAllByIdExcludingSignatures(element: Element, id: string, results: E
   ) {
     return results;
   }
-  return findAllById(element, id, results);
+  return findAllById(element, id, results, findAllByIdExcludingSignatures);
 }
 
 /**
