@@ -30,7 +30,8 @@ describe('Security: XSW (duplicate Id shadowing)', () => {
     const sigXml = signer.GetXml();
     assert.ok(sigXml);
 
-    // Add the signature into the signed element itself, which is allowed with `enveloped` transform and should verify successfully.
+    // Add the signature into the signed element itself,
+    // which is allowed with `enveloped` transform and should verify successfully.
     const paymentEl = xades.Select(doc, '//*[local-name()="Payment"]')[0] as Element;
     assert.ok(paymentEl);
     paymentEl.appendChild(sigXml);

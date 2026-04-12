@@ -790,7 +790,12 @@ export class SignedXml implements IXmlSerializable {
 
 type ElementFinder = (element: Element, id: string, results: Element[]) => void;
 
-function findAllById(element: Element, id: string, results: Element[] = [], finder?: ElementFinder): Element[] {
+function findAllById(
+  element: Element,
+  id: string,
+  results: Element[] = [],
+  finder?: ElementFinder,
+): Element[] {
   if (element.nodeType !== XmlNodeType.Element) {
     return results;
   }
