@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xmldsigjs#readme",
   "devDependencies": {
-    "@peculiar/eslint-config-base": "^0.2.8",
+    "@peculiar/eslint-config-base": "^0.2.9",
     "@peculiar/webcrypto": "^1.5.0",
     "@types/node": "^24.7.2",
     "@vitest/coverage-v8": "^4.0.15",
