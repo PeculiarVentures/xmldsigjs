@@ -1,7 +1,8 @@
 # xml-core
 
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xmldsigjs/master/LICENSE)
-[![npm version](https://badge.fury.io/js/xml-core.svg)](https://badge.fury.io/js/xml-core)
+![NPM License](https://img.shields.io/npm/l/xml-core)
+![NPM Version](https://img.shields.io/npm/v/xml-core)
+![NPM Downloads](https://img.shields.io/npm/dm/xml-core?label=npm)
 
 A foundational library for working with XML in JavaScript/TypeScript with schema validation through decorators.
 

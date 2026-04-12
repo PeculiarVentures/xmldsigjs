@@ -1,7 +1,8 @@
 # XMLDSIGjs
 
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xmldsigjs/master/LICENSE)
-[![npm version](https://badge.fury.io/js/xmldsigjs.svg)](https://badge.fury.io/js/xmldsigjs)
+![NPM License](https://img.shields.io/npm/l/xmldsigjs)
+![NPM Version](https://img.shields.io/npm/v/xmldsigjs)
+![NPM Downloads](https://img.shields.io/npm/dm/xmldsigjs?label=npm)
 
 XML Digital Signature implementation in TypeScript/JavaScript using Web Crypto API.
 

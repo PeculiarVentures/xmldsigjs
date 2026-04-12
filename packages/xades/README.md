@@ -1,7 +1,8 @@
 # XAdESjs
 
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xmldsigjs/master/LICENSE)
-[![npm version](https://badge.fury.io/js/xadesjs.svg)](https://badge.fury.io/js/xadesjs)
+![NPM License](https://img.shields.io/npm/l/xadesjs)
+![NPM Version](https://img.shields.io/npm/v/xadesjs)
+![NPM Downloads](https://img.shields.io/npm/dm/xadesjs?label=npm)
 
 XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScript built on XMLDSIGjs.
 

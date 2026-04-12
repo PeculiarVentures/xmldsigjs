@@ -12,13 +12,25 @@ This monorepo contains three interconnected packages:
 
 ### [xml-core](./packages/core/README.md)
 
+![NPM License](https://img.shields.io/npm/l/xml-core)
+![NPM Version](https://img.shields.io/npm/v/xml-core)
+![NPM Downloads](https://img.shields.io/npm/dm/xml-core?label=npm)
+
 A foundational library for working with XML in JavaScript/TypeScript with schema validation through decorators.
 
 ### [xmldsigjs](./packages/xmldsig/README.md)
 
+![NPM License](https://img.shields.io/npm/l/xmldsigjs)
+![NPM Version](https://img.shields.io/npm/v/xmldsigjs)
+![NPM Downloads](https://img.shields.io/npm/dm/xmldsigjs?label=npm)
+
 XML Digital Signature implementation based on Web Crypto API with support for various cryptographic algorithms and canonicalization methods.
 
 ### [xadesjs](./packages/xades/README.md)
+
+![NPM License](https://img.shields.io/npm/l/xadesjs)
+![NPM Version](https://img.shields.io/npm/v/xadesjs)
+![NPM Downloads](https://img.shields.io/npm/dm/xadesjs?label=npm)
 
 XML Advanced Electronic Signatures (XAdES) implementation that extends XMLDSIGjs with additional signature formats and metadata.
 
