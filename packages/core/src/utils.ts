@@ -29,7 +29,9 @@ function SelectNodesNode(node: Node, xPath: string): Node[] {
 export const Select: SelectNodes = typeof self !== 'undefined' ? SelectNodesEx : SelectNodesNode;
 
 export function Parse(xmlString: string) {
-  xmlString = xmlString.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  // Strip UTF-8 BOM. Node's utf8 decoder preserves U+FEFF, and @xmldom/xmldom >= 0.9
+  // treats content before the XML declaration as a fatal well-formedness error.
+  xmlString = xmlString.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
   let DOMParserCtor: typeof DOMParser;
   if (typeof DOMParser !== 'undefined') {

@@ -69,4 +69,9 @@ describe('utils', () => {
     const text = Stringify(xml);
     assert.equal(xmlString, text);
   });
+
+  it('Parse strips UTF-8 BOM before XML declaration', () => {
+    const xml = Parse('\uFEFF<?xml version="1.0" encoding="utf-8"?><root/>');
+    assert.equal(xml.documentElement.nodeName, 'root');
+  });
 });
