@@ -161,15 +161,15 @@ This makes it possible to use different providers at the same time, for example 
 ```typescript
 const signedXml = new xmldsigjs.SignedXml();
 
-await signedXml.Sign(algorithm, key, doc, options, tenantCrypto);
-await signedXml.Verify(undefined, tenantCrypto);
+await signedXml.Sign(algorithm, key, doc, options, customCrypto);
+await signedXml.Verify(undefined, customCrypto);
 ```
 
 A provider can also be passed to the constructor. It is then used by every method of that
 instance which does not get one of its own:
 
 ```typescript
-const signedXml = new xmldsigjs.SignedXml(doc, tenantCrypto);
+const signedXml = new xmldsigjs.SignedXml(doc, customCrypto);
 ```
 
 With a provider given on each call the Application does not need an engine at all.

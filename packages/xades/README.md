@@ -166,14 +166,14 @@ Like XMLDSIGjs, every method doing cryptographic operations accepts a provider a
 argument, which takes precedence over the one set by `Application.setEngine()`:
 
 ```typescript
-await signedXml.Sign(algorithm, key, doc, options, tenantCrypto);
-await signedXml.Verify(undefined, tenantCrypto);
+await signedXml.Sign(algorithm, key, doc, options, customCrypto);
+await signedXml.Verify(undefined, customCrypto);
 ```
 
 The constructor needs a provider too, because it generates the Id of the signature:
 
 ```typescript
-const signedXml = new xadesjs.SignedXml(doc, tenantCrypto);
+const signedXml = new xadesjs.SignedXml(doc, customCrypto);
 ```
 
 ## Algorithm Support
