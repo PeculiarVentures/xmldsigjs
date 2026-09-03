@@ -31,11 +31,11 @@ export class KeyValue extends KeyInfoClause {
     }
   }
 
-  public async importKey(key: CryptoKey): Promise<this> {
+  public async importKey(key: CryptoKey, crypto?: Crypto): Promise<this> {
     for (const [, ctor] of keyValueRegistry) {
       if (ctor.canImportCryptoKey(key)) {
         const keyValue = new ctor();
-        await keyValue.importKey(key);
+        await keyValue.importKey(key, crypto);
         this.Value = keyValue;
         return this;
       }
@@ -43,11 +43,11 @@ export class KeyValue extends KeyInfoClause {
     throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, key.algorithm.name);
   }
 
-  public async exportKey(alg?: Algorithm) {
+  public async exportKey(alg?: Algorithm, crypto?: Crypto) {
     if (!this.Value) {
       throw new XmlError(XE.NULL_REFERENCE);
     }
-    return this.Value.exportKey(alg);
+    return this.Value.exportKey(alg, crypto);
   }
 
   protected OnGetXml(element: Element) {

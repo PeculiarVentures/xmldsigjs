@@ -108,8 +108,14 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     return this.Properties.UnsignedProperties;
   }
 
-  constructor(node?: Document | Element) {
-    super(node);
+  /**
+   * Creates an instance of SignedXml.
+   *
+   * @param {(Document | Element)} [node]
+   * @param {Crypto} [crypto] Crypto provider. Default is from Application
+   */
+  constructor(node?: Document | Element, crypto?: Crypto) {
+    super(node, crypto);
 
     this.CreateQualifyingProperties();
   }
@@ -145,17 +151,13 @@ export class SignedXml extends XmlDSigJs.SignedXml {
   }
 
   public async Sign(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     algorithm: Algorithm,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     key: CryptoKey,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     data: Document | XmlDSigJs.DigestReferenceSource,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: OptionsXAdES,
+    crypto?: Crypto,
   ) {
-    // eslint-disable-next-line prefer-rest-params
-    return super.Sign.apply(this, arguments as any);
+    return super.Sign(algorithm, key, data, options, crypto);
   }
 
   // #endregion
@@ -170,7 +172,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       );
     }
 
-    const rnd = XmlDSigJs.Application.crypto.getRandomValues(new Uint8Array(6)) as Uint8Array;
+    const rnd = XmlDSigJs.resolveCrypto(this.crypto).getRandomValues(new Uint8Array(6));
     const id = XmlCore.Convert.ToHex(rnd);
 
     this.XmlSignature.Id ||= `id-${id}`;
@@ -188,8 +190,9 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     algorithm: Algorithm,
     key: CryptoKey,
     options: OptionsXAdES,
+    crypto?: Crypto,
   ) {
-    await super.ApplySignOptions(signature, algorithm, key, options);
+    await super.ApplySignOptions(signature, algorithm, key, options, crypto);
     if (this.Properties) {
       const sigProps = this.Properties.SignedProperties.SignedSignatureProperties;
 
@@ -218,15 +221,18 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
       signature.SignedInfo.References.Add(xadesRef);
 
-      await this.ApplySigningCertificate(options.signingCertificate);
-      await this.ApplySigningCertificateV2(options.signingCertificateV2);
-      await this.ApplySignaturePolicyIdentifier(options.policy);
+      await this.ApplySigningCertificate(options.signingCertificate, crypto);
+      await this.ApplySigningCertificateV2(options.signingCertificateV2, crypto);
+      await this.ApplySignaturePolicyIdentifier(options.policy, crypto);
       this.ApplySignatureProductionPlace(options.productionPlace);
       this.ApplySignerRoles(options.signerRole);
     }
   }
 
-  protected async ApplySigningCertificate(value?: string | OptionsSigningCertificate) {
+  protected async ApplySigningCertificate(
+    value?: string | OptionsSigningCertificate,
+    crypto?: Crypto,
+  ) {
     if (this.Properties && value) {
       const options: OptionsSigningCertificate =
         typeof value === 'string' ? { certificate: value } : value;
@@ -256,7 +262,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
       signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
       signingCertificate.CertDigest.DigestValue = new Uint8Array(
-        await cert.Thumbprint(alg.algorithm.name),
+        await cert.Thumbprint(alg.algorithm.name, crypto),
       );
 
       this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Add(
@@ -265,7 +271,10 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     }
   }
 
-  protected async ApplySigningCertificateV2(value?: string | OptionsSigningCertificateV2) {
+  protected async ApplySigningCertificateV2(
+    value?: string | OptionsSigningCertificateV2,
+    crypto?: Crypto,
+  ) {
     if (this.Properties && value) {
       const options: OptionsSigningCertificate =
         typeof value === 'string' ? { certificate: value } : value;
@@ -294,7 +303,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
       signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
       signingCertificate.CertDigest.DigestValue = new Uint8Array(
-        await cert.Thumbprint(alg.algorithm.name),
+        await cert.Thumbprint(alg.algorithm.name, crypto),
       );
 
       this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificateV2.Add(
@@ -303,7 +312,10 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     }
   }
 
-  protected async ApplySignaturePolicyIdentifier(options?: OptionsPolicyId | boolean) {
+  protected async ApplySignaturePolicyIdentifier(
+    options?: OptionsPolicyId | boolean,
+    crypto?: Crypto,
+  ) {
     if (this.Properties) {
       const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
 
@@ -363,7 +375,10 @@ export class SignedXml extends XmlDSigJs.SignedXml {
             identifierContent = c14n.GetOutput();
           }
 
-          policyId.SigPolicyHash.DigestValue = await digestAlgorithm.Digest(identifierContent);
+          policyId.SigPolicyHash.DigestValue = await digestAlgorithm.Digest(
+            identifierContent,
+            crypto,
+          );
         }
 
         if (options.qualifiers) {
@@ -459,7 +474,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     }
   }
 
-  protected async VerifySigningCertificate() {
+  protected async VerifySigningCertificate(crypto?: Crypto) {
     let x509: XmlDSigJs.X509Certificate | null = null;
 
     if (this.XmlSignature && this.Properties) {
@@ -492,7 +507,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
               continue;
             }
 
-            const hash = new Uint8Array(await cert.Thumbprint(alg.algorithm as any));
+            const hash = new Uint8Array(await cert.Thumbprint(alg.algorithm as any, crypto));
             const b64Hash = XmlCore.Convert.ToBase64(hash);
 
             if (b64Hash === b64CertDigest) {

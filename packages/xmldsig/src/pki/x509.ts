@@ -1,7 +1,7 @@
 import * as Asn1Js from 'asn1js';
 import { Certificate, CryptoEngineAlgorithmParams } from 'pkijs';
 import { ECDSA } from '../algorithms/ecdsa_sign.js';
-import { Application } from '../application.js';
+import { resolveCrypto, resolvePkiEngine } from '../application.js';
 
 export type DigestAlgorithm = string | 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
 
@@ -113,10 +113,11 @@ export class X509Certificate {
   /**
    * Returns a thumbprint of the certificate
    * @param  {DigestAlgorithm="SHA-1"} algName Digest algorithm name
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    * @returns Promise<ArrayBuffer>
    */
-  public async Thumbprint(algName: DigestAlgorithm = 'SHA-1') {
-    return Application.crypto.subtle.digest(algName, this.raw);
+  public async Thumbprint(algName: DigestAlgorithm = 'SHA-1', crypto?: Crypto) {
+    return resolveCrypto(crypto).subtle.digest(algName, this.raw);
   }
 
   /**
@@ -136,9 +137,14 @@ export class X509Certificate {
   /**
    * Returns public key from X509Certificate
    * @param  {Algorithm} algorithm
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    * @returns Promise<CryptoKey>
    */
-  public async exportKey(algorithm?: Algorithm | EcKeyImportParams | RsaHashedImportParams) {
+  public async exportKey(
+    algorithm?: Algorithm | EcKeyImportParams | RsaHashedImportParams,
+    crypto?: Crypto,
+  ) {
+    const engine = resolvePkiEngine(crypto);
     if (algorithm) {
       const alg = {
         algorithm,
@@ -159,7 +165,10 @@ export class X509Certificate {
         }
       }
 
-      const key = await this.simpl.getPublicKey({ algorithm: alg as CryptoEngineAlgorithmParams });
+      const key = await this.simpl.getPublicKey(
+        { algorithm: alg as CryptoEngineAlgorithmParams },
+        engine,
+      );
       this.publicKey = key;
 
       return key;
@@ -168,14 +177,17 @@ export class X509Certificate {
     if (this.simpl.subjectPublicKeyInfo.algorithm.algorithmId === '1.2.840.113549.1.1.1') {
       // Use default hash algorithm for RSA keys. Otherwise it throws an exception
       // for unsupported mechanism (eg md5WithRSAEncryption)
-      this.publicKey = await this.simpl.getPublicKey({
-        algorithm: {
-          algorithm: { name: 'RSASSA-PKCS1-v1_5', hash: { name: 'SHA-256' } },
-          usages: ['verify'],
+      this.publicKey = await this.simpl.getPublicKey(
+        {
+          algorithm: {
+            algorithm: { name: 'RSASSA-PKCS1-v1_5', hash: { name: 'SHA-256' } },
+            usages: ['verify'],
+          },
         },
-      });
+        engine,
+      );
     } else {
-      this.publicKey = await this.simpl.getPublicKey();
+      this.publicKey = await this.simpl.getPublicKey(undefined, engine);
     }
 
     return this.publicKey;
