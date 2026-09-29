@@ -64,7 +64,6 @@ class Ed25519Signature extends xmldsig.SignatureAlgorithm {
     signedInfo: string,
     key: CryptoKey,
     signatureValue: Uint8Array,
-    _algorithm?: Algorithm,
   ): Promise<boolean> {
     const info = new TextEncoder().encode(signedInfo);
     return crypto.subtle.verify('Ed25519', key, signatureValue, info);

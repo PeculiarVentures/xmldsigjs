@@ -130,7 +130,8 @@ Sign(
   algorithm: Algorithm,
   key: CryptoKey,
   data: Document,
-  options?: OptionsSign
+  options?: OptionsSign,
+  crypto?: Crypto
 ): Promise<Signature>
 ```
 
@@ -148,8 +149,30 @@ interface OptionsSign {
 ### SignedXml.Verify()
 
 ```typescript
-Verify(key?: CryptoKey): Promise<boolean>
+Verify(key?: CryptoKey, crypto?: Crypto): Promise<boolean>
 ```
+
+## Crypto Provider
+
+`Application.setEngine()` sets the provider for the whole process. Every method doing
+cryptographic operations also accepts a provider as its last argument, which takes precedence.
+This makes it possible to use different providers at the same time, for example one per tenant:
+
+```typescript
+const signedXml = new xmldsigjs.SignedXml();
+
+await signedXml.Sign(algorithm, key, doc, options, customCrypto);
+await signedXml.Verify(undefined, customCrypto);
+```
+
+A provider can also be passed to the constructor. It is then used by every method of that
+instance which does not get one of its own:
+
+```typescript
+const signedXml = new xmldsigjs.SignedXml(doc, customCrypto);
+```
+
+With a provider given on each call the Application does not need an engine at all.
 
 ## Node.js: Registering XML Dependencies
 

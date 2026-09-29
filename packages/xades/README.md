@@ -130,7 +130,8 @@ Sign(
   algorithm: Algorithm,
   key: CryptoKey,
   data: Document,
-  options?: OptionsXAdES
+  options?: OptionsXAdES,
+  crypto?: Crypto
 ): Promise<Signature>
 ```
 
@@ -157,6 +158,22 @@ interface OptionsXAdES {
   };
   policy?: OptionsPolicyId;
 }
+```
+
+## Crypto Provider
+
+Like XMLDSIGjs, every method doing cryptographic operations accepts a provider as its last
+argument, which takes precedence over the one set by `Application.setEngine()`:
+
+```typescript
+await signedXml.Sign(algorithm, key, doc, options, customCrypto);
+await signedXml.Verify(undefined, customCrypto);
+```
+
+The constructor needs a provider too, because it generates the Id of the signature:
+
+```typescript
+const signedXml = new xadesjs.SignedXml(doc, customCrypto);
 ```
 
 ## Algorithm Support
