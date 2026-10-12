@@ -22,15 +22,15 @@ npm install xml-core
 ## Quick Start
 
 ```typescript
-import { XmlObject, XmlElement, XmlAttribute, XmlChildElement } from "xml-core";
+import { XmlObject, XmlElement, XmlAttribute, XmlChildElement } from 'xml-core';
 
-@XmlElement({ localName: "Person" })
+@XmlElement({ localName: 'Person' })
 class Person extends XmlObject {
-  @XmlAttribute({ localName: "id" })
-  public id: string = "";
+  @XmlAttribute({ localName: 'id' })
+  public id: string = '';
 
-  @XmlChildElement({ localName: "Name" })
-  public name: string = "";
+  @XmlChildElement({ localName: 'Name' })
+  public name: string = '';
 }
 
 // Parse XML
@@ -40,8 +40,8 @@ console.log(person.id); // "123"
 console.log(person.name); // "John Doe"
 
 // Generate XML
-person.id = "456";
-person.name = "Jane Smith";
+person.id = '456';
+person.name = 'Jane Smith';
 console.log(person.toString()); // <Person id="456"><Name>Jane Smith</Name></Person>
 ```
 
@@ -120,4 +120,4 @@ setNodeDependencies({
 
 ## License
 
-  MIT
+MIT

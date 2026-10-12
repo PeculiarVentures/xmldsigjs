@@ -22,15 +22,15 @@ npm install xadesjs
 
 ## XAdES Profiles
 
-| Profile    | Digital Signature | Cryptographic Timestamp | Revocation References | Revocation Data | Secure Timestamp |
-|------------|-------------------|-------------------------|----------------------|-----------------|------------------|
-| **XAdES-BES** | ✓                 | ✗                       | ✗                    | ✗               | ✗                |
-| XAdES-T    | ✓                 | ✓                       | ✗                    | ✗               | ✗                |
-| XAdES-C    | ✓                 | ✓                       | ✓                    | ✗               | ✗                |
-| XAdES-X-L  | ✓                 | ✓                       | ✓                    | ✓               | ✗                |
-| XAdES-A    | ✓                 | ✓                       | ✓                    | ✓               | ✓                |
+| Profile       | Digital Signature | Cryptographic Timestamp | Revocation References | Revocation Data | Secure Timestamp |
+| ------------- | ----------------- | ----------------------- | --------------------- | --------------- | ---------------- |
+| **XAdES-BES** | ✓                 | ✗                       | ✗                     | ✗               | ✗                |
+| XAdES-T       | ✓                 | ✓                       | ✗                     | ✗               | ✗                |
+| XAdES-C       | ✓                 | ✓                       | ✓                     | ✗               | ✗                |
+| XAdES-X-L     | ✓                 | ✓                       | ✓                     | ✓               | ✗                |
+| XAdES-A       | ✓                 | ✓                       | ✓                     | ✓               | ✓                |
 
-*Currently only XAdES-BES is fully supported.*
+_Currently only XAdES-BES is fully supported._
 
 ## Quick Start
 
@@ -49,7 +49,7 @@ xadesjs.Application.setEngine('NodeJS', new Crypto());
 
 ```html
 <script type="module">
-import * as xadesjs from "https://unpkg.com/xadesjs@latest/dist/esm/index.js";
+  import * as xadesjs from 'https://unpkg.com/xadesjs@latest/dist/esm/index.js';
 </script>
 ```
 
@@ -65,13 +65,13 @@ async function signXAdES() {
   // Generate key pair
   const keys = await crypto.subtle.generateKey(
     {
-      name: "RSASSA-PKCS1-v1_5",
+      name: 'RSASSA-PKCS1-v1_5',
       modulusLength: 2048,
       publicExponent: new Uint8Array([1, 0, 1]),
-      hash: "SHA-256"
+      hash: 'SHA-256',
     },
     false,
-    ["sign", "verify"]
+    ['sign', 'verify'],
   );
 
   // Parse XML document
@@ -79,23 +79,18 @@ async function signXAdES() {
 
   // Create XAdES signature
   const signedXml = new xadesjs.SignedXml();
-  await signedXml.Sign(
-    { name: "RSASSA-PKCS1-v1_5" },
-    keys.privateKey,
-    xml,
-    {
-      keyValue: keys.publicKey,
-      references: [{ hash: "SHA-256", transforms: ["enveloped"] }],
-      productionPlace: {
-        country: "US",
-        state: "California",
-        city: "San Francisco"
-      },
-      signerRole: {
-        claimed: ["Developer"]
-      }
-    }
-  );
+  await signedXml.Sign({ name: 'RSASSA-PKCS1-v1_5' }, keys.privateKey, xml, {
+    keyValue: keys.publicKey,
+    references: [{ hash: 'SHA-256', transforms: ['enveloped'] }],
+    productionPlace: {
+      country: 'US',
+      state: 'California',
+      city: 'San Francisco',
+    },
+    signerRole: {
+      claimed: ['Developer'],
+    },
+  });
 
   console.log(signedXml.toString());
 }
@@ -108,10 +103,7 @@ import * as xadesjs from 'xadesjs';
 
 async function verifyXAdES(signedXmlString) {
   const doc = xadesjs.Parse(signedXmlString);
-  const signatures = doc.getElementsByTagNameNS(
-    'http://www.w3.org/2000/09/xmldsig#',
-    'Signature'
-  );
+  const signatures = doc.getElementsByTagNameNS('http://www.w3.org/2000/09/xmldsig#', 'Signature');
 
   const signedXml = new xadesjs.SignedXml(doc);
   signedXml.LoadXml(signatures[0]);

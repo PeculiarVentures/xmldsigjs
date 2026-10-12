@@ -69,7 +69,10 @@ describe('Security: XSW (duplicate Id shadowing)', () => {
 
     // Modify the document's Payment (attacker-controlled)
     const amountEl = xades.Select(paymentAttackEl, './*[local-name()="Amount"]')[0] as Element;
-    const recipientEl = xades.Select(paymentAttackEl, './*[local-name()="Recipient"]')[0] as Element;
+    const recipientEl = xades.Select(
+      paymentAttackEl,
+      './*[local-name()="Recipient"]',
+    )[0] as Element;
     assert.ok(amountEl);
     assert.ok(recipientEl);
     amountEl.textContent = '999999.99';
