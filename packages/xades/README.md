@@ -38,7 +38,7 @@ _Currently only XAdES-BES is fully supported._
 
 ### Node.js Setup
 
-> **Note:** Use ESM modules (`.mjs` extension or `"type": "module"` in `package.json`).
+> **Note:** Both ESM (`import`) and CommonJS (`require`) are supported.
 
 ```javascript
 import * as xadesjs from 'xadesjs';
@@ -51,7 +51,7 @@ xadesjs.Application.setEngine('NodeJS', new Crypto());
 
 ```html
 <script type="module">
-  import * as xadesjs from 'https://unpkg.com/xadesjs@latest/dist/esm/index.js';
+  import * as xadesjs from 'https://esm.sh/xadesjs';
 </script>
 ```
 

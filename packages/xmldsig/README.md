@@ -46,7 +46,7 @@ npm install xmldsigjs
 
 ### Node.js Setup
 
-> **Note:** Use ESM modules (`.mjs` extension or `"type": "module"` in `package.json`).
+> **Note:** Both ESM (`import`) and CommonJS (`require`) are supported.
 
 ```javascript
 import * as xmldsigjs from 'xmldsigjs';
@@ -59,7 +59,7 @@ xmldsigjs.Application.setEngine('NodeJS', new Crypto());
 
 ```html
 <script type="module">
-  import * as xmldsigjs from 'https://unpkg.com/xmldsigjs@latest/dist/esm/index.js';
+  import * as xmldsigjs from 'https://esm.sh/xmldsigjs';
 </script>
 ```
 
@@ -151,7 +151,7 @@ To work with XML in Node.js, you need to register DOM and XPath dependencies:
 
 ```typescript
 import * as xmldom from '@xmldom/xmldom';
-import { setNodeDependencies } from 'xmldsigjs';
+import { setNodeDependencies } from 'xml-core';
 import xpath from 'xpath';
 
 setNodeDependencies({
