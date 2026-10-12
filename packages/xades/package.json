@@ -28,8 +28,8 @@
   ],
   "scripts": {
     "test": "vitest run",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
     "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:esm:package && npm run build:types",
     "build:cjs": "tsc -p tsconfig.build.json --outDir build/cjs --module commonjs --moduleResolution node",
     "build:esm": "tsc -p tsconfig.build.json --outDir build/esm --module esnext --moduleResolution bundler",
