@@ -1,13 +1,12 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "./tsconfig.compile.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
     "paths": {
       "xml-core": ["./packages/core/src"],
       "xmldsigjs": ["./packages/xmldsig/src"],
       "xadesjs": ["./packages/xades/src"]
     }
-  }
+  },
+  "exclude": ["node_modules", "coverage", "packages/*/build"]
 }
