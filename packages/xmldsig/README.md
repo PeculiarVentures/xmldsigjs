@@ -1,8 +1,10 @@
 # XMLDSIGjs
 
 ![NPM License](https://img.shields.io/npm/l/xmldsigjs)
-![NPM Version](https://img.shields.io/npm/v/xmldsigjs)
-![NPM Downloads](https://img.shields.io/npm/dm/xmldsigjs?label=npm)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/ci.yml?label=test)
+[![npm version](https://img.shields.io/npm/v/xmldsigjs.svg)](https://www.npmjs.com/package/xmldsigjs)
+![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
+[![npm downloads](https://img.shields.io/npm/dm/xmldsigjs.svg)](https://www.npmjs.com/package/xmldsigjs)
 
 XML Digital Signature implementation in TypeScript/JavaScript using Web Crypto API.
 
