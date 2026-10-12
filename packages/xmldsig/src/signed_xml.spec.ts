@@ -30,7 +30,7 @@ async function createRsaPssPublicKey(): Promise<CryptoKey> {
   return keyPair.publicKey;
 }
 
-function addX509ExportStub(signedXml: xmldsig.SignedXml, publicKey: CryptoKey) {
+function addX509ExportStub(signedXml: TestSignedXml, publicKey: CryptoKey) {
   let seenAlgorithm: Algorithm | undefined;
   const cert = {
     exportKey: async (alg?: Algorithm) => {
@@ -61,7 +61,7 @@ describe('SignedXml', () => {
 
       assert.equal(keys.length, 1);
       assert.equal(seenAlgorithm?.name, 'RSA-PSS');
-      assert.equal((seenAlgorithm as RsaHashedImportParams).hash.name, 'SHA-256');
+      assert.equal((seenAlgorithm as RsaHashedKeyAlgorithm).hash.name, 'SHA-256');
       assert.equal((seenAlgorithm as RsaPssParams).saltLength, 32);
     });
 
@@ -83,7 +83,7 @@ describe('SignedXml', () => {
       );
       assert.equal(signedXml.XmlSignature.SignedInfo.SignatureMethod.Any.Count, 0);
       assert.equal(seenAlgorithm?.name, 'RSA-PSS');
-      assert.equal((seenAlgorithm as RsaHashedImportParams).hash.name, 'SHA-256');
+      assert.equal((seenAlgorithm as RsaHashedKeyAlgorithm).hash.name, 'SHA-256');
       assert.equal((seenAlgorithm as RsaPssParams).saltLength, 32);
     });
   });
