@@ -57,7 +57,7 @@ xmldsigjs.Application.setEngine('NodeJS', new Crypto());
 
 ```html
 <script type="module">
-import * as xmldsigjs from "https://unpkg.com/xmldsigjs@latest/dist/esm/index.js";
+  import * as xmldsigjs from 'https://unpkg.com/xmldsigjs@latest/dist/esm/index.js';
 </script>
 ```
 
@@ -73,13 +73,13 @@ async function signXML() {
   // Generate key pair
   const keys = await crypto.subtle.generateKey(
     {
-      name: "RSASSA-PKCS1-v1_5",
+      name: 'RSASSA-PKCS1-v1_5',
       modulusLength: 2048,
       publicExponent: new Uint8Array([1, 0, 1]),
-      hash: "SHA-256"
+      hash: 'SHA-256',
     },
     false,
-    ["sign", "verify"]
+    ['sign', 'verify'],
   );
 
   // Parse XML document
@@ -87,15 +87,10 @@ async function signXML() {
 
   // Create signature
   const signedXml = new xmldsigjs.SignedXml();
-  await signedXml.Sign(
-    { name: "RSASSA-PKCS1-v1_5" },
-    keys.privateKey,
-    xml,
-    {
-      keyValue: keys.publicKey,
-      references: [{ hash: "SHA-256", transforms: ["enveloped", "c14n"] }]
-    }
-  );
+  await signedXml.Sign({ name: 'RSASSA-PKCS1-v1_5' }, keys.privateKey, xml, {
+    keyValue: keys.publicKey,
+    references: [{ hash: 'SHA-256', transforms: ['enveloped', 'c14n'] }],
+  });
 
   console.log(signedXml.toString());
 }
@@ -108,10 +103,7 @@ import * as xmldsigjs from 'xmldsigjs';
 
 async function verifyXML(signedXmlString) {
   const doc = xmldsigjs.Parse(signedXmlString);
-  const signatures = doc.getElementsByTagNameNS(
-    'http://www.w3.org/2000/09/xmldsig#',
-    'Signature'
-  );
+  const signatures = doc.getElementsByTagNameNS('http://www.w3.org/2000/09/xmldsig#', 'Signature');
 
   const signedXml = new xmldsigjs.SignedXml(doc);
   signedXml.LoadXml(signatures[0]);
@@ -138,10 +130,10 @@ Sign(
 
 ```typescript
 interface OptionsSign {
-  id?: string;                          // Signature ID
-  keyValue?: CryptoKey;                 // Public key for KeyInfo
-  x509?: string[];                      // X.509 certificates
-  references?: OptionsSignReference[];  // Reference elements
+  id?: string; // Signature ID
+  keyValue?: CryptoKey; // Public key for KeyInfo
+  x509?: string[]; // X.509 certificates
+  references?: OptionsSignReference[]; // Reference elements
 }
 ```
 

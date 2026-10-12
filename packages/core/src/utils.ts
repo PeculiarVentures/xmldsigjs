@@ -31,7 +31,10 @@ export const Select: SelectNodes = typeof self !== 'undefined' ? SelectNodesEx :
 export function Parse(xmlString: string) {
   // Strip UTF-8 BOM. Node's utf8 decoder preserves U+FEFF, and @xmldom/xmldom >= 0.9
   // treats content before the XML declaration as a fatal well-formedness error.
-  xmlString = xmlString.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  xmlString = xmlString
+    .replace(/^\uFEFF/, '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
 
   let DOMParserCtor: typeof DOMParser;
   if (typeof DOMParser !== 'undefined') {
