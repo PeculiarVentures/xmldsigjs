@@ -148,7 +148,7 @@ describe('RSA-PSS', () => {
 
         const resolved = xmldsig.CryptoConfig.CreateSignatureAlgorithm(method);
         assert.equal(resolved.algorithm.name, 'RSA-PSS');
-        assert.equal((resolved.algorithm as RsaHashedImportParams).hash.name, vector.hash);
+        assert.equal((resolved.algorithm as RsaHashedKeyAlgorithm).hash.name, vector.hash);
         assert.equal((resolved.algorithm as RsaPssParams).saltLength, vector.saltLength);
 
         const algorithm = new vector.algorithm();
