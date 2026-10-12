@@ -151,7 +151,7 @@ To work with XML in Node.js, you need to register DOM and XPath dependencies:
 
 ```typescript
 import * as xmldom from '@xmldom/xmldom';
-import { setNodeDependencies } from 'xml-core';
+import { setNodeDependencies } from 'xmldsigjs';
 import xpath from 'xpath';
 
 setNodeDependencies({

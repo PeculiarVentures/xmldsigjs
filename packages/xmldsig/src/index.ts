@@ -7,4 +7,11 @@ export * from './xml/index.js';
 export * from './pki/index.js';
 export * from './xml/key_infos/index.js';
 export * from './signed_xml.js';
-export { Select, Parse, Stringify, XmlElement, XmlChildElement } from 'xml-core';
+export {
+  Select,
+  Parse,
+  Stringify,
+  XmlElement,
+  XmlChildElement,
+  setNodeDependencies,
+} from 'xml-core';
