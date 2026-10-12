@@ -24,9 +24,6 @@
     "LICENSE",
     "README.md"
   ],
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PeculiarVentures/xmldsigjs.git"
