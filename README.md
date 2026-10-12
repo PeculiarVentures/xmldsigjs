@@ -1,8 +1,8 @@
 # XMLDSIG Monorepo
 
-[![CI](https://github.com/PeculiarVentures/xmldsigjs/actions/workflows/ci.yml/badge.svg)](https://github.com/PeculiarVentures/xmldsigjs/actions/workflows/ci.yml)
-
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xmldsigjs/master/LICENSE)
+![GitHub License](https://img.shields.io/github/license/PeculiarVentures/xmldsigjs)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/ci.yml?label=test)
+![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
 
 A TypeScript/JavaScript implementation of XML security standards using Web Crypto API for both browsers and Node.js.
 
@@ -13,24 +13,30 @@ This monorepo contains three interconnected packages:
 ### [xml-core](./packages/core/README.md)
 
 ![NPM License](https://img.shields.io/npm/l/xml-core)
-![NPM Version](https://img.shields.io/npm/v/xml-core)
-![NPM Downloads](https://img.shields.io/npm/dm/xml-core?label=npm)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/ci.yml?label=test)
+[![npm version](https://img.shields.io/npm/v/xml-core.svg)](https://www.npmjs.com/package/xml-core)
+![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
+[![npm downloads](https://img.shields.io/npm/dm/xml-core.svg)](https://www.npmjs.com/package/xml-core)
 
 A foundational library for working with XML in JavaScript/TypeScript with schema validation through decorators.
 
 ### [xmldsigjs](./packages/xmldsig/README.md)
 
 ![NPM License](https://img.shields.io/npm/l/xmldsigjs)
-![NPM Version](https://img.shields.io/npm/v/xmldsigjs)
-![NPM Downloads](https://img.shields.io/npm/dm/xmldsigjs?label=npm)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/ci.yml?label=test)
+[![npm version](https://img.shields.io/npm/v/xmldsigjs.svg)](https://www.npmjs.com/package/xmldsigjs)
+![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
+[![npm downloads](https://img.shields.io/npm/dm/xmldsigjs.svg)](https://www.npmjs.com/package/xmldsigjs)
 
 XML Digital Signature implementation based on Web Crypto API with support for various cryptographic algorithms and canonicalization methods.
 
 ### [xadesjs](./packages/xades/README.md)
 
 ![NPM License](https://img.shields.io/npm/l/xadesjs)
-![NPM Version](https://img.shields.io/npm/v/xadesjs)
-![NPM Downloads](https://img.shields.io/npm/dm/xadesjs?label=npm)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/ci.yml?label=test)
+[![npm version](https://img.shields.io/npm/v/xadesjs.svg)](https://www.npmjs.com/package/xadesjs)
+![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
+[![npm downloads](https://img.shields.io/npm/dm/xadesjs.svg)](https://www.npmjs.com/package/xadesjs)
 
 XML Advanced Electronic Signatures (XAdES) implementation that extends XMLDSIGjs with additional signature formats and metadata.
 
