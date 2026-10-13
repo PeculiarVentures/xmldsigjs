@@ -108,13 +108,14 @@ export class KeyInfoX509Data extends KeyInfoClause {
   /**
    * Exports key from X509Data object
    * @param  {Algorithm} alg
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    * @returns Promise
    */
-  public async exportKey(alg?: RsaHashedImportParams | EcKeyImportParams) {
+  public async exportKey(alg?: RsaHashedImportParams | EcKeyImportParams, crypto?: Crypto) {
     if (!this.Certificates.length) {
       throw new XmlError(XE.NULL_REFERENCE);
     }
-    this.Key = await this.Certificates[0].exportKey(alg);
+    this.Key = await this.Certificates[0].exportKey(alg, crypto);
 
     return this.Key;
   }

@@ -9,7 +9,7 @@ import {
   XmlObject,
 } from 'xml-core';
 
-import { Application } from '../../application.js';
+import { resolveCrypto } from '../../application.js';
 import { ECDSA } from '../../algorithms/ecdsa_sign.js';
 import { XmlSignature } from '../index.js';
 import { KeyInfoClause } from './key_info_clause.js';
@@ -143,14 +143,15 @@ export class EcdsaKeyValue extends KeyInfoClause {
   /**
    * Imports key to the ECKeyValue object
    * @param  {CryptoKey} key
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    * @returns Promise<this>
    */
-  public async importKey(key: CryptoKey) {
+  public async importKey(key: CryptoKey, crypto?: Crypto) {
     if (!key.algorithm.name || key.algorithm.name.toUpperCase() !== 'ECDSA') {
       throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
     }
 
-    const jwk = await Application.crypto.subtle.exportKey('jwk', key);
+    const jwk = await resolveCrypto(crypto).subtle.exportKey('jwk', key);
 
     this.key = key;
     this.jwk = jwk;
@@ -171,9 +172,10 @@ export class EcdsaKeyValue extends KeyInfoClause {
   /**
    * Exports key from the ECKeyValue object
    * @param  {Algorithm} _alg
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    * @returns Promise
    */
-  public async exportKey(_alg?: Algorithm) {
+  public async exportKey(_alg?: Algorithm, crypto?: Crypto) {
     if (this.key) {
       return this.key;
     }
@@ -189,7 +191,7 @@ export class EcdsaKeyValue extends KeyInfoClause {
       ext: true,
     };
     this.keyUsage = ['verify'];
-    const key = await Application.crypto.subtle.importKey(
+    const key = await resolveCrypto(crypto).subtle.importKey(
       'jwk',
       jwk as any,
       { name: 'ECDSA', namedCurve: crv } as any,
