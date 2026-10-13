@@ -1,4 +1,5 @@
 {
+  "name": "xmldsigjs-monorepo",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -29,12 +30,14 @@
     "@peculiar/webcrypto": "^1.5.0",
     "@types/node": "^24.7.2",
     "@vitest/coverage-v8": "^5.0.4",
-    "lerna": "^10.0.1",
+    "lerna": "^10.1.0",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.87.0",
     "tsdown": "^0.23.1",
     "typescript": "^5.7.3",
-    "vite-tsconfig-paths": "^6.0.1",
     "vitest": "^5.0.4"
+  },
+  "overrides": {
+    "vite": "^8.3.4"
   }
 }
