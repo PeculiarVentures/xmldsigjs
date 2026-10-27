@@ -83,7 +83,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
     super();
     if (cert) {
       if (cert instanceof Uint8Array) {
-        this.AddCertificate(new X509Certificate(cert));
+        this.AddCertificate(new X509Certificate(cert as Uint8Array<ArrayBuffer>));
       } else if (cert instanceof X509Certificate) {
         switch (includeOptions) {
           case X509IncludeOption.None:

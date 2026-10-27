@@ -1,4 +1,4 @@
-import { CryptoEngine, setEngine } from "pkijs";
+import { CryptoEngine, type ICryptoEngine, setEngine } from "pkijs";
 import { XE, XmlError } from "xml-core";
 
 export interface CryptoEx extends Crypto {
@@ -16,7 +16,8 @@ export class Application {
    */
   public static setEngine(name: string, crypto: Crypto): void {
     engineCrypto = Object.assign(crypto, { name });
-    setEngine(name, new CryptoEngine({ name, crypto }));
+    // pkijs 3 typings predate the TypeScript 6 DOM lib.
+    setEngine(name, new CryptoEngine({ name, crypto }) as unknown as ICryptoEngine);
   }
 
   /**

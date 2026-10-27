@@ -1,12 +1,24 @@
 {
-  "extends": "./tsconfig.compile.json",
   "compilerOptions": {
-    "baseUrl": ".",
+    "target": "es2023",
+    "lib": ["es2023", "DOM"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noImplicitOverride": true,
+    "noErrorTruncation": true,
+    "noEmit": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
     "paths": {
       "xml-core": ["./packages/core/src"],
       "xmldsigjs": ["./packages/xmldsig/src"],
       "xadesjs": ["./packages/xades/src"]
     }
   },
-  "exclude": ["node_modules", "coverage", "packages/*/build"]
+  "include": ["packages/*/src", "packages/*/test", "*.config.ts"]
 }
