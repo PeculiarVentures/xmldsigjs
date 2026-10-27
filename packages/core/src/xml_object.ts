@@ -2,6 +2,7 @@ import * as CONST from "./const.js";
 import { XE, XmlError } from "./error.js";
 import type { AssocArray, IXmlSerializable, XmlAttributeType, XmlChildElementType, XmlContentType, XmlSchema } from "./types.js";
 import { isDocument, isElement, Parse, SelectSingleNode, Stringify } from "./utils.js";
+import type { XmlCollection } from "./xml_collection.js";
 
 const DEFAULT_ROOT_NAME = "xml_root";
 
@@ -404,7 +405,7 @@ export class XmlObject implements IXmlSerializable {
                 throw new XmlError(XE.XML_EXCEPTION, `Schema for '${schema.localName}' with flag noRoot must have 'parser'`);
               }
               const col: XmlCollection<any> = new schema.parser() as any;
-              if (!(col instanceof XmlCollection)) {
+              if (!(col as any)?.[CONST.XML_COLLECTION]) {
                 throw new XmlError(XE.XML_EXCEPTION, `Schema for '${schema.localName}' with flag noRoot must have 'parser' like instance of XmlCollection`);
               }
               (col as any).OnLoadXml(element); // protected member
@@ -560,5 +561,3 @@ export class XmlObject implements IXmlSerializable {
     return XmlObject.CreateDocument(this.localName, this.NamespaceURI, this.Prefix);
   }
 }
-
-import { XmlCollection } from "./xml_collection.js";
