@@ -1,24 +1,21 @@
-name: CI
+name: Test
 
+# Pushes to master are tested by Release, which calls this workflow before release-please.
 on:
-  push:
-    branches:
-      - master
-      - main
   pull_request:
+  workflow_call:
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
 
       - name: Install dependencies
@@ -30,14 +27,17 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
-      - name: Type check
+      - name: Typecheck
         run: npm run typecheck
 
       - name: Build packages
         run: npm run build
 
-      - name: Run tests with coverage
+      - name: Check generated package exports are committed
+        run: git diff --exit-code package.json 'packages/*/package.json'
+
+      - name: Run test with coverage
         run: npm run coverage
 
-      - name: Upload coverage
+      - name: Coveralls
         uses: coverallsapp/github-action@v2

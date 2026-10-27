@@ -1,7 +1,7 @@
 # XAdESjs
 
 ![NPM License](https://img.shields.io/npm/l/xadesjs)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/ci.yml?label=test)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/release.yml?branch=master&label=release)
 [![npm version](https://img.shields.io/npm/v/xadesjs.svg)](https://www.npmjs.com/package/xadesjs)
 ![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
 [![npm downloads](https://img.shields.io/npm/dm/xadesjs.svg)](https://www.npmjs.com/package/xadesjs)
