@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, assert } from "vitest";
-import * as xmldsig from "../src/index.js";
-import "./config.js";
+import * as xmldsig from "../index.js";
+import "../../test/config.js";
 
 const CUSTOM_TRANSFORM_NAMESPACE = "urn:custom:transform";
 

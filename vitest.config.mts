@@ -5,9 +5,8 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
-    globals: true,
     environment: "node",
-    include: ["packages/*/src/**/*.spec.ts", "packages/*/test/**/*.{test,spec}.ts"],
+    include: ["packages/*/src/**/*.spec.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov", "text-summary"],

@@ -1,7 +1,7 @@
 import { describe, it, assert } from "vitest";
 import { Stringify } from "xml-core";
-import "../test/config.js";
-import * as xmldsig from "../src/index.js";
+import "../../../test/config.js";
+import * as xmldsig from "../../index.js";
 
 describe("Transforms", () => {
   describe("base64", () => {

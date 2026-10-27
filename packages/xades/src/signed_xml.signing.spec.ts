@@ -2,7 +2,7 @@ import { describe, it, assert, beforeAll } from "vitest";
 import { Crypto } from "@peculiar/webcrypto";
 import * as XmlCore from "xml-core";
 import "../../core/test/config.js";
-import * as XAdES from "../src/index.js";
+import * as XAdES from "./index.js";
 
 describe("XAdES signing", () => {
   const cert =

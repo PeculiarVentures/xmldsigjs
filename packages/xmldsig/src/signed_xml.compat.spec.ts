@@ -4,8 +4,8 @@ import * as fs from "node:fs";
 import { describe, it, assert, beforeAll, afterAll } from "vitest";
 import { Convert } from "pvtsutils";
 import { Stringify } from "xml-core";
-import * as xmldsig from "../src/index.js";
-import "./config.js";
+import * as xmldsig from "./index.js";
+import "../test/config.js";
 
 const exec = promisify(child_process.exec);
 

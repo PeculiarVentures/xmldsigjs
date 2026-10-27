@@ -1,8 +1,8 @@
 import * as path from "node:path";
 import { describe, it, assert } from "vitest";
 import { Parse } from "xml-core";
-import * as xmldsig from "../src/index.js";
-import { readXml } from "./config.js";
+import * as xmldsig from "./index.js";
+import { readXml } from "../test/config.js";
 
 describe("Verify XML with InclusiveNamespaces", () => {
   it("Verify XML signed with InclusiveNamespace and attributes with dash", async () => {
@@ -18,7 +18,7 @@ describe("Verify XML with InclusiveNamespaces", () => {
 
 describe("Verify XML signatures", function () {
   async function verifyXML(name: string, res = true) {
-    const file = path.join(__dirname, "static", name);
+    const file = path.join(__dirname, "../test/static", name);
     const xml = readXml(file);
 
     const signatures = xml.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
@@ -29,8 +29,8 @@ describe("Verify XML signatures", function () {
   }
 
   async function verifyExternalXML(name: string, externalName: string, res = true) {
-    const file = path.join(__dirname, "static", name);
-    const externalFile = path.join(__dirname, "static", externalName);
+    const file = path.join(__dirname, "../test/static", name);
+    const externalFile = path.join(__dirname, "../test/static", externalName);
     const xml = readXml(file);
     const externalXml = readXml(externalFile);
 
