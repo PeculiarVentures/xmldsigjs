@@ -1,4 +1,4 @@
-import { type AssocArray } from "./types.js";
+import type { AssocArray } from "./types.js";
 import { APPLICATION_XML, XmlNodeType } from "./xml.js";
 
 export type SelectNodes = (node: Node, xPath: string) => Node[];

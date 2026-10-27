@@ -1,6 +1,6 @@
 import * as CONST from "./const.js";
 import { XE, XmlError } from "./error.js";
-import { AssocArray, IXmlSerializable, XmlAttributeType, XmlChildElementType, XmlContentType, XmlSchema } from "./types.js";
+import type { AssocArray, IXmlSerializable, XmlAttributeType, XmlChildElementType, XmlContentType, XmlSchema } from "./types.js";
 import { isDocument, isElement, Parse, SelectSingleNode, Stringify } from "./utils.js";
 
 const DEFAULT_ROOT_NAME = "xml_root";

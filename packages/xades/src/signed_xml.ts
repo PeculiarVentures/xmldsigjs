@@ -1,6 +1,6 @@
 import * as XmlCore from "xml-core";
 import * as XmlDSigJs from "xmldsigjs";
-import { OptionsSign } from "xmldsigjs";
+import type { OptionsSign } from "xmldsigjs";
 import * as XAdES from "./xml/index.js";
 
 const XADES_REFERENCE_TYPE = "http://uri.etsi.org/01903#SignedProperties";

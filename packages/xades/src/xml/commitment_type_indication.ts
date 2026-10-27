@@ -1,4 +1,4 @@
-import { XmlChildElement, XmlContent, XmlElement, IConverter } from "xml-core";
+import { XmlChildElement, XmlContent, XmlElement, type IConverter } from "xml-core";
 import { Any } from "./any.js";
 import { ObjectIdentifier } from "./object_identifier.js";
 import { XmlXades } from "./xml.js";

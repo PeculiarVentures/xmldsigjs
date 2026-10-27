@@ -1,4 +1,4 @@
-import { ITransformConstructable } from "./transform.js";
+import type { ITransformConstructable } from "./transform.js";
 import {
   XmlDsigBase64Transform,
   XmlDsigC14NTransform,

@@ -2,7 +2,7 @@ import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter, XmlNumbe
 import { Any } from "./any.js";
 import { XadesDateTime } from "./date_time.js";
 import { DigestAlgAndValueType } from "./signing_certificate.js";
-import { UnsignedSignatureProperty } from "./unsigned_signature_properties.js";
+import type { UnsignedSignatureProperty } from "./unsigned_signature_properties.js";
 import { XmlXades } from "./xml.js";
 import { XadesCollection, XadesObject } from "./xml_base.js";
 

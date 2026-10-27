@@ -1,4 +1,4 @@
-import { XmlAttribute, XmlContent, XmlElement, IConverter, XmlBase64Converter } from "xml-core";
+import { XmlAttribute, XmlContent, XmlElement, type IConverter, XmlBase64Converter } from "xml-core";
 import { XmlXades } from "./xml.js";
 import { XadesObject } from "./xml_base.js";
 

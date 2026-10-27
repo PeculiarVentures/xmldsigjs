@@ -1,4 +1,4 @@
-import { XE, XmlError, XmlAttribute, XmlChildElement, XmlElement, IXmlSerializable } from "xml-core";
+import { XE, XmlError, XmlAttribute, XmlChildElement, XmlElement, type IXmlSerializable } from "xml-core";
 
 import { XmlSignature } from "./xml_names.js";
 import { XmlSignatureObject } from "./xml_object.js";

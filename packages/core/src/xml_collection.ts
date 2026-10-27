@@ -1,6 +1,6 @@
 import { Collection } from "./collection.js";
 import { XE, XmlError } from "./error.js";
-import { ICollection } from "./types.js";
+import type { ICollection } from "./types.js";
 import { isElement } from "./utils.js";
 import { XmlObject } from "./xml_object.js";
 

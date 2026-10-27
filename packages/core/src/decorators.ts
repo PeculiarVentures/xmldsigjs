@@ -1,5 +1,5 @@
 import * as CONST from "./const.js";
-import { XmlAttributeType, XmlChildElementType, XmlContentType, XmlElementType, XmlSchema } from "./types.js";
+import type { XmlAttributeType, XmlChildElementType, XmlContentType, XmlElementType, XmlSchema } from "./types.js";
 
 const MAX = 1e9;
 

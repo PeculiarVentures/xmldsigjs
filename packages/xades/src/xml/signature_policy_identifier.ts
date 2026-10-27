@@ -1,4 +1,4 @@
-import { XmlChildElement, XmlContent, XmlElement, IConverter, XmlNumberConverter } from "xml-core";
+import { XmlChildElement, XmlContent, XmlElement, type IConverter, XmlNumberConverter } from "xml-core";
 import { Transforms } from "xmldsigjs";
 import { AnyCollection } from "./any.js";
 import { ObjectIdentifier } from "./object_identifier.js";

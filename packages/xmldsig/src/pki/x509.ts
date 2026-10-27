@@ -1,5 +1,5 @@
 import * as Asn1Js from "asn1js";
-import { Certificate, CryptoEngineAlgorithmParams } from "pkijs";
+import { Certificate, type CryptoEngineAlgorithmParams } from "pkijs";
 import { ECDSA } from "../algorithms/ecdsa_sign.js";
 import { Application } from "../application.js";
 

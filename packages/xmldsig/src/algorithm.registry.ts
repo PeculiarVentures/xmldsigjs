@@ -1,4 +1,4 @@
-import { IHashAlgorithmConstructable, ISignatureAlgorithmConstructable } from "./algorithm.js";
+import type { IHashAlgorithmConstructable, ISignatureAlgorithmConstructable } from "./algorithm.js";
 
 interface IHashAlgorithmRegistryItem {
   type: "hash";
