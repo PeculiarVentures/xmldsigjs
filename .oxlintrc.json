@@ -8,7 +8,6 @@
   },
   "rules": {
     "eslint/no-shadow": "off",
-    "typescript/no-empty-object-type": "off",
     "typescript/no-explicit-any": "off",
     "typescript/no-extraneous-class": "off",
     "typescript/no-non-null-assertion": "off",
@@ -17,16 +16,5 @@
     "unicorn/no-array-reverse": "off",
     "unicorn/no-array-sort": "off"
   },
-  "overrides": [
-    {
-      "files": ["**/*.spec.ts", "**/*.test.ts", "**/test/**"],
-      "rules": {
-        "import/no-unassigned-import": "off",
-        "unicorn/consistent-function-scoping": "off",
-        "eslint/no-await-in-loop": "off",
-        "eslint/no-new": "off"
-      }
-    }
-  ],
-  "ignorePatterns": ["**/build/**", "coverage/**", "examples/**"]
+  "ignorePatterns": ["**/build/**", "coverage/**"]
 }
