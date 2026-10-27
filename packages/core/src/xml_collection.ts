@@ -1,4 +1,5 @@
 import { Collection } from "./collection.js";
+import { XML_COLLECTION } from "./const.js";
 import { XE, XmlError } from "./error.js";
 import type { ICollection } from "./types.js";
 import { isElement } from "./utils.js";
@@ -116,3 +117,5 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
     }
   }
 }
+
+(XmlCollection.prototype as any)[XML_COLLECTION] = true;
