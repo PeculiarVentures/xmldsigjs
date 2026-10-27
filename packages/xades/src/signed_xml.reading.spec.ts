@@ -2,8 +2,8 @@ import { describe, it, assert } from "vitest";
 import { Crypto } from "@peculiar/webcrypto";
 import { Application } from "xmldsigjs";
 import "../../core/test/config.js";
-import * as XAdES from "../src/index.js";
-import { SignedXml, xml } from "../src/index.js";
+import * as XAdES from "./index.js";
+import { SignedXml, xml } from "./index.js";
 
 const { QualifyingProperties, SignatureTimeStamp, CertificateValues, RevocationValues, ArchiveTimeStamp } = xml;
 const { CounterSignature } = xml;

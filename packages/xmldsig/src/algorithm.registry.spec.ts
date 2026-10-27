@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, assert } from "vitest";
-import * as xmldsig from "../src/index.js";
-import "./config.js";
+import * as xmldsig from "./index.js";
+import "../test/config.js";
 
 // Ed25519 signature algorithm namespaces
 const ED25519_NAMESPACE = "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519";

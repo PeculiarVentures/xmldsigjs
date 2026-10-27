@@ -1,6 +1,6 @@
 import { describe, it, assert } from "vitest";
-import { XmlAttribute, XmlChildElement, XmlElement, XmlCollection, XmlObject, XmlNumberConverter } from "../src/index.js";
-import "./config.js";
+import { XmlAttribute, XmlChildElement, XmlElement, XmlCollection, XmlObject, XmlNumberConverter } from "./index.js";
+import "../test/config.js";
 
 describe("GetXml/LoadXml/HasChanged", () => {
   it("Simple", () => {

@@ -1,6 +1,6 @@
 import { describe, it, assert } from "vitest";
-import * as xmldsig from "../src/index.js";
-import "./config.js";
+import * as xmldsig from "../index.js";
+import "../../test/config.js";
 
 describe("ECDSA", () => {
   // namedCurves
