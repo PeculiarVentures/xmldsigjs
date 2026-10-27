@@ -1,6 +1,6 @@
 name: Test
 
-# Pushes to master are tested by Release, which calls this workflow before release-please.
+# Pushes to master are tested by Publish, which calls this workflow before release-please.
 on:
   pull_request:
   workflow_call:
