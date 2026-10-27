@@ -46,7 +46,11 @@
     "url": "https://github.com/PeculiarVentures/xmldsigjs/issues"
   },
   "homepage": "https://github.com/PeculiarVentures/xmldsigjs/blob/master/packages/xades/README.md",
-  "dependencies": {
+  "peerDependencies": {
+    "xml-core": "^1.2.6",
+    "xmldsigjs": "^2.8.8"
+  },
+  "devDependencies": {
     "xml-core": "^1.2.6",
     "xmldsigjs": "^2.8.8"
   }

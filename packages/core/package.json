@@ -44,6 +44,10 @@
   "homepage": "https://github.com/PeculiarVentures/xmldsigjs/blob/master/packages/core/README.md",
   "peerDependencies": {
     "@xmldom/xmldom": "^0.9.10",
-    "xpath": "^0.0.34"
+    "xpath": "^0.0.34 || ^0.0.35"
+  },
+  "devDependencies": {
+    "@xmldom/xmldom": "^0.9.12",
+    "xpath": "^0.0.35"
   }
 }
