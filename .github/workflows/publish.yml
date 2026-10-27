@@ -1,4 +1,4 @@
-name: Release
+name: Publish
 
 on:
   push:
@@ -75,11 +75,11 @@ jobs:
         run: |
           if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
             if [ "$GITHUB_REF_TYPE" != tag ] || [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-              echo "::error::Run Release from a v<version> release tag, not from $GITHUB_REF_NAME"
+              echo "::error::Run Publish from a v<version> release tag, not from $GITHUB_REF_NAME"
               exit 1
             fi
           elif [ "$RELEASE_SHA" != "$GITHUB_SHA" ]; then
-            echo "::error::Release commit $RELEASE_SHA differs from $GITHUB_SHA; run Release manually from the release tag"
+            echo "::error::Release commit $RELEASE_SHA differs from $GITHUB_SHA; run Publish manually from the release tag"
             exit 1
           fi
 
