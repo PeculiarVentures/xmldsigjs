@@ -12,7 +12,7 @@ describe("Canonicalization", () => {
     return false;
   }
 
-  function warn(name) {
+  function warn(name: string) {
     console.warn("    \x1b[33mWARN:\x1b[0m Test is not supported for %s", name);
   }
 
@@ -20,7 +20,7 @@ describe("Canonicalization", () => {
     canon(false, xml, xpath, result, false);
   }
 
-  function C14NComment(xml, xpath, result) {
+  function C14NComment(xml: string, xpath: string | null, result: string) {
     canon(false, xml, xpath, result, true);
   }
 

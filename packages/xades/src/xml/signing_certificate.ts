@@ -35,7 +35,7 @@ export class DigestAlgAndValueType extends XadesObject {
     parser: DigestMethod,
     required: true,
   })
-  public DigestMethod: DigestMethod;
+  public DigestMethod!: DigestMethod;
 
   @XmlChildElement({
     localName: XmlSignature.ElementNames.DigestValue,
@@ -44,7 +44,7 @@ export class DigestAlgAndValueType extends XadesObject {
     converter: XmlBase64Converter,
     required: true,
   })
-  public DigestValue: Uint8Array;
+  public DigestValue!: Uint8Array;
 }
 
 @XmlElement({
@@ -61,16 +61,16 @@ export class Cert extends XadesObject {
     parser: DigestAlgAndValueType,
     required: true,
   })
-  public CertDigest: DigestAlgAndValueType;
+  public CertDigest!: DigestAlgAndValueType;
 
   @XmlChildElement({
     parser: IssuerSerial,
     required: true,
   })
-  public IssuerSerial: X509IssuerSerial;
+  public IssuerSerial!: X509IssuerSerial;
 
   @XmlAttribute({ localName: XmlXades.AttributeNames.URI })
-  public Uri: string;
+  public Uri!: string;
 }
 
 @XmlElement({

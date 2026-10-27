@@ -19,7 +19,7 @@ import { XmlXades } from "./xml.js";
 @XmlElement({ localName: XmlXades.ElementNames.Any })
 export class Any extends XadesObject {
   @XmlContent()
-  public Value: string;
+  public Value!: string;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.Any })

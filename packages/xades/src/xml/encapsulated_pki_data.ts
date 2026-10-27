@@ -51,18 +51,18 @@ export class EncapsulatedPKIData extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Encoding,
     defaultValue: null,
     converter: XmlEncodingConverter,
   })
-  public Encoding: EncodingType;
+  public Encoding!: EncodingType;
 
   @XmlContent({
     required: true,
     converter: XmlBase64Converter,
   })
-  public Value: Uint8Array;
+  public Value!: Uint8Array;
 }

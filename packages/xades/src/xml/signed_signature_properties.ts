@@ -36,26 +36,26 @@ export class SignedSignatureProperties extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.SigningTime,
     parser: XadesDateTime,
   })
-  public SigningTime: XadesDateTime;
+  public SigningTime!: XadesDateTime;
 
   @XmlChildElement({ parser: SigningCertificate })
-  public SigningCertificate: SigningCertificate;
+  public SigningCertificate!: SigningCertificate;
 
   @XmlChildElement({ parser: SigningCertificateV2 })
-  public SigningCertificateV2: SigningCertificateV2;
+  public SigningCertificateV2!: SigningCertificateV2;
 
   @XmlChildElement({ parser: SignaturePolicyIdentifier })
-  public SignaturePolicyIdentifier: SignaturePolicyIdentifier;
+  public SignaturePolicyIdentifier!: SignaturePolicyIdentifier;
 
   @XmlChildElement({ parser: SignatureProductionPlace })
-  public SignatureProductionPlace: SignatureProductionPlace;
+  public SignatureProductionPlace!: SignatureProductionPlace;
 
   @XmlChildElement({ parser: SignerRole })
-  public SignerRole: SignerRole;
+  public SignerRole!: SignerRole;
 }

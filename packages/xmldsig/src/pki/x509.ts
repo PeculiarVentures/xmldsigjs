@@ -77,8 +77,8 @@ const OID: Record<string, { short?: string; long?: string }> = {
  * Represents an <X509Certificate> element.
  */
 export class X509Certificate {
-  protected raw: Uint8Array;
-  protected simpl: Certificate;
+  protected raw!: Uint8Array;
+  protected simpl!: Certificate;
   protected publicKey: CryptoKey | null = null;
 
   constructor(rawData?: BufferSource) {
@@ -213,6 +213,6 @@ export class X509Certificate {
   // #endregion
 
   private isHashedAlgorithm(alg: Algorithm): alg is RsaHashedImportParams {
-    return !!alg["hash"];
+    return !!(alg as RsaHashedImportParams).hash;
   }
 }

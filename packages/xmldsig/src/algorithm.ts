@@ -17,8 +17,8 @@ export interface IHashAlgorithm extends IAlgorithm {
 export type IHashAlgorithmConstructable = new () => IHashAlgorithm;
 
 export abstract class XmlAlgorithm implements IAlgorithm {
-  public algorithm: Algorithm;
-  public namespaceURI: string;
+  public algorithm!: Algorithm;
+  public namespaceURI!: string;
 
   public getAlgorithmName(): string {
     return this.namespaceURI;

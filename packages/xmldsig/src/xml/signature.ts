@@ -37,7 +37,7 @@ export class Signature extends XmlSignatureObject {
     localName: XmlSignature.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   /**
    * Gets or sets the SignedInfo of the current Signature.
@@ -46,7 +46,7 @@ export class Signature extends XmlSignatureObject {
     parser: SignedInfo,
     required: true,
   })
-  public SignedInfo: SignedInfo;
+  public SignedInfo!: SignedInfo;
 
   /**
    * Gets or sets the value of the digital signature.
@@ -59,7 +59,7 @@ export class Signature extends XmlSignatureObject {
     converter: XmlBase64Converter,
     defaultValue: null,
   })
-  public SignatureValue: Uint8Array | null;
+  public SignatureValue!: Uint8Array | null;
 
   /**
    * Gets or sets the KeyInfo of the current Signature.
@@ -67,11 +67,11 @@ export class Signature extends XmlSignatureObject {
   @XmlChildElement({
     parser: KeyInfo,
   })
-  public KeyInfo: KeyInfo;
+  public KeyInfo!: KeyInfo;
 
   @XmlChildElement({
     parser: DataObjects,
     noRoot: true,
   })
-  public ObjectList: DataObjects;
+  public ObjectList!: DataObjects;
 }

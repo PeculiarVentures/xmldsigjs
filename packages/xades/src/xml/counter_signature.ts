@@ -23,5 +23,5 @@ export class CounterSignature extends XadesObject implements UnsignedSignaturePr
     parser: Signature,
     required: true,
   })
-  public Signature: Signature;
+  public Signature!: Signature;
 }

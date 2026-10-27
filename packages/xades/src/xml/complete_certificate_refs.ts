@@ -24,12 +24,12 @@ export class CompleteCertificateRefs extends XadesObject implements UnsignedSign
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.CertRefs,
     parser: CertIDList,
     required: true,
   })
-  public CertRefs: CertIDList;
+  public CertRefs!: CertIDList;
 }

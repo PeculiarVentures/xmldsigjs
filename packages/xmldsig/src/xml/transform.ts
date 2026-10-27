@@ -47,7 +47,7 @@ export class Transform extends XmlSignatureObject implements ITransform {
     localName: XmlSignature.AttributeNames.Algorithm,
     defaultValue: "",
   })
-  public Algorithm: string;
+  public Algorithm!: string;
 
   /**
    * XPath of the transformation
@@ -56,7 +56,7 @@ export class Transform extends XmlSignatureObject implements ITransform {
     localName: XmlSignature.ElementNames.XPath,
     defaultValue: "",
   })
-  public XPath: string;
+  public XPath!: string;
 
   protected innerXml: Node | null = null;
 

@@ -32,7 +32,7 @@ export class CertV2 extends XadesObject {
     parser: DigestAlgAndValueType,
     required: true,
   })
-  public CertDigest: DigestAlgAndValueType;
+  public CertDigest!: DigestAlgAndValueType;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.IssuerSerialV2,
@@ -41,10 +41,10 @@ export class CertV2 extends XadesObject {
     converter: XmlBase64Converter,
     required: false,
   })
-  public IssuerSerial: Uint8Array;
+  public IssuerSerial!: Uint8Array;
 
   @XmlAttribute({ localName: XmlXades.AttributeNames.URI })
-  public Uri: string;
+  public Uri!: string;
 }
 
 @XmlElement({

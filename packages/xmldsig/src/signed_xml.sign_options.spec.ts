@@ -10,20 +10,20 @@ describe("Signing options", () => {
     publicExponent: new Uint8Array([1, 0, 1]),
     modulusLength: 2048,
   };
-  let keys;
+  let keys: CryptoKeyPair;
 
   beforeAll(async () => {
     keys = await xmldsig.Application.crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
   });
 
-  async function Sign(options) {
+  async function Sign(options?: xmldsig.OptionsSign) {
     const signedXml = new xmldsig.SignedXml();
 
     await signedXml.Sign(algorithm, keys.privateKey, xmlDocument, options);
     return signedXml;
   }
 
-  function Parse(xml) {
+  function Parse(xml: string) {
     const vXml = xmldsig.Parse(xml);
     const vSignature = vXml.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature")[0];
     const signedXml = new xmldsig.SignedXml(vXml);
@@ -32,7 +32,7 @@ describe("Signing options", () => {
     return signedXml;
   }
 
-  async function SignParse(options) {
+  async function SignParse(options?: xmldsig.OptionsSign) {
     const xml = await Sign(options);
     // console.log(xml.toString());
     return Parse(xml.toString());
@@ -40,7 +40,7 @@ describe("Signing options", () => {
 
   describe("Signature", () => {
     describe("Id", () => {
-      async function Check(value, expectedValue) {
+      async function Check(value?: string, expectedValue?: string) {
         const signature = await SignParse({
           id: value,
           keyValue: keys.publicKey,
@@ -67,7 +67,7 @@ describe("Signing options", () => {
 
   describe("References", () => {
     describe("Uri", () => {
-      async function Check(value, expectedValue) {
+      async function Check(value?: string, expectedValue?: string) {
         const signature = await SignParse({
           keyValue: keys.publicKey,
           references: [

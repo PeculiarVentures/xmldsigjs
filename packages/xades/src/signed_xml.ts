@@ -116,7 +116,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
   // #region Public methods
 
-  public LoadXml(value: Element | string) {
+  public override LoadXml(value: Element | string) {
     super.LoadXml(value as string);
 
     let properties: XAdES.QualifyingProperties | null = null;
@@ -141,7 +141,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     this.properties = properties;
   }
 
-  public async Sign(
+  public override async Sign(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     algorithm: Algorithm,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -177,7 +177,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     this.XmlSignature.ObjectList.Add(dataObject);
   }
 
-  protected async ApplySignOptions(signature: XmlDSigJs.Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsXAdES) {
+  protected override async ApplySignOptions(signature: XmlDSigJs.Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsXAdES) {
     await super.ApplySignOptions(signature, algorithm, key, options);
     if (this.Properties) {
       const sigProps = this.Properties.SignedProperties.SignedSignatureProperties;

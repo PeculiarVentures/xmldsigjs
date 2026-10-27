@@ -31,9 +31,9 @@ describe("RSA-PSS", () => {
                 ["sign", "verify"],
               )) as Required<CryptoKeyPair>;
 
-              const alg = { name: "RSA-PSS" };
+              const alg: Algorithm & { saltLength?: number } = { name: "RSA-PSS" };
               if (saltLength) {
-                alg["saltLength"] = saltLength;
+                alg.saltLength = saltLength;
               }
               await signature.Sign(
                 alg, // algorithm

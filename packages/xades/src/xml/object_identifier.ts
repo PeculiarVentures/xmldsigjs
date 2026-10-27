@@ -46,13 +46,13 @@ export type IdentifierQualifier = "OIDAsURI" | "OIDAsURN";
 @XmlElement({ localName: XmlXades.ElementNames.Identifier })
 export class Identifier extends XadesObject {
   @XmlAttribute({ localName: XmlXades.AttributeNames.Qualifier })
-  public Qualifier: IdentifierQualifier;
+  public Qualifier!: IdentifierQualifier;
 
   @XmlContent({
     defaultValue: "",
     required: true,
   })
-  public Value: string;
+  public Value!: string;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.DocumentationReference })
@@ -61,15 +61,15 @@ export class DocumentationReference extends XadesObject {
     defaultValue: "",
     required: true,
   })
-  public Uri: string;
+  public Uri!: string;
 
-  protected OnLoadXml(e: Element) {
+  protected override OnLoadXml(e: Element) {
     if (e.textContent) {
       this.Uri = e.textContent;
     }
   }
 
-  protected OnGetXml(e: Element) {
+  protected override OnGetXml(e: Element) {
     if (this.Uri) {
       e.textContent = this.Uri;
     }
@@ -88,7 +88,7 @@ export class ObjectIdentifier extends XadesObject {
     parser: Identifier,
     required: true,
   })
-  public Identifier: Identifier;
+  public Identifier!: Identifier;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.Description,
@@ -96,8 +96,8 @@ export class ObjectIdentifier extends XadesObject {
     prefix: XmlXades.DefaultPrefix,
     defaultValue: "",
   })
-  public Description: string;
+  public Description!: string;
 
   @XmlChildElement({ parser: DocumentationReferences })
-  public DocumentationReferences: DocumentationReferences;
+  public DocumentationReferences!: DocumentationReferences;
 }

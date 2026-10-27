@@ -56,7 +56,7 @@ describe("HMAC", () => {
           break;
       }
       assert.equal(si.SignatureMethod.Algorithm, signatureMethod);
-      assert.equal(signature2.XmlSignature.SignatureValue?.length, signatureValueSize / 8);
+      assert.equal(signature2.XmlSignature.SignatureValue?.length, signatureValueSize! / 8);
 
       assert.equal(si.SignatureMethod.HMACOutputLength, undefined);
 

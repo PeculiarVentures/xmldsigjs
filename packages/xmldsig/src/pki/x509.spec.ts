@@ -54,7 +54,7 @@ describe("X509Certificate", () => {
     assert.equal(!!key, true);
     assert.equal(key.type, "public");
     assert.equal(key.algorithm.name, "RSASSA-PKCS1-v1_5");
-    assert.equal(key.algorithm["hash"].name, "SHA-256");
+    assert.equal((key.algorithm as RsaHashedKeyAlgorithm).hash.name, "SHA-256");
 
     assert.equal(x509.PublicKey, key);
   });
@@ -68,7 +68,7 @@ describe("X509Certificate", () => {
     assert.equal(!!key, true);
     assert.equal(key.type, "public");
     assert.equal(key.algorithm.name, "ECDSA");
-    assert.equal(key.algorithm["namedCurve"], "P-256");
+    assert.equal((key.algorithm as EcKeyAlgorithm).namedCurve, "P-256");
 
     assert.equal(x509.PublicKey, key);
 

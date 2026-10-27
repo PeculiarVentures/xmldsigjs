@@ -8,9 +8,9 @@ const CUSTOM_TRANSFORM_NAMESPACE = "urn:custom:transform";
  * Custom transform implementation for testing
  */
 class CustomTransformation extends xmldsig.Transform {
-  public Algorithm = CUSTOM_TRANSFORM_NAMESPACE;
+  public override Algorithm = CUSTOM_TRANSFORM_NAMESPACE;
 
-  public GetOutput(): string {
+  public override GetOutput(): string {
     if (!this.innerXml) {
       throw new Error("innerXml is required");
     }
@@ -59,8 +59,8 @@ describe("Transform Registration", () => {
     const customNamespace = "http://www.w3.org/2000/09/xmldsig#base64";
 
     class CustomBase64Transform extends xmldsig.Transform {
-      public Algorithm = customNamespace;
-      public GetOutput(): string {
+      public override Algorithm = customNamespace;
+      public override GetOutput(): string {
         return "custom-base64-output";
       }
     }

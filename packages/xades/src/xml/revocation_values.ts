@@ -75,14 +75,14 @@ export class RevocationValues extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: CRLValues })
-  public CRLValues: CRLValues;
+  public CRLValues!: CRLValues;
 
   @XmlChildElement({ parser: OCSPValues })
-  public OCSPValues: OCSPValues;
+  public OCSPValues!: OCSPValues;
 
   @XmlChildElement({ parser: OtherValues })
-  public OtherValues: OtherValues;
+  public OtherValues!: OtherValues;
 }

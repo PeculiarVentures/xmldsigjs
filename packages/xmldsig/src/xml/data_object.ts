@@ -34,19 +34,19 @@ export class DataObject extends XmlSignatureObject {
     localName: XmlSignature.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.MimeType,
     defaultValue: "",
   })
-  public MimeType: string;
+  public MimeType!: string;
 
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Encoding,
     defaultValue: "",
   })
-  public Encoding: string;
+  public Encoding!: string;
 }
 
 @XmlElement({

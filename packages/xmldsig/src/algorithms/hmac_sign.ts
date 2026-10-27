@@ -32,14 +32,14 @@ export class HmacSha1 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: HmacKeyAlgorithm = {
+  public override algorithm: HmacKeyAlgorithm = {
     name: HMAC,
     hash: {
       name: SHA1,
     },
   };
 
-  public namespaceURI = HMAC_SHA1_NAMESPACE;
+  public override namespaceURI = HMAC_SHA1_NAMESPACE;
 }
 
 export class HmacSha256 extends SignatureAlgorithm {
@@ -47,14 +47,14 @@ export class HmacSha256 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: HmacKeyAlgorithm = {
+  public override algorithm: HmacKeyAlgorithm = {
     name: HMAC,
     hash: {
       name: SHA256,
     },
   };
 
-  public namespaceURI = HMAC_SHA256_NAMESPACE;
+  public override namespaceURI = HMAC_SHA256_NAMESPACE;
 }
 
 export class HmacSha384 extends SignatureAlgorithm {
@@ -62,14 +62,14 @@ export class HmacSha384 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: HmacKeyAlgorithm = {
+  public override algorithm: HmacKeyAlgorithm = {
     name: HMAC,
     hash: {
       name: SHA384,
     },
   };
 
-  public namespaceURI = HMAC_SHA384_NAMESPACE;
+  public override namespaceURI = HMAC_SHA384_NAMESPACE;
 }
 
 export class HmacSha512 extends SignatureAlgorithm {
@@ -77,12 +77,12 @@ export class HmacSha512 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: HmacKeyAlgorithm = {
+  public override algorithm: HmacKeyAlgorithm = {
     name: HMAC,
     hash: {
       name: SHA512,
     },
   };
 
-  public namespaceURI = HMAC_SHA512_NAMESPACE;
+  public override namespaceURI = HMAC_SHA512_NAMESPACE;
 }

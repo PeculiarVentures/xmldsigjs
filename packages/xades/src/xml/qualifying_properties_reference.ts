@@ -20,11 +20,11 @@ export class QualifyingPropertiesReference extends XadesObject {
     localName: XmlXades.AttributeNames.URI,
     required: true,
   })
-  public Uri: string;
+  public Uri!: string;
 
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 }

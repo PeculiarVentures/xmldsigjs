@@ -33,11 +33,11 @@ export class SignedProperties extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: SignedSignatureProperties })
-  public SignedSignatureProperties: SignedSignatureProperties;
+  public SignedSignatureProperties!: SignedSignatureProperties;
 
   @XmlChildElement({ parser: SignedDataObjectProperties })
-  public SignedDataObjectProperties: SignedDataObjectProperties;
+  public SignedDataObjectProperties!: SignedDataObjectProperties;
 }

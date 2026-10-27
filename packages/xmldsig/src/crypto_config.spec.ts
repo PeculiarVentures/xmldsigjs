@@ -6,7 +6,7 @@ describe("CryptoConfig", () => {
   describe("Digest", () => {
     const vector = {
       data: new Uint8Array([116, 101, 115, 116]), // "test"
-      algs: {
+      algs: <Record<string, string>>{
         "SHA-1": "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
         "SHA-256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
         "SHA-384": "768412320f7b0aa5812fce428dc4706b3cae50e02a64caa16a782249bfe8efc4b7ef1ccb126255d196047dfedf17a0a9",
@@ -14,7 +14,7 @@ describe("CryptoConfig", () => {
       },
     };
 
-    function getIncomingData() {
+    function getIncomingData(): Record<string, string | BufferSource> {
       return {
         String: "test",
         ArrayBuffer: vector.data.buffer,

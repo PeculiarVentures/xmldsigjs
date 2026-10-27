@@ -36,7 +36,7 @@ export class Reference extends XmlSignatureObject {
   @XmlAttribute({
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   /**
    * Gets or sets the Uri of the current Reference.
@@ -53,12 +53,12 @@ export class Reference extends XmlSignatureObject {
     localName: XmlSignature.AttributeNames.Type,
     defaultValue: "",
   })
-  public Type: string;
+  public Type!: string;
 
   @XmlChildElement({
     parser: Transforms,
   })
-  public Transforms: Transforms;
+  public Transforms!: Transforms;
 
   /**
    * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
@@ -79,7 +79,7 @@ export class Reference extends XmlSignatureObject {
     prefix: XmlSignature.DefaultPrefix,
     converter: XmlBase64Converter,
   })
-  public DigestValue: Uint8Array;
+  public DigestValue!: Uint8Array;
 
   constructor(uri?: string) {
     super();

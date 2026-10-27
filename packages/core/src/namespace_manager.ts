@@ -2,7 +2,7 @@ import { Collection } from "./collection.js";
 import type { XmlNamespace } from "./types.js";
 
 export class NamespaceManager extends Collection<XmlNamespace> {
-  public Add(item: XmlNamespace) {
+  public override Add(item: XmlNamespace) {
     item.prefix = item.prefix || "";
     item.namespace = item.namespace || "";
     super.Add(item);

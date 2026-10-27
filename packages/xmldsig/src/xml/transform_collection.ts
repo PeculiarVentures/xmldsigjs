@@ -13,7 +13,7 @@ import { XmlSignatureCollection } from "./xml_object.js";
   parser: Transform,
 })
 export class Transforms extends XmlSignatureCollection<Transform> {
-  protected OnLoadXml(element: Element) {
+  protected override OnLoadXml(element: Element) {
     super.OnLoadXml(element);
     // Update parsed objects
     this.items = this.GetIterator().map((item) => {

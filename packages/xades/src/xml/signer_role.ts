@@ -49,8 +49,8 @@ export class CertifiedRoles extends XadesCollection<CertifiedRole> {}
 @XmlElement({ localName: XmlXades.ElementNames.SignerRole })
 export class SignerRole extends XadesObject {
   @XmlChildElement({ parser: ClaimedRoles })
-  public ClaimedRoles: ClaimedRoles;
+  public ClaimedRoles!: ClaimedRoles;
 
   @XmlChildElement({ parser: CertifiedRoles })
-  public CertifiedRoles: CertifiedRoles;
+  public CertifiedRoles!: CertifiedRoles;
 }

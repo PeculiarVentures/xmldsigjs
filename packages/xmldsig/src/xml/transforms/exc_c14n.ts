@@ -8,7 +8,7 @@ import { Transform } from "../transform.js";
  * as defined by the World Wide Web Consortium (W3C), without comments.
  */
 export class XmlDsigExcC14NTransform extends Transform {
-  public Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
+  public override Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
 
   protected xmlCanonicalizer = new XmlCanonicalizer(false, true);
 
@@ -24,7 +24,7 @@ export class XmlDsigExcC14NTransform extends Transform {
     this.xmlCanonicalizer.InclusiveNamespacesPrefixList = value;
   }
 
-  public LoadXml(param: string | Element) {
+  public override LoadXml(param: string | Element) {
     super.LoadXml(param);
     if (this.Element && this.Element.childNodes) {
       for (let i = 0; i < this.Element.childNodes.length; i++) {
@@ -43,7 +43,7 @@ export class XmlDsigExcC14NTransform extends Transform {
   /**
    * Returns the output of the current XmlDsigExcC14NTransform object
    */
-  public GetOutput(): string {
+  public override GetOutput(): string {
     if (!this.innerXml) {
       throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
     }
@@ -63,6 +63,6 @@ export class XmlDsigExcC14NTransform extends Transform {
  * as defined by the World Wide Web Consortium (W3C), with comments.
  */
 export class XmlDsigExcC14NWithCommentsTransform extends XmlDsigExcC14NTransform {
-  public Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
-  protected xmlCanonicalizer = new XmlCanonicalizer(true, true);
+  public override Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
+  protected override xmlCanonicalizer = new XmlCanonicalizer(true, true);
 }

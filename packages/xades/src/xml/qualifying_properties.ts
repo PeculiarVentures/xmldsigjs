@@ -26,17 +26,17 @@ export class QualifyingProperties extends XadesObject {
     localName: XmlXades.AttributeNames.Target,
     required: true,
   })
-  public Target: string;
+  public Target!: string;
 
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: SignedProperties })
-  public SignedProperties: SignedProperties;
+  public SignedProperties!: SignedProperties;
 
   @XmlChildElement({ parser: UnsignedProperties })
-  public UnsignedProperties: UnsignedProperties;
+  public UnsignedProperties!: UnsignedProperties;
 }
