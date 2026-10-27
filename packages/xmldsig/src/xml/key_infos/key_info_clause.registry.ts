@@ -1,5 +1,5 @@
 import { XmlSignature } from "../xml_names.js";
-import { KeyInfoClauseConstructable } from "./key_info_clause.js";
+import type { KeyInfoClauseConstructable } from "./key_info_clause.js";
 
 class KeyInfoClauseRegistry extends Map<string, KeyInfoClauseConstructable> {}
 

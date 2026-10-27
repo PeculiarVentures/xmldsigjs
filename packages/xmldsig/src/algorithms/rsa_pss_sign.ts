@@ -1,6 +1,6 @@
 import { XE, XmlError } from "xml-core";
-import { ISignatureAlgorithm, SignatureAlgorithm } from "../algorithm.js";
-import { SignatureMethod } from "../xml/signature_method.js";
+import { type ISignatureAlgorithm, SignatureAlgorithm } from "../algorithm.js";
+import type { SignatureMethod } from "../xml/signature_method.js";
 import { PssAlgorithmParams } from "../xml/key_infos/rsa_key.js";
 import { SHA1, SHA1_NAMESPACE, SHA256, SHA256_NAMESPACE, SHA384, SHA384_NAMESPACE, SHA512, SHA512_NAMESPACE } from "./rsa_hash.js";
 

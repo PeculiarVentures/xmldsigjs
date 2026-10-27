@@ -1,6 +1,6 @@
 import { Convert, Stringify } from "xml-core";
 import { Application } from "./application.js";
-import { SignatureMethod } from "./xml/signature_method.js";
+import type { SignatureMethod } from "./xml/signature_method.js";
 
 export type BASE64 = string;
 

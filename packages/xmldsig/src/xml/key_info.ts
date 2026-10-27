@@ -1,6 +1,7 @@
 import { XmlNodeType, XmlAttribute, XmlElement } from "xml-core";
 
-import { KeyInfoClause, KeyInfoX509Data, KeyValue, SPKIData } from "./key_infos/index.js";
+import type { KeyInfoClause } from "./key_infos/index.js";
+import { KeyInfoX509Data, KeyValue, SPKIData } from "./key_infos/index.js";
 import { XmlSignature } from "./xml_names.js";
 import { XmlSignatureCollection } from "./xml_object.js";
 

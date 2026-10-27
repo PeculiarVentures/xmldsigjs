@@ -1,5 +1,5 @@
 import { XE, XmlError } from "xml-core";
-import { KeyInfoClause } from "./key_info_clause.js";
+import type { KeyInfoClause } from "./key_info_clause.js";
 import { keyValueRegistry } from "./key_info_clause.registry.js";
 
 export class KeyInfoClauseFactory {

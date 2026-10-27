@@ -1,9 +1,10 @@
 import { XE, XmlError } from "xml-core";
 
-import { IHashAlgorithm, ISignatureAlgorithm, HashAlgorithm, SignatureAlgorithm, ISignatureAlgorithmConstructable, IHashAlgorithmConstructable } from "./algorithm.js";
+import type { IHashAlgorithm, ISignatureAlgorithm, HashAlgorithm, SignatureAlgorithm, ISignatureAlgorithmConstructable, IHashAlgorithmConstructable } from "./algorithm.js";
 import { SignatureMethod } from "./xml/signature_method.js";
 
-import { Transform, XmlSignature } from "./xml/index.js";
+import type { Transform } from "./xml/index.js";
+import { XmlSignature } from "./xml/index.js";
 import {
   XmlDsigBase64Transform,
   XmlDsigC14NTransform,
@@ -14,10 +15,10 @@ import {
 } from "./xml/transforms/index.js";
 import { AlgorithmFactory } from "./algorithm.factory.js";
 import { algorithmRegistry } from "./algorithm.registry.js";
-import { KeyInfoClauseConstructable } from "./xml/key_infos/index.js";
+import type { KeyInfoClauseConstructable } from "./xml/key_infos/index.js";
 import { keyValueRegistry } from "./xml/key_infos/key_info_clause.registry.js";
 import { transformRegistry } from "./xml/transform.registry.js";
-import { ITransformConstructable } from "./xml/transform.js";
+import type { ITransformConstructable } from "./xml/transform.js";
 
 export class CryptoConfig {
   /**

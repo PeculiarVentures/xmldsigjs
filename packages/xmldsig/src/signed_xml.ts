@@ -1,18 +1,10 @@
-import { IXmlSerializable, XmlObject, XmlNodeType, isDocument, isElement, assign, XmlError, XE, AssocArray, Parse, SelectNamespaces, Stringify } from "xml-core";
+import { type IXmlSerializable, XmlObject, XmlNodeType, isDocument, isElement, assign, XmlError, XE, type AssocArray, Parse, SelectNamespaces, Stringify } from "xml-core";
 
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import * as Alg from "./algorithms/index.js";
 import { CryptoConfig } from "./crypto_config.js";
-import {
-  KeyInfo,
-  Reference,
-  References,
-  Signature,
-  Transform as XmlTransform,
-  Transforms as XmlTransforms,
-  XmlDsigC14NWithCommentsTransform,
-  XmlDsigExcC14NWithCommentsTransform,
-} from "./xml/index.js";
+import type { Transform as XmlTransform } from "./xml/index.js";
+import { KeyInfo, Reference, References, Signature, Transforms as XmlTransforms, XmlDsigC14NWithCommentsTransform, XmlDsigExcC14NWithCommentsTransform } from "./xml/index.js";
 import { KeyInfoX509Data, KeyValue } from "./xml/key_infos/index.js";
 import * as KeyInfos from "./xml/key_infos/index.js";
 import * as Transforms from "./xml/transforms/index.js";

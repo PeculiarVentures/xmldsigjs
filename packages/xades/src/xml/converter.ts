@@ -1,4 +1,4 @@
-import { IConverter } from "xml-core";
+import type { IConverter } from "xml-core";
 
 export const XmlDateTimeConverter: IConverter<Date> = {
   /**

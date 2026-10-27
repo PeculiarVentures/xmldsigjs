@@ -1,4 +1,4 @@
-import { ISignatureAlgorithm, SignatureAlgorithm } from "../algorithm.js";
+import { type ISignatureAlgorithm, SignatureAlgorithm } from "../algorithm.js";
 import { SHA1, SHA256, SHA384, SHA512 } from "./rsa_hash.js";
 
 export const RSA_PKCS1 = "RSASSA-PKCS1-v1_5";

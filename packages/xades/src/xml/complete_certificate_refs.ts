@@ -1,6 +1,6 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 import { CertIDList } from "./signing_certificate.js";
-import { UnsignedSignatureProperty } from "./unsigned_signature_properties.js";
+import type { UnsignedSignatureProperty } from "./unsigned_signature_properties.js";
 import { XmlXades } from "./xml.js";
 import { XadesObject } from "./xml_base.js";
 
