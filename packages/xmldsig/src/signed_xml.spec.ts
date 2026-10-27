@@ -83,3 +83,60 @@ describe("SignedXml", () => {
     });
   });
 });
+
+async function sha256(data: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {
+  return new Uint8Array(await xmldsig.Application.crypto.subtle.digest("SHA-256", data));
+}
+
+describe("SignedXml BufferSource content", () => {
+  const hmac = { name: "HMAC", hash: "SHA-256" };
+
+  it("digests only the bytes of a Uint8Array view with an offset", async () => {
+    const key = (await xmldsig.Application.crypto.subtle.generateKey(hmac, false, ["sign", "verify"])) as CryptoKey;
+    const content = new Uint8Array([0xff, 0xff, 1, 2, 3, 0xff]).subarray(2, 5);
+    const signedXml = new xmldsig.SignedXml();
+    signedXml.contentHandler = async () => content;
+
+    await signedXml.Sign(hmac, key, content, { references: [{ hash: "SHA-256", uri: "data.bin" }] });
+
+    const reference = signedXml.XmlSignature.SignedInfo.References.Item(0)!;
+    assert.deepEqual(new Uint8Array(reference.DigestValue), await sha256(new Uint8Array([1, 2, 3])));
+    assert.isTrue(await signedXml.Verify({ key, content }));
+  });
+
+  it("decodes UTF-8 XML bytes before the default C14N transform", async () => {
+    const key = (await xmldsig.Application.crypto.subtle.generateKey(hmac, false, ["sign", "verify"])) as CryptoKey;
+    const xml = "<root>żółw €</root>";
+    const content = new TextEncoder().encode(`﻿${xml}`);
+    const signedXml = new xmldsig.SignedXml();
+
+    await signedXml.Sign(hmac, key, content, { references: [{ hash: "SHA-256" }] });
+
+    const reference = signedXml.XmlSignature.SignedInfo.References.Item(0)!;
+    assert.deepEqual(new Uint8Array(reference.DigestValue), await sha256(new TextEncoder().encode(xml)));
+  });
+
+  it("replaces invalid UTF-8 in XML bytes with U+FFFD", async () => {
+    const key = (await xmldsig.Application.crypto.subtle.generateKey(hmac, false, ["sign", "verify"])) as CryptoKey;
+    const content = new Uint8Array([...new TextEncoder().encode("<root>"), 0xff, ...new TextEncoder().encode("</root>")]);
+    const signedXml = new xmldsig.SignedXml();
+
+    await signedXml.Sign(hmac, key, content, { references: [{ hash: "SHA-256" }] });
+
+    const reference = signedXml.XmlSignature.SignedInfo.References.Item(0)!;
+    assert.deepEqual(new Uint8Array(reference.DigestValue), await sha256(new TextEncoder().encode("<root>\uFFFD</root>")));
+  });
+
+  it("rejects an x509 option that is not Base64", async () => {
+    const key = (await xmldsig.Application.crypto.subtle.generateKey(hmac, false, ["sign", "verify"])) as CryptoKey;
+    const signedXml = new xmldsig.SignedXml();
+
+    let error: unknown;
+    try {
+      await signedXml.Sign(hmac, key, xmldsig.Parse("<root/>"), { x509: ["not base64!"] });
+    } catch (e) {
+      error = e;
+    }
+    assert.instanceOf(error, TypeError);
+  });
+});
