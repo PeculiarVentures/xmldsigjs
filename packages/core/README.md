@@ -1,10 +1,16 @@
-# xml-core
+<h1 align="center">
+  xml-core
+</h1>
+
+<div align="center">
 
 ![NPM License](https://img.shields.io/npm/l/xml-core)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/release.yml?branch=master&label=release)
 [![npm version](https://img.shields.io/npm/v/xml-core.svg)](https://www.npmjs.com/package/xml-core)
 ![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
 [![npm downloads](https://img.shields.io/npm/dm/xml-core.svg)](https://www.npmjs.com/package/xml-core)
+
+</div>
 
 A foundational library for working with XML in JavaScript/TypeScript with schema validation through decorators.
 
@@ -13,6 +19,16 @@ A foundational library for working with XML in JavaScript/TypeScript with schema
 ```bash
 npm install xml-core
 ```
+
+## Breaking Changes In v3
+
+v3 is ESM-only and requires Node.js `^20.19.0 || >=22.12.0` (was `>=16`). xml-core, xmldsigjs and xadesjs are released together and all move to 3.0.0. CommonJS code can still `require("xml-core")` on these versions; Node.js 22.0–22.11 can't. See the [full notes](https://github.com/PeculiarVentures/xmldsigjs#breaking-changes-in-v3).
+
+- **TypeScript compiling to CommonJS:** use `"module": "node20"` or `"nodenext"` (`node16` fails with TS1479). ESM and bundler setups need no changes.
+- **Jest in CommonJS mode:** switch to ESM mode or Vitest, or configure an ESM-to-CommonJS transformer and make sure `transformIgnorePatterns` doesn't exclude `xml-core` and its peers.
+- **Deep imports** (`xml-core/build/...`) are blocked by `exports`; import from `xml-core`.
+- **Peer dependencies:** `@xmldom/xmldom` (`^0.9.10`) and `xpath` (`^0.0.34 || ^0.0.35`) stay peers. xmldsigjs and xadesjs have xml-core `^3.0.0` as a peer, so your app shares one copy (`setNodeDependencies` and the decorator schemas are module-level state).
+- **Stricter `Convert`:** Base64 and hex decoding throw `TypeError` for invalid text, and UTF-8 helpers replace invalid input with U+FFFD instead of throwing `URIError`. See the full notes.
 
 ## Features
 

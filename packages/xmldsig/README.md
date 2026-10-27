@@ -1,10 +1,16 @@
-# XMLDSIGjs
+<h1 align="center">
+  XMLDSIGjs
+</h1>
+
+<div align="center">
 
 ![NPM License](https://img.shields.io/npm/l/xmldsigjs)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/release.yml?branch=master&label=release)
 [![npm version](https://img.shields.io/npm/v/xmldsigjs.svg)](https://www.npmjs.com/package/xmldsigjs)
 ![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
 [![npm downloads](https://img.shields.io/npm/dm/xmldsigjs.svg)](https://www.npmjs.com/package/xmldsigjs)
+
+</div>
 
 XML Digital Signature implementation in TypeScript/JavaScript using Web Crypto API.
 
@@ -13,6 +19,15 @@ XML Digital Signature implementation in TypeScript/JavaScript using Web Crypto A
 ```bash
 npm install xmldsigjs
 ```
+
+## Breaking Changes In v3
+
+v3 is ESM-only and requires Node.js `^20.19.0 || >=22.12.0` (was `>=16`). xml-core, xmldsigjs and xadesjs are released together and all move to 3.0.0. CommonJS code can still `require("xmldsigjs")` on these versions; Node.js 22.0–22.11 can't. See the [full notes](https://github.com/PeculiarVentures/xmldsigjs#breaking-changes-in-v3).
+
+- **TypeScript compiling to CommonJS:** use `"module": "node20"` or `"nodenext"` (`node16` fails with TS1479). ESM and bundler setups need no changes.
+- **Jest in CommonJS mode:** switch to ESM mode or Vitest, or configure an ESM-to-CommonJS transformer and make sure `transformIgnorePatterns` doesn't exclude `xmldsigjs` and its peers.
+- **Deep imports** (`xmldsigjs/build/...`) are blocked by `exports`; import from `xmldsigjs`.
+- **Peer dependencies:** `xml-core` (`^3.0.0`), `pkijs` (`^4.0.0`) and `asn1js` (`^4.0.0`) are peers instead of dependencies, so your app shares one copy with xadesjs. npm installs peers automatically. `xpath` is no longer a direct dependency; it comes with xml-core's peers.
 
 ## Features
 
@@ -46,7 +61,7 @@ npm install xmldsigjs
 
 ### Node.js Setup
 
-> **Note:** Both ESM (`import`) and CommonJS (`require`) are supported.
+> **Note:** The package is ESM-only. CommonJS code can `require()` it on Node.js `^20.19.0 || >=22.12.0`.
 
 ```javascript
 import * as xmldsigjs from "xmldsigjs";
@@ -164,7 +179,7 @@ setNodeDependencies({
 
 ## WebCrypto Environment
 
-Node.js >=19 ships a built‑in WebCrypto. For Node.js 16/18 or to ensure consistent behavior across environments, you can use:
+Node.js ships a built‑in WebCrypto (`globalThis.crypto`). To get the same behavior across environments, you can also use:
 
 ```ts
 import { Crypto } from "@peculiar/webcrypto";

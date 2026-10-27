@@ -1,10 +1,16 @@
-# XAdESjs
+<h1 align="center">
+  XAdESjs
+</h1>
+
+<div align="center">
 
 ![NPM License](https://img.shields.io/npm/l/xadesjs)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/release.yml?branch=master&label=release)
 [![npm version](https://img.shields.io/npm/v/xadesjs.svg)](https://www.npmjs.com/package/xadesjs)
 ![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
 [![npm downloads](https://img.shields.io/npm/dm/xadesjs.svg)](https://www.npmjs.com/package/xadesjs)
+
+</div>
 
 XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScript built on XMLDSIGjs.
 
@@ -13,6 +19,15 @@ XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScri
 ```bash
 npm install xadesjs
 ```
+
+## Breaking Changes In v3
+
+v3 is ESM-only and requires Node.js `^20.19.0 || >=22.12.0` (was `>=16`). xml-core, xmldsigjs and xadesjs are released together and all move to 3.0.0. CommonJS code can still `require("xadesjs")` on these versions; Node.js 22.0–22.11 can't. See the [full notes](https://github.com/PeculiarVentures/xmldsigjs#breaking-changes-in-v3).
+
+- **TypeScript compiling to CommonJS:** use `"module": "node20"` or `"nodenext"` (`node16` fails with TS1479). ESM and bundler setups need no changes.
+- **Jest in CommonJS mode:** switch to ESM mode or Vitest, or configure an ESM-to-CommonJS transformer and make sure `transformIgnorePatterns` doesn't exclude `xadesjs` and its peers.
+- **Deep imports** (`xadesjs/build/...`) are blocked by `exports`; import from `xadesjs`.
+- **Peer dependencies:** `xml-core` and `xmldsigjs` (`^3.0.0`) are peers instead of dependencies, so your app shares one copy of the `Application` engine and the algorithm and transform registries. npm installs peers automatically.
 
 ## Features
 
@@ -38,7 +53,7 @@ _Currently only XAdES-BES is fully supported._
 
 ### Node.js Setup
 
-> **Note:** Both ESM (`import`) and CommonJS (`require`) are supported.
+> **Note:** The package is ESM-only. CommonJS code can `require()` it on Node.js `^20.19.0 || >=22.12.0`.
 
 ```javascript
 import * as xadesjs from "xadesjs";
