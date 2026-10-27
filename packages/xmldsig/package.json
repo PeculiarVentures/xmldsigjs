@@ -2,31 +2,30 @@
   "name": "xmldsigjs",
   "version": "2.8.8",
   "description": "XML Digital Signature implementation in TypeScript/JavaScript using Web Crypto API",
+  "type": "module",
+  "sideEffects": false,
   "main": "./build/index.js",
-  "module": "./build/index.mjs",
+  "module": "./build/index.js",
   "types": "./build/index.d.ts",
   "exports": {
-    ".": {
-      "module": "./build/index.mjs",
-      "default": "./build/index.js"
-    },
+    ".": "./build/index.js",
     "./package.json": "./package.json"
   },
-  "sideEffects": false,
   "engines": {
-    "node": ">=16.0.0"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "files": [
-    "build",
-    "LICENSE",
-    "README.md"
+    "build/",
+    "README.md",
+    "LICENSE"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/xmldsigjs.git"
+    "url": "https://github.com/PeculiarVentures/xmldsigjs",
+    "directory": "packages/xmldsig"
   },
   "keywords": [
     "xml",

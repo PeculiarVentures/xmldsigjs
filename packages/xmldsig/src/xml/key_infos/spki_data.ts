@@ -46,7 +46,7 @@ export class SPKIData extends KeyInfoClause {
     if (!this.SPKIexp) {
       throw new Error("SPKI data is not defined");
     }
-    const key = await Application.crypto.subtle.importKey("spki", this.SPKIexp, alg as any, true, ["verify"]);
+    const key = await Application.crypto.subtle.importKey("spki", this.SPKIexp as Uint8Array<ArrayBuffer>, alg as any, true, ["verify"]);
     this.Key = key;
     return key;
   }

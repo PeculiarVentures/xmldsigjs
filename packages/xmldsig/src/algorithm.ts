@@ -28,7 +28,7 @@ export abstract class XmlAlgorithm implements IAlgorithm {
 export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
   public async Digest(xml: BufferSource | string | Node): Promise<Uint8Array> {
     // console.log("HashedInfo:", xml);
-    let buf: Uint8Array;
+    let buf: Uint8Array<ArrayBuffer>;
     if (typeof xml === "string") {
       // C14N transforms
       // console.log("Hash:\n%s\n", xml);
@@ -83,6 +83,6 @@ export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignat
     const alg = this.algorithm;
     const info = Convert.FromString(signedInfo, "utf8");
 
-    return Application.crypto.subtle.verify(alg, key, signatureValue, info);
+    return Application.crypto.subtle.verify(alg, key, signatureValue as Uint8Array<ArrayBuffer>, info);
   }
 }

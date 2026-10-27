@@ -17,7 +17,7 @@ class Shake256 extends xmldsig.HashAlgorithm {
   public override async Digest(xml: BufferSource | string | Node): Promise<Uint8Array> {
     // For SHAKE256, we need to specify the output length
     // Using 256 bits (32 bytes) as default output length
-    let buf: Uint8Array;
+    let buf: Uint8Array<ArrayBuffer>;
 
     if (typeof xml === "string") {
       buf = new TextEncoder().encode(xml);
@@ -58,7 +58,7 @@ class Ed25519Signature extends xmldsig.SignatureAlgorithm {
 
   public override async Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, _algorithm?: Algorithm): Promise<boolean> {
     const info = new TextEncoder().encode(signedInfo);
-    return crypto.subtle.verify("Ed25519", key, signatureValue, info);
+    return crypto.subtle.verify("Ed25519", key, signatureValue as Uint8Array<ArrayBuffer>, info);
   }
 }
 
@@ -80,7 +80,7 @@ class Ed25519KeyValue extends xmldsig.KeyInfoClause {
     namespaceURI: "http://www.w3.org/2021/04/xmldsig-more#",
     prefix: "dsig11",
   })
-  public PublicKey!: Uint8Array;
+  public PublicKey!: Uint8Array<ArrayBuffer>;
 
   public async importKey(key: CryptoKey): Promise<this> {
     if (key.algorithm.name !== "Ed25519") {

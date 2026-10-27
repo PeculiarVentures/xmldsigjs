@@ -2,31 +2,30 @@
   "name": "xml-core",
   "version": "1.2.6",
   "description": "A foundational library for working with XML in JavaScript/TypeScript with schema validation through decorators",
+  "type": "module",
+  "sideEffects": false,
   "main": "./build/index.js",
-  "module": "./build/index.mjs",
+  "module": "./build/index.js",
   "types": "./build/index.d.ts",
   "exports": {
-    ".": {
-      "module": "./build/index.mjs",
-      "default": "./build/index.js"
-    },
+    ".": "./build/index.js",
     "./package.json": "./package.json"
   },
-  "sideEffects": false,
   "engines": {
-    "node": ">=16.0.0"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "files": [
-    "build",
-    "LICENSE",
-    "README.md"
+    "build/",
+    "README.md",
+    "LICENSE"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/xmldsigjs.git"
+    "url": "https://github.com/PeculiarVentures/xmldsigjs",
+    "directory": "packages/core"
   },
   "keywords": [
     "xml",
@@ -43,7 +42,6 @@
     "url": "https://github.com/PeculiarVentures/xmldsigjs/issues"
   },
   "homepage": "https://github.com/PeculiarVentures/xmldsigjs/blob/master/packages/core/README.md",
-  "dependencies": {},
   "peerDependencies": {
     "@xmldom/xmldom": "^0.9.10",
     "xpath": "^0.0.34"

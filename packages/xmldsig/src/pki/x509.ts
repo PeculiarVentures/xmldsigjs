@@ -77,7 +77,7 @@ const OID: Record<string, { short?: string; long?: string }> = {
  * Represents an <X509Certificate> element.
  */
 export class X509Certificate {
-  protected raw!: Uint8Array;
+  protected raw!: Uint8Array<ArrayBuffer>;
   protected simpl!: Certificate;
   protected publicKey: CryptoKey | null = null;
 
