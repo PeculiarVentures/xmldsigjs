@@ -1,8 +1,8 @@
-import { XmlChildElement, XmlElement } from 'xml-core';
-import { Any } from './any.js';
-import { EncapsulatedPKIData } from './encapsulated_pki_data.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlChildElement, XmlElement } from "xml-core";
+import { Any } from "./any.js";
+import { EncapsulatedPKIData } from "./encapsulated_pki_data.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <SignerRole> element of an XML signature.

@@ -1,14 +1,14 @@
-import { XE, XmlError } from 'xml-core';
+import { XE, XmlError } from "xml-core";
 
-import { XmlCanonicalizer } from '../../canonicalizer.js';
-import { Transform } from '../transform.js';
+import { XmlCanonicalizer } from "../../canonicalizer.js";
+import { Transform } from "../transform.js";
 
 /**
  * Represents the exclusive C14N XML canonicalization transform for a digital signature
  * as defined by the World Wide Web Consortium (W3C), without comments.
  */
 export class XmlDsigExcC14NTransform extends Transform {
-  public Algorithm = 'http://www.w3.org/2001/10/xml-exc-c14n#';
+  public Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
 
   protected xmlCanonicalizer = new XmlCanonicalizer(false, true);
 
@@ -31,7 +31,7 @@ export class XmlDsigExcC14NTransform extends Transform {
         const element = this.Element.childNodes[i] as HTMLElement;
         if (element && element.nodeType === 1) {
           switch (element.localName) {
-            case 'InclusiveNamespaces':
+            case "InclusiveNamespaces":
               this.setInclusiveNamespacesElement(element);
               break;
           }
@@ -45,13 +45,13 @@ export class XmlDsigExcC14NTransform extends Transform {
    */
   public GetOutput(): string {
     if (!this.innerXml) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'innerXml');
+      throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
     }
     return this.xmlCanonicalizer.Canonicalize(this.innerXml);
   }
 
   private setInclusiveNamespacesElement(element: HTMLElement) {
-    const prefixList = element.getAttribute('PrefixList');
+    const prefixList = element.getAttribute("PrefixList");
     if (prefixList && prefixList.length > 0) {
       this.xmlCanonicalizer.InclusiveNamespacesPrefixList = prefixList;
     }
@@ -63,6 +63,6 @@ export class XmlDsigExcC14NTransform extends Transform {
  * as defined by the World Wide Web Consortium (W3C), with comments.
  */
 export class XmlDsigExcC14NWithCommentsTransform extends XmlDsigExcC14NTransform {
-  public Algorithm = 'http://www.w3.org/2001/10/xml-exc-c14n#WithComments';
+  public Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
   protected xmlCanonicalizer = new XmlCanonicalizer(true, true);
 }

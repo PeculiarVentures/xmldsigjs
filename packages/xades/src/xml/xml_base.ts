@@ -1,16 +1,16 @@
-import * as XmlCore from 'xml-core';
-import { XmlElement } from 'xml-core';
-import { XmlXades } from './xml.js';
+import * as XmlCore from "xml-core";
+import { XmlElement } from "xml-core";
+import { XmlXades } from "./xml.js";
 
 @XmlElement({
-  localName: 'xades',
+  localName: "xades",
   namespaceURI: XmlXades.NamespaceURI,
   prefix: XmlXades.DefaultPrefix,
 })
 export class XadesObject extends XmlCore.XmlObject {}
 
 @XmlElement({
-  localName: 'xades_collection',
+  localName: "xades_collection",
   namespaceURI: XmlXades.NamespaceURI,
   prefix: XmlXades.DefaultPrefix,
 })

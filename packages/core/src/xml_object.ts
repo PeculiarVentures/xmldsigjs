@@ -1,16 +1,9 @@
-import * as CONST from './const.js';
-import { XE, XmlError } from './error.js';
-import {
-  AssocArray,
-  IXmlSerializable,
-  XmlAttributeType,
-  XmlChildElementType,
-  XmlContentType,
-  XmlSchema,
-} from './types.js';
-import { isDocument, isElement, Parse, SelectSingleNode, Stringify } from './utils.js';
+import * as CONST from "./const.js";
+import { XE, XmlError } from "./error.js";
+import { AssocArray, IXmlSerializable, XmlAttributeType, XmlChildElementType, XmlContentType, XmlSchema } from "./types.js";
+import { isDocument, isElement, Parse, SelectSingleNode, Stringify } from "./utils.js";
 
-const DEFAULT_ROOT_NAME = 'xml_root';
+const DEFAULT_ROOT_NAME = "xml_root";
 
 export class XmlObject implements IXmlSerializable {
   public static LoadXml<T extends XmlObject>(this: new () => T, param: string | Element) {
@@ -27,12 +20,7 @@ export class XmlObject implements IXmlSerializable {
     return xmlNodeList[0] || null;
   }
 
-  public static GetAttribute(
-    element: Element,
-    attrName: string,
-    defaultValue: string | null,
-    required = true,
-  ) {
+  public static GetAttribute(element: Element, attrName: string, defaultValue: string | null, required = true) {
     if (element.hasAttribute(attrName)) {
       return element.getAttribute(attrName);
     } else {
@@ -74,24 +62,16 @@ export class XmlObject implements IXmlSerializable {
    * @param  {string} prefix
    * @returns Document
    */
-  public static CreateDocument(
-    root: string = DEFAULT_ROOT_NAME,
-    namespaceUri: string | null = null,
-    prefix: string | null = null,
-  ): Document {
+  public static CreateDocument(root: string = DEFAULT_ROOT_NAME, namespaceUri: string | null = null, prefix: string | null = null): Document {
     if (prefix && !namespaceUri) {
-      throw new XmlError(
-        XE.PARAM_REQUIRED,
-        'namespaceUri',
-        `Prefix '${prefix}' requires namespaceUri`,
-      );
+      throw new XmlError(XE.PARAM_REQUIRED, "namespaceUri", `Prefix '${prefix}' requires namespaceUri`);
     }
-    let namePrefix = '';
-    let nsPrefix = '';
-    let namespaceUri2 = '';
+    let namePrefix = "";
+    let nsPrefix = "";
+    let namespaceUri2 = "";
     if (prefix) {
-      namePrefix = prefix + ':';
-      nsPrefix = ':' + prefix;
+      namePrefix = prefix + ":";
+      nsPrefix = ":" + prefix;
     }
     if (namespaceUri) {
       namespaceUri2 = ` xmlns${nsPrefix}="${namespaceUri}"`;
@@ -106,11 +86,7 @@ export class XmlObject implements IXmlSerializable {
     const res: Element[] = [];
     for (let i = 0; i < node.childNodes.length; i++) {
       const child = node.childNodes[i];
-      if (
-        isElement(child) &&
-        child.localName === localName &&
-        (child.namespaceURI === nameSpace || !nameSpace)
-      ) {
+      if (isElement(child) && child.localName === localName && (child.namespaceURI === nameSpace || !nameSpace)) {
         res.push(child);
       }
     }
@@ -121,30 +97,17 @@ export class XmlObject implements IXmlSerializable {
     node = isDocument(node) ? node.documentElement : node;
     for (let i = 0; i < node.childNodes.length; i++) {
       const child = node.childNodes[i];
-      if (
-        isElement(child) &&
-        child.localName === localName &&
-        (child.namespaceURI === nameSpace || !nameSpace)
-      ) {
+      if (isElement(child) && child.localName === localName && (child.namespaceURI === nameSpace || !nameSpace)) {
         return child;
       }
     }
     return null;
   }
 
-  public static GetChild(
-    node: Element,
-    localName: string,
-    nameSpace?: string,
-    required = true,
-  ): Element | null {
+  public static GetChild(node: Element, localName: string, nameSpace?: string, required = true): Element | null {
     for (let i = 0; i < node.childNodes.length; i++) {
       const child = node.childNodes[i];
-      if (
-        isElement(child) &&
-        child.localName === localName &&
-        (child.namespaceURI === nameSpace || !nameSpace)
-      ) {
+      if (isElement(child) && child.localName === localName && (child.namespaceURI === nameSpace || !nameSpace)) {
         return child;
       }
     }
@@ -199,7 +162,7 @@ export class XmlObject implements IXmlSerializable {
   }
 
   public get LocalName(): string {
-    return this.localName || '';
+    return this.localName || "";
   }
 
   public get NamespaceURI(): string | null {
@@ -236,7 +199,7 @@ export class XmlObject implements IXmlSerializable {
     const el = this.CreateElement();
     const self = this.GetStatic();
 
-    const localName: string = this.localName || '';
+    const localName: string = this.localName || "";
 
     // Add attributes
     if (self.items) {
@@ -269,9 +232,9 @@ export class XmlObject implements IXmlSerializable {
             // attr value
             if (schema.defaultValue !== parser || schema.required) {
               if (!schema.namespaceURI) {
-                el.setAttribute(schema.localName || '', value);
+                el.setAttribute(schema.localName || "", value);
               } else {
-                el.setAttributeNS(schema.namespaceURI, schema.localName || '', value);
+                el.setAttributeNS(schema.namespaceURI, schema.localName || "", value);
               }
             }
             break;
@@ -288,9 +251,7 @@ export class XmlObject implements IXmlSerializable {
               }
 
               if (parser) {
-                node = parser.GetXml(
-                  parser.element === void 0 && (schema.required || parser.Count),
-                );
+                node = parser.GetXml(parser.element === void 0 && (schema.required || parser.Count));
               }
             } else {
               const value = schema.converter ? schema.converter.get(parser) : parser;
@@ -299,14 +260,9 @@ export class XmlObject implements IXmlSerializable {
               }
               if (parser !== schema.defaultValue || schema.required) {
                 if (!schema.namespaceURI) {
-                  node = doc.createElement(
-                    `${schema.prefix ? schema.prefix + ':' : ''}${schema.localName}`,
-                  );
+                  node = doc.createElement(`${schema.prefix ? schema.prefix + ":" : ""}${schema.localName}`);
                 } else {
-                  node = doc.createElementNS(
-                    schema.namespaceURI,
-                    `${schema.prefix ? schema.prefix + ':' : ''}${schema.localName}`,
-                  );
+                  node = doc.createElementNS(schema.namespaceURI, `${schema.prefix ? schema.prefix + ":" : ""}${schema.localName}`);
                 }
                 if (Array.isArray(value)) {
                   for (const child of value) {
@@ -344,10 +300,7 @@ export class XmlObject implements IXmlSerializable {
                   throw new XmlError(XE.COLLECTION_LIMIT, parser.localName, self.localName);
                 }
                 els.forEach((e) => el.appendChild(e.cloneNode(true)));
-              } else if (
-                node.childNodes.length < (schema.minOccurs || 0) ||
-                node.childNodes.length > (schema.maxOccurs || Infinity)
-              ) {
+              } else if (node.childNodes.length < (schema.minOccurs || 0) || node.childNodes.length > (schema.maxOccurs || Infinity)) {
                 throw new XmlError(XE.COLLECTION_LIMIT, parser.localName, self.localName);
               } else {
                 el.appendChild(node);
@@ -370,7 +323,7 @@ export class XmlObject implements IXmlSerializable {
   public LoadXml(param: string | Element) {
     let element: Element;
     const thisAny = this as any;
-    if (typeof param === 'string') {
+    if (typeof param === "string") {
       const doc = Parse(param);
       element = doc.documentElement;
     } else {
@@ -378,11 +331,11 @@ export class XmlObject implements IXmlSerializable {
     }
 
     if (!element) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'element');
+      throw new XmlError(XE.PARAM_REQUIRED, "element");
     }
 
     const self = this.GetStatic();
-    const localName = this.localName || '';
+    const localName = this.localName || "";
 
     if (!(element.localName === localName && element.namespaceURI == this.NamespaceURI)) {
       throw new XmlError(XE.ELEMENT_MALFORMED, localName);
@@ -406,9 +359,7 @@ export class XmlObject implements IXmlSerializable {
             if (!element.textContent) {
               thisAny[key] = schema.defaultValue;
             } else {
-              const value = schema.converter
-                ? schema.converter.set(element.textContent)
-                : element.textContent;
+              const value = schema.converter ? schema.converter.set(element.textContent) : element.textContent;
               thisAny[key] = value;
             }
             break;
@@ -420,20 +371,12 @@ export class XmlObject implements IXmlSerializable {
             let getAttribute: () => string | null;
 
             if (!schema.localName) {
-              throw new XmlError(XE.PARAM_REQUIRED, 'localName');
+              throw new XmlError(XE.PARAM_REQUIRED, "localName");
             }
 
             if (schema.namespaceURI) {
-              hasAttribute = element.hasAttributeNS.bind(
-                element,
-                schema.namespaceURI,
-                schema.localName,
-              );
-              getAttribute = element.getAttributeNS.bind(
-                element,
-                schema.namespaceURI,
-                schema.localName,
-              );
+              hasAttribute = element.hasAttributeNS.bind(element, schema.namespaceURI, schema.localName);
+              getAttribute = element.getAttributeNS.bind(element, schema.namespaceURI, schema.localName);
             } else {
               hasAttribute = element.hasAttribute.bind(element, schema.localName);
               getAttribute = element.getAttribute.bind(element, schema.localName);
@@ -447,8 +390,7 @@ export class XmlObject implements IXmlSerializable {
               thisAny[key] = schema.defaultValue;
             } else {
               const attrValue = getAttribute();
-              const value =
-                schema.converter && attrValue ? schema.converter.set(attrValue) : attrValue;
+              const value = schema.converter && attrValue ? schema.converter.set(attrValue) : attrValue;
               thisAny[key] = value;
             }
             break;
@@ -459,17 +401,11 @@ export class XmlObject implements IXmlSerializable {
             // noRoot
             if (schema.noRoot) {
               if (!schema.parser) {
-                throw new XmlError(
-                  XE.XML_EXCEPTION,
-                  `Schema for '${schema.localName}' with flag noRoot must have 'parser'`,
-                );
+                throw new XmlError(XE.XML_EXCEPTION, `Schema for '${schema.localName}' with flag noRoot must have 'parser'`);
               }
               const col: XmlCollection<any> = new schema.parser() as any;
               if (!(col instanceof XmlCollection)) {
-                throw new XmlError(
-                  XE.XML_EXCEPTION,
-                  `Schema for '${schema.localName}' with flag noRoot must have 'parser' like instance of XmlCollection`,
-                );
+                throw new XmlError(XE.XML_EXCEPTION, `Schema for '${schema.localName}' with flag noRoot must have 'parser' like instance of XmlCollection`);
               }
               (col as any).OnLoadXml(element); // protected member
               delete col.element; // reset cache status
@@ -477,11 +413,7 @@ export class XmlObject implements IXmlSerializable {
               const minOccurs = schema.minOccurs || 0;
               const maxOccurs = schema.maxOccurs || Infinity;
               if (col.Count < minOccurs || col.Count > maxOccurs) {
-                throw new XmlError(
-                  XE.COLLECTION_LIMIT,
-                  (schema.parser as any).localName,
-                  localName,
-                );
+                throw new XmlError(XE.COLLECTION_LIMIT, (schema.parser as any).localName, localName);
               }
               thisAny[key] = col;
               continue;
@@ -503,11 +435,7 @@ export class XmlObject implements IXmlSerializable {
 
             // required
             if (schema.required && !foundElement) {
-              throw new XmlError(
-                XE.ELEMENT_MISSING,
-                schema.parser ? (schema.parser as any).localName : schema.localName,
-                localName,
-              );
+              throw new XmlError(XE.ELEMENT_MISSING, schema.parser ? (schema.parser as any).localName : schema.localName, localName);
             }
 
             if (!schema.parser) {
@@ -515,7 +443,7 @@ export class XmlObject implements IXmlSerializable {
               if (!foundElement) {
                 thisAny[key] = schema.defaultValue;
               } else {
-                const textContent = foundElement.textContent || '';
+                const textContent = foundElement.textContent || "";
                 const value = schema.converter ? schema.converter.set(textContent) : textContent;
                 thisAny[key] = value;
               }
@@ -538,7 +466,7 @@ export class XmlObject implements IXmlSerializable {
     // Get custom
     this.OnLoadXml(element);
 
-    this.prefix = element.prefix || '';
+    this.prefix = element.prefix || "";
     this.element = element;
   }
 
@@ -548,7 +476,7 @@ export class XmlObject implements IXmlSerializable {
    */
   public toString(): string {
     const xml = this.GetXml();
-    return xml ? Stringify(xml) : '';
+    return xml ? Stringify(xml) : "";
   }
 
   public GetElement(name: string, required = true) {
@@ -562,11 +490,7 @@ export class XmlObject implements IXmlSerializable {
     if (!this.element) {
       throw new XmlError(XE.NULL_PARAM, this.localName);
     }
-    return XmlObject.GetChildren(
-      this.element,
-      localName,
-      nameSpace || this.NamespaceURI || undefined,
-    );
+    return XmlObject.GetChildren(this.element, localName, nameSpace || this.NamespaceURI || undefined);
   }
 
   public GetChild(localName: string, required = true): Element | null {
@@ -603,36 +527,28 @@ export class XmlObject implements IXmlSerializable {
   }
 
   protected GetPrefix(): string {
-    return this.Prefix ? this.prefix + ':' : '';
+    return this.Prefix ? this.prefix + ":" : "";
   }
 
   protected OnGetXml(_element: Element) {
     // Empty
   }
 
-  protected CreateElement(
-    document?: Document,
-    localName?: string,
-    namespaceUri: string | null = null,
-    prefix: string | null = null,
-  ) {
+  protected CreateElement(document?: Document, localName?: string, namespaceUri: string | null = null, prefix: string | null = null) {
     if (!document) {
       const createdDocument = this.CreateDocument();
       if (createdDocument) {
         document = createdDocument;
       } else {
-        throw new XmlError(XE.XML_EXCEPTION, 'Document not created');
+        throw new XmlError(XE.XML_EXCEPTION, "Document not created");
       }
     }
     localName = localName || this.localName;
     namespaceUri = namespaceUri || this.NamespaceURI;
     prefix = prefix || this.prefix;
 
-    const tagName = (prefix ? `${prefix}:` : '') + localName;
-    const xn =
-      namespaceUri && document
-        ? document.createElementNS(namespaceUri, tagName)
-        : document?.createElement(tagName);
+    const tagName = (prefix ? `${prefix}:` : "") + localName;
+    const xn = namespaceUri && document ? document.createElementNS(namespaceUri, tagName) : document?.createElement(tagName);
     if (document && xn) {
       document.importNode(xn, true);
     }
@@ -645,4 +561,4 @@ export class XmlObject implements IXmlSerializable {
   }
 }
 
-import { XmlCollection } from './xml_collection.js';
+import { XmlCollection } from "./xml_collection.js";

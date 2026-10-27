@@ -1,14 +1,14 @@
-import { describe, it, assert } from 'vitest';
-import '../test/config.js';
-import { XmlAttribute, XmlCollection, XmlElement, XmlObject } from './index.js';
+import { describe, it, assert } from "vitest";
+import "../test/config.js";
+import { XmlAttribute, XmlCollection, XmlElement, XmlObject } from "./index.js";
 
-describe('XmlCollection', () => {
+describe("XmlCollection", () => {
   @XmlElement({
-    localName: 'child',
-    namespaceURI: 'http://some.com',
+    localName: "child",
+    namespaceURI: "http://some.com",
   })
   class Child extends XmlObject {
-    @XmlAttribute({ localName: 'id', defaultValue: 0 })
+    @XmlAttribute({ localName: "id", defaultValue: 0 })
     public Id!: number;
 
     constructor(id?: number) {
@@ -21,13 +21,13 @@ describe('XmlCollection', () => {
   }
 
   @XmlElement({
-    localName: 'children',
-    namespaceURI: 'http://some.com',
+    localName: "children",
+    namespaceURI: "http://some.com",
     parser: Child,
   })
   class Children extends XmlCollection<Child> {}
 
-  it('Pop', () => {
+  it("Pop", () => {
     const col = new Children();
     col.Add(new Child(1));
     col.Add(new Child(2));
@@ -39,7 +39,7 @@ describe('XmlCollection', () => {
     assert.equal(col.Item(1)?.Id, 2);
   });
 
-  it('RemoveAt', () => {
+  it("RemoveAt", () => {
     const col = new Children();
     col.Add(new Child(1));
     col.Add(new Child(2));
@@ -51,7 +51,7 @@ describe('XmlCollection', () => {
     assert.equal(col.Item(1)?.Id, 3);
   });
 
-  it('Clear', () => {
+  it("Clear", () => {
     const col = new Children();
     col.Add(new Child(1));
     col.Add(new Child(2));
@@ -61,14 +61,14 @@ describe('XmlCollection', () => {
     assert.equal(col.Count, 0);
   });
 
-  it('IsEmpty', () => {
+  it("IsEmpty", () => {
     const col = new Children();
     assert.equal(col.IsEmpty(), true);
     col.Add(new Child(1));
     assert.equal(col.IsEmpty(), false);
   });
 
-  it('ForEach', () => {
+  it("ForEach", () => {
     const col = new Children();
     col.Add(new Child(1));
     col.Add(new Child(2));
@@ -80,7 +80,7 @@ describe('XmlCollection', () => {
     });
   });
 
-  it('Map', () => {
+  it("Map", () => {
     const col = new Children();
     col.Add(new Child(1));
     col.Add(new Child(2));
@@ -96,7 +96,7 @@ describe('XmlCollection', () => {
       });
   });
 
-  it('Filter', () => {
+  it("Filter", () => {
     const col = new Children();
     col.Add(new Child(1));
     col.Add(new Child(2));
@@ -109,7 +109,7 @@ describe('XmlCollection', () => {
     assert.equal(list.Item(0)?.Id, 3);
   });
 
-  it('Sort', () => {
+  it("Sort", () => {
     const col = new Children();
     col.Add(new Child(1));
     col.Add(new Child(3));
@@ -130,7 +130,7 @@ describe('XmlCollection', () => {
     assert.equal(list.Item(2)?.Id, 1);
   });
 
-  it('Every', () => {
+  it("Every", () => {
     const col = new Children();
     col.Add(new Child(1));
     col.Add(new Child(1));
@@ -152,19 +152,19 @@ describe('XmlCollection', () => {
     );
   });
 
-  describe('HasChanged', () => {
-    it('Initialized empty collection is not changed', () => {
+  describe("HasChanged", () => {
+    it("Initialized empty collection is not changed", () => {
       const col = new Children();
       assert.equal(col.HasChanged(), false);
     });
 
-    it('Update state on item adding', () => {
+    it("Update state on item adding", () => {
       const col = new Children();
       col.Add(new Child());
       assert.equal(col.HasChanged(), true);
     });
 
-    it('Update state on item removing', () => {
+    it("Update state on item removing", () => {
       const col = new Children();
       col.Add(new Child());
       col.GetXml();
@@ -173,7 +173,7 @@ describe('XmlCollection', () => {
       assert.equal(col.HasChanged(), true);
     });
 
-    it('Set unchanged state for loaded XML', () => {
+    it("Set unchanged state for loaded XML", () => {
       const xml = `<children xmlns="http://some.com"><child id="0"/><child id="1"/></children>`;
       const col = new Children();
       col.LoadXml(xml);

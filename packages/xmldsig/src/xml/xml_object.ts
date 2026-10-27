@@ -1,16 +1,16 @@
-import { XmlCollection, XmlObject, XmlElement } from 'xml-core';
+import { XmlCollection, XmlObject, XmlElement } from "xml-core";
 
-import { XmlSignature } from './xml_names.js';
+import { XmlSignature } from "./xml_names.js";
 
 @XmlElement({
-  localName: 'xmldsig',
+  localName: "xmldsig",
   namespaceURI: XmlSignature.NamespaceURI,
   prefix: XmlSignature.DefaultPrefix,
 })
 export class XmlSignatureObject extends XmlObject {}
 
 @XmlElement({
-  localName: 'xmldsig_collection',
+  localName: "xmldsig_collection",
   namespaceURI: XmlSignature.NamespaceURI,
   prefix: XmlSignature.DefaultPrefix,
 })

@@ -1,23 +1,14 @@
-import { XE, XmlError } from 'xml-core';
-import { ISignatureAlgorithm, SignatureAlgorithm } from '../algorithm.js';
-import { SignatureMethod } from '../xml/signature_method.js';
-import { PssAlgorithmParams } from '../xml/key_infos/rsa_key.js';
-import {
-  SHA1,
-  SHA1_NAMESPACE,
-  SHA256,
-  SHA256_NAMESPACE,
-  SHA384,
-  SHA384_NAMESPACE,
-  SHA512,
-  SHA512_NAMESPACE,
-} from './rsa_hash.js';
+import { XE, XmlError } from "xml-core";
+import { ISignatureAlgorithm, SignatureAlgorithm } from "../algorithm.js";
+import { SignatureMethod } from "../xml/signature_method.js";
+import { PssAlgorithmParams } from "../xml/key_infos/rsa_key.js";
+import { SHA1, SHA1_NAMESPACE, SHA256, SHA256_NAMESPACE, SHA384, SHA384_NAMESPACE, SHA512, SHA512_NAMESPACE } from "./rsa_hash.js";
 
 // https://tools.ietf.org/html/rfc6931#section-2.3.9
 
-export const RSA_PSS = 'RSA-PSS';
+export const RSA_PSS = "RSA-PSS";
 
-export const RSA_PSS_WITH_PARAMS_NAMESPACE = 'http://www.w3.org/2007/05/xmldsig-more#rsa-pss';
+export const RSA_PSS_WITH_PARAMS_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#rsa-pss";
 
 interface RsaPSSSignParams extends Algorithm {
   name: typeof RSA_PSS;
@@ -83,10 +74,7 @@ export class RsaPssWithParams extends SignatureAlgorithm {
               this.algorithm.hash.name = SHA512;
               break;
             default:
-              throw new XmlError(
-                XE.CRYPTOGRAPHIC,
-                `Unsupported hash algorithm: ${item.DigestMethod.Algorithm}`,
-              );
+              throw new XmlError(XE.CRYPTOGRAPHIC, `Unsupported hash algorithm: ${item.DigestMethod.Algorithm}`);
           }
           // Set the salt length if specified
           if (item.SaltLength) {
@@ -97,7 +85,7 @@ export class RsaPssWithParams extends SignatureAlgorithm {
         return false;
       })
     ) {
-      throw new XmlError(XE.CRYPTOGRAPHIC, 'RSA-PSS parameters not found in SignatureMethod');
+      throw new XmlError(XE.CRYPTOGRAPHIC, "RSA-PSS parameters not found in SignatureMethod");
     }
   }
 
@@ -118,10 +106,7 @@ export class RsaPssWithParams extends SignatureAlgorithm {
         pssParams.DigestMethod.Algorithm = SHA512_NAMESPACE;
         break;
       default:
-        throw new XmlError(
-          XE.CRYPTOGRAPHIC,
-          `Unsupported hash algorithm: ${this.algorithm.hash.name}`,
-        );
+        throw new XmlError(XE.CRYPTOGRAPHIC, `Unsupported hash algorithm: ${this.algorithm.hash.name}`);
     }
 
     if (this.algorithm.saltLength) {

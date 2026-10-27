@@ -1,16 +1,10 @@
-import {
-  XmlAttribute,
-  XmlChildElement,
-  XmlElement,
-  XmlBase64Converter,
-  XmlNumberConverter,
-} from 'xml-core';
-import { Any } from './any.js';
-import { XadesDateTime } from './date_time.js';
-import { DigestAlgAndValueType } from './signing_certificate.js';
-import { UnsignedSignatureProperty } from './unsigned_signature_properties.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter, XmlNumberConverter } from "xml-core";
+import { Any } from "./any.js";
+import { XadesDateTime } from "./date_time.js";
+import { DigestAlgAndValueType } from "./signing_certificate.js";
+import { UnsignedSignatureProperty } from "./unsigned_signature_properties.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <CompleteRevocationRefs> element of an XML signature.
@@ -106,7 +100,7 @@ export class ResponderID extends XadesObject {
 export class OCSPIdentifier extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.URI,
-    defaultValue: '',
+    defaultValue: "",
   })
   public URI: string;
 
@@ -143,7 +137,7 @@ export class OCSPRefs extends XadesCollection<OCSPRef> {}
 export class CRLIdentifier extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.URI,
-    defaultValue: '',
+    defaultValue: "",
   })
   public URI: string;
 
@@ -190,7 +184,7 @@ export class CRLRefs extends XadesCollection<CRLRef> {}
 export class CompleteRevocationRefs extends XadesObject implements UnsignedSignatureProperty {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

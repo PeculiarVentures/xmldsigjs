@@ -1,5 +1,5 @@
-import { CryptoEngine, setEngine } from 'pkijs';
-import { XE, XmlError } from 'xml-core';
+import { CryptoEngine, setEngine } from "pkijs";
+import { XE, XmlError } from "xml-core";
 
 export interface CryptoEx extends Crypto {
   name: string;
@@ -30,14 +30,14 @@ export class Application {
   }
 
   public static isNodePlugin(): boolean {
-    return typeof self === 'undefined' && typeof window === 'undefined';
+    return typeof self === "undefined" && typeof window === "undefined";
   }
 }
 
 // set default w3 WebCrypto
 function init() {
   if (!Application.isNodePlugin()) {
-    Application.setEngine('W3 WebCrypto module', self.crypto);
+    Application.setEngine("W3 WebCrypto module", self.crypto);
   }
 }
 init();

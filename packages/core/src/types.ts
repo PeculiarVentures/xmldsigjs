@@ -46,7 +46,7 @@ export type IXmlSerializableConstructor = new () => IXmlSerializable;
  */
 export type AssocArray<T> = Record<string, T>;
 
-export declare type XmlBufferEncoding = string | 'utf8' | 'binary' | 'hex' | 'base64' | 'base64url';
+export declare type XmlBufferEncoding = string | "utf8" | "binary" | "hex" | "base64" | "base64url";
 
 export declare type ISelectResult = Node[] | Node | boolean | number | string;
 

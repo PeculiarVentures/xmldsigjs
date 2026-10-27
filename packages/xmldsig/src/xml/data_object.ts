@@ -1,7 +1,7 @@
-import { XmlAttribute, XmlElement } from 'xml-core';
+import { XmlAttribute, XmlElement } from "xml-core";
 
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureCollection, XmlSignatureObject } from "./xml_object.js";
 
 // XmlElement part of the signature
 // Note: Looks like KeyInfoNode (but the later is XmlElement inside KeyInfo)
@@ -32,25 +32,25 @@ import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
 export class DataObject extends XmlSignatureObject {
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.MimeType,
-    defaultValue: '',
+    defaultValue: "",
   })
   public MimeType: string;
 
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Encoding,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Encoding: string;
 }
 
 @XmlElement({
-  localName: 'xmldsig_objects',
+  localName: "xmldsig_objects",
   parser: DataObject,
 })
 export class DataObjects extends XmlSignatureCollection<DataObject> {}

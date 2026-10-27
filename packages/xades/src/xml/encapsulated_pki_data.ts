@@ -1,6 +1,6 @@
-import { XmlAttribute, XmlContent, XmlElement, IConverter, XmlBase64Converter } from 'xml-core';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlContent, XmlElement, IConverter, XmlBase64Converter } from "xml-core";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <EncapsulatedPKIData> element of an XML signature.
@@ -21,11 +21,11 @@ import { XadesObject } from './xml_base.js';
 const XmlEncodingConverter: IConverter<EncodingType> = {
   get: (value: EncodingType) => {
     switch (value) {
-      case 'der':
-      case 'ber':
-      case 'cer':
-      case 'per':
-      case 'xer':
+      case "der":
+      case "ber":
+      case "cer":
+      case "per":
+      case "xer":
         return `http://uri.etsi.org/01903/v1.2.2#${value.toUpperCase()}`;
     }
 
@@ -43,13 +43,13 @@ const XmlEncodingConverter: IConverter<EncodingType> = {
   },
 };
 
-export type EncodingType = 'der' | 'ber' | 'cer' | 'per' | 'xer' | null;
+export type EncodingType = "der" | "ber" | "cer" | "per" | "xer" | null;
 
-@XmlElement({ localName: 'EncapsulatedPKIData' })
+@XmlElement({ localName: "EncapsulatedPKIData" })
 export class EncapsulatedPKIData extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

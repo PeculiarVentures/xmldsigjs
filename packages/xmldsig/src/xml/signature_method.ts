@@ -1,9 +1,9 @@
-import * as XmlCore from 'xml-core';
-import { XmlAttribute, XmlChildElement, XmlElement, XmlObject, XmlNumberConverter } from 'xml-core';
+import * as XmlCore from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement, XmlObject, XmlNumberConverter } from "xml-core";
 
-import { PssAlgorithmParams } from './key_infos/rsa_key.js';
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
+import { PssAlgorithmParams } from "./key_infos/rsa_key.js";
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureCollection, XmlSignatureObject } from "./xml_object.js";
 
 /**
  * Represents the <SignatureMethod> element of an XML signature.
@@ -24,16 +24,13 @@ import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
  */
 
 @XmlElement({
-  localName: 'Other',
+  localName: "Other",
 })
 export class SignatureMethodOther extends XmlSignatureCollection<XmlObject> {
   public OnLoadXml(element: Element) {
     for (let i = 0; i < element.childNodes.length; i++) {
       const node = element.childNodes.item(i) as Element;
-      if (
-        node.nodeType !== XmlCore.XmlNodeType.Element ||
-        node.nodeName === XmlSignature.ElementNames.HMACOutputLength
-      ) {
+      if (node.nodeType !== XmlCore.XmlNodeType.Element || node.nodeName === XmlSignature.ElementNames.HMACOutputLength) {
         // Exclude HMACOutputLength
         continue;
       }
@@ -61,7 +58,7 @@ export class SignatureMethod extends XmlSignatureObject {
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Algorithm,
     required: true,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Algorithm: string;
 

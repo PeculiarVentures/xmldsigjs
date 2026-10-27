@@ -1,75 +1,75 @@
-import * as Asn1Js from 'asn1js';
-import { Certificate, CryptoEngineAlgorithmParams } from 'pkijs';
-import { ECDSA } from '../algorithms/ecdsa_sign.js';
-import { Application } from '../application.js';
+import * as Asn1Js from "asn1js";
+import { Certificate, CryptoEngineAlgorithmParams } from "pkijs";
+import { ECDSA } from "../algorithms/ecdsa_sign.js";
+import { Application } from "../application.js";
 
-export type DigestAlgorithm = string | 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
+export type DigestAlgorithm = string | "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
 
 /**
  * List of OIDs
  * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx
  */
 const OID: Record<string, { short?: string; long?: string }> = {
-  '2.5.4.3': {
-    short: 'CN',
-    long: 'CommonName',
+  "2.5.4.3": {
+    short: "CN",
+    long: "CommonName",
   },
-  '2.5.4.6': {
-    short: 'C',
-    long: 'Country',
+  "2.5.4.6": {
+    short: "C",
+    long: "Country",
   },
-  '2.5.4.5': {
-    long: 'DeviceSerialNumber',
+  "2.5.4.5": {
+    long: "DeviceSerialNumber",
   },
-  '0.9.2342.19200300.100.1.25': {
-    short: 'DC',
-    long: 'DomainComponent',
+  "0.9.2342.19200300.100.1.25": {
+    short: "DC",
+    long: "DomainComponent",
   },
-  '1.2.840.113549.1.9.1': {
-    short: 'E',
-    long: 'EMail',
+  "1.2.840.113549.1.9.1": {
+    short: "E",
+    long: "EMail",
   },
-  '2.5.4.42': {
-    short: 'G',
-    long: 'GivenName',
+  "2.5.4.42": {
+    short: "G",
+    long: "GivenName",
   },
-  '2.5.4.43': {
-    short: 'I',
-    long: 'Initials',
+  "2.5.4.43": {
+    short: "I",
+    long: "Initials",
   },
-  '2.5.4.7': {
-    short: 'L',
-    long: 'Locality',
+  "2.5.4.7": {
+    short: "L",
+    long: "Locality",
   },
-  '2.5.4.10': {
-    short: 'O',
-    long: 'Organization',
+  "2.5.4.10": {
+    short: "O",
+    long: "Organization",
   },
-  '2.5.4.11': {
-    short: 'OU',
-    long: 'OrganizationUnit',
+  "2.5.4.11": {
+    short: "OU",
+    long: "OrganizationUnit",
   },
-  '2.5.4.8': {
-    short: 'ST',
-    long: 'State',
+  "2.5.4.8": {
+    short: "ST",
+    long: "State",
   },
-  '2.5.4.9': {
-    short: 'Street',
-    long: 'StreetAddress',
+  "2.5.4.9": {
+    short: "Street",
+    long: "StreetAddress",
   },
-  '2.5.4.4': {
-    short: 'SN',
-    long: 'SurName',
+  "2.5.4.4": {
+    short: "SN",
+    long: "SurName",
   },
-  '2.5.4.12': {
-    short: 'T',
-    long: 'Title',
+  "2.5.4.12": {
+    short: "T",
+    long: "Title",
   },
-  '1.2.840.113549.1.9.8': {
-    long: 'UnstructuredAddress',
+  "1.2.840.113549.1.9.8": {
+    long: "UnstructuredAddress",
   },
-  '1.2.840.113549.1.9.2': {
-    long: 'UnstructuredName',
+  "1.2.840.113549.1.9.2": {
+    long: "UnstructuredName",
   },
 };
 
@@ -115,7 +115,7 @@ export class X509Certificate {
    * @param  {DigestAlgorithm="SHA-1"} algName Digest algorithm name
    * @returns Promise<ArrayBuffer>
    */
-  public async Thumbprint(algName: DigestAlgorithm = 'SHA-1') {
+  public async Thumbprint(algName: DigestAlgorithm = "SHA-1") {
     return Application.crypto.subtle.digest(algName, this.raw);
   }
 
@@ -142,19 +142,19 @@ export class X509Certificate {
     if (algorithm) {
       const alg = {
         algorithm,
-        usages: ['verify'],
+        usages: ["verify"],
       };
       if (alg.algorithm.name.toUpperCase() === ECDSA) {
         const json = this.simpl.subjectPublicKeyInfo.toJSON();
-        if ('crv' in json && json.crv) {
+        if ("crv" in json && json.crv) {
           // Set named curve
           (alg.algorithm as any).namedCurve = json.crv;
         } else {
-          throw new Error('Cannot get Curved name from the ECDSA public key');
+          throw new Error("Cannot get Curved name from the ECDSA public key");
         }
       }
       if (this.isHashedAlgorithm(alg.algorithm)) {
-        if (typeof alg.algorithm.hash === 'string') {
+        if (typeof alg.algorithm.hash === "string") {
           alg.algorithm.hash = { name: alg.algorithm.hash };
         }
       }
@@ -165,13 +165,13 @@ export class X509Certificate {
       return key;
     }
 
-    if (this.simpl.subjectPublicKeyInfo.algorithm.algorithmId === '1.2.840.113549.1.1.1') {
+    if (this.simpl.subjectPublicKeyInfo.algorithm.algorithmId === "1.2.840.113549.1.1.1") {
       // Use default hash algorithm for RSA keys. Otherwise it throws an exception
       // for unsupported mechanism (eg md5WithRSAEncryption)
       this.publicKey = await this.simpl.getPublicKey({
         algorithm: {
-          algorithm: { name: 'RSASSA-PKCS1-v1_5', hash: { name: 'SHA-256' } },
-          usages: ['verify'],
+          algorithm: { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } },
+          usages: ["verify"],
         },
       });
     } else {
@@ -190,7 +190,7 @@ export class X509Certificate {
    * Example:
    * > C=Some name, O=Some organization name, C=RU
    */
-  protected NameToString(name: any, splitter = ','): string {
+  protected NameToString(name: any, splitter = ","): string {
     const res: string[] = [];
     name.typesAndValues.forEach((typeAndValue: any) => {
       const type = typeAndValue.type;
@@ -198,7 +198,7 @@ export class X509Certificate {
       const name2 = oid ? oid.short : null;
       res.push(`${name2 ? name2 : type}=${typeAndValue.value.valueBlock.value}`);
     });
-    return res.join(splitter + ' ');
+    return res.join(splitter + " ");
   }
 
   /**
@@ -213,6 +213,6 @@ export class X509Certificate {
   // #endregion
 
   private isHashedAlgorithm(alg: Algorithm): alg is RsaHashedImportParams {
-    return !!alg['hash'];
+    return !!alg["hash"];
   }
 }

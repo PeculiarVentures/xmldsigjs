@@ -1,11 +1,4 @@
-node_modules/
-build/
-lib/
-.nyc_output/
-coverage/
-**/*.map
-*.log
-test*.js
-
-# MacOS
+coverage
+node_modules
+build
 .DS_Store

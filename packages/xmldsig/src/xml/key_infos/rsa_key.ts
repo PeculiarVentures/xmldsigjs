@@ -1,25 +1,15 @@
-import {
-  Convert,
-  XE,
-  XmlAttribute,
-  XmlBase64Converter,
-  XmlChildElement,
-  XmlElement,
-  XmlError,
-  XmlNumberConverter,
-  XmlObject,
-} from 'xml-core';
+import { Convert, XE, XmlAttribute, XmlBase64Converter, XmlChildElement, XmlElement, XmlError, XmlNumberConverter, XmlObject } from "xml-core";
 
-import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from '../../algorithms/index.js';
-import { Application } from '../../application.js';
-import { DigestMethod } from '../digest_method.js';
-import { XmlSignature } from '../xml_names.js';
-import { KeyInfoClause } from './key_info_clause.js';
+import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from "../../algorithms/index.js";
+import { Application } from "../../application.js";
+import { DigestMethod } from "../digest_method.js";
+import { XmlSignature } from "../xml_names.js";
+import { KeyInfoClause } from "./key_info_clause.js";
 
 const DEFAULT_ALGORITHM: RsaHashedImportParams = {
-  name: 'RSASSA-PKCS1-v1_5',
+  name: "RSASSA-PKCS1-v1_5",
   hash: {
-    name: 'SHA-256',
+    name: "SHA-256",
   },
 };
 
@@ -81,16 +71,16 @@ export class RsaKeyValue extends KeyInfoClause {
    * @returns Promise
    */
   public async importKey(key: CryptoKey) {
-    const algName = key.algorithm.name ? key.algorithm.name.toUpperCase() : '';
+    const algName = key.algorithm.name ? key.algorithm.name.toUpperCase() : "";
     if (algName !== RSA_PKCS1.toUpperCase() && algName !== RSA_PSS.toUpperCase()) {
       throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
     }
     this.key = key;
-    const jwk = await Application.crypto.subtle.exportKey('jwk', key);
+    const jwk = await Application.crypto.subtle.exportKey("jwk", key);
 
     this.jwk = jwk;
-    this.Modulus = Convert.FromBase64Url(jwk.n || '');
-    this.Exponent = Convert.FromBase64Url(jwk.e || '');
+    this.Modulus = Convert.FromBase64Url(jwk.n || "");
+    this.Exponent = Convert.FromBase64Url(jwk.e || "");
     this.keyUsage = key.usages;
 
     return this;
@@ -107,20 +97,20 @@ export class RsaKeyValue extends KeyInfoClause {
     }
     // fill jwk
     if (!this.Modulus) {
-      throw new XmlError(XE.CRYPTOGRAPHIC, 'RsaKeyValue has no Modulus');
+      throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Modulus");
     }
     const modulus = Convert.ToBase64Url(this.Modulus);
     if (!this.Exponent) {
-      throw new XmlError(XE.CRYPTOGRAPHIC, 'RsaKeyValue has no Exponent');
+      throw new XmlError(XE.CRYPTOGRAPHIC, "RsaKeyValue has no Exponent");
     }
     const exponent = Convert.ToBase64Url(this.Exponent);
     let algJwk: string;
     switch (alg.name.toUpperCase()) {
       case RSA_PKCS1.toUpperCase():
-        algJwk = 'R';
+        algJwk = "R";
         break;
       case RSA_PSS.toUpperCase():
-        algJwk = 'P';
+        algJwk = "P";
         break;
       default:
         throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, alg.name);
@@ -129,32 +119,26 @@ export class RsaKeyValue extends KeyInfoClause {
     // Convert hash to JWK name
     switch ((alg as any).hash.name.toUpperCase()) {
       case SHA1:
-        algJwk += 'S1';
+        algJwk += "S1";
         break;
       case SHA256:
-        algJwk += 'S256';
+        algJwk += "S256";
         break;
       case SHA384:
-        algJwk += 'S384';
+        algJwk += "S384";
         break;
       case SHA512:
-        algJwk += 'S512';
+        algJwk += "S512";
         break;
     }
     const jwk: IJwkRsa = {
-      kty: 'RSA',
+      kty: "RSA",
       alg: algJwk,
       n: modulus,
       e: exponent,
       ext: true,
     };
-    return Application.crypto.subtle.importKey(
-      'jwk',
-      jwk as any,
-      alg as any,
-      true,
-      this.keyUsage as KeyUsage[],
-    );
+    return Application.crypto.subtle.importKey("jwk", jwk as any, alg as any, true, this.keyUsage as KeyUsage[]);
   }
 
   /**
@@ -164,7 +148,7 @@ export class RsaKeyValue extends KeyInfoClause {
    */
   public LoadXml(node: Element | string): void {
     super.LoadXml(node);
-    this.keyUsage = ['verify'];
+    this.keyUsage = ["verify"];
   }
 }
 
@@ -202,8 +186,8 @@ export class RsaKeyValue extends KeyInfoClause {
  *
  */
 
-const NAMESPACE_URI = 'http://www.w3.org/2007/05/xmldsig-more#';
-const PREFIX = 'pss';
+const NAMESPACE_URI = "http://www.w3.org/2007/05/xmldsig-more#";
+const PREFIX = "pss";
 
 @XmlElement({
   localName: XmlSignature.ElementNames.MaskGenerationFunction,
@@ -218,7 +202,7 @@ export class MaskGenerationFunction extends XmlObject {
 
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Algorithm,
-    defaultValue: 'http://www.w3.org/2007/05/xmldsig-more#MGF1',
+    defaultValue: "http://www.w3.org/2007/05/xmldsig-more#MGF1",
   })
   public Algorithm: string;
 }

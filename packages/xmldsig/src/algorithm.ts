@@ -1,6 +1,6 @@
-import { Convert, Stringify } from 'xml-core';
-import { Application } from './application.js';
-import { SignatureMethod } from './xml/signature_method.js';
+import { Convert, Stringify } from "xml-core";
+import { Application } from "./application.js";
+import { SignatureMethod } from "./xml/signature_method.js";
 
 export type BASE64 = string;
 
@@ -29,10 +29,10 @@ export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorit
   public async Digest(xml: BufferSource | string | Node): Promise<Uint8Array> {
     // console.log("HashedInfo:", xml);
     let buf: Uint8Array;
-    if (typeof xml === 'string') {
+    if (typeof xml === "string") {
       // C14N transforms
       // console.log("Hash:\n%s\n", xml);
-      buf = Convert.FromString(xml, 'utf8');
+      buf = Convert.FromString(xml, "utf8");
     } else if (ArrayBuffer.isView(xml)) {
       buf = new Uint8Array(xml.buffer);
     } else if (xml instanceof ArrayBuffer) {
@@ -41,7 +41,7 @@ export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorit
     } else {
       // enveloped signature transform
       const txt = Stringify(xml);
-      buf = Convert.FromString(txt, 'utf8');
+      buf = Convert.FromString(txt, "utf8");
     }
     const hash = await Application.crypto.subtle.digest(this.algorithm, buf);
     return new Uint8Array(hash);
@@ -71,7 +71,7 @@ export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignat
    * Sign the given string using the given key
    */
   public async Sign(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm) {
-    const info = Convert.FromString(signedInfo, 'utf8');
+    const info = Convert.FromString(signedInfo, "utf8");
 
     return Application.crypto.subtle.sign(algorithm as any, signingKey, info);
   }
@@ -81,7 +81,7 @@ export abstract class SignatureAlgorithm extends XmlAlgorithm implements ISignat
    */
   public async Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array) {
     const alg = this.algorithm;
-    const info = Convert.FromString(signedInfo, 'utf8');
+    const info = Convert.FromString(signedInfo, "utf8");
 
     return Application.crypto.subtle.verify(alg, key, signatureValue, info);
   }

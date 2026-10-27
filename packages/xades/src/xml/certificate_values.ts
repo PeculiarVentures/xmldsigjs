@@ -1,8 +1,8 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { Any } from './any.js';
-import { EncapsulatedPKIData } from './encapsulated_pki_data.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { Any } from "./any.js";
+import { EncapsulatedPKIData } from "./encapsulated_pki_data.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <CertificateValues> element of an XML signature.
@@ -23,7 +23,7 @@ import { XadesCollection, XadesObject } from './xml_base.js';
 export class OtherCertificate extends Any {}
 
 @XmlElement({
-  localName: 'OtherCertificateCollection',
+  localName: "OtherCertificateCollection",
   parser: OtherCertificate,
 })
 export class OtherCertificateCollection extends XadesCollection<OtherCertificate> {}
@@ -32,7 +32,7 @@ export class OtherCertificateCollection extends XadesCollection<OtherCertificate
 export class EncapsulatedX509Certificate extends EncapsulatedPKIData {}
 
 @XmlElement({
-  localName: 'EncapsulatedX509CertificateCollection',
+  localName: "EncapsulatedX509CertificateCollection",
   parser: EncapsulatedX509Certificate,
 })
 
@@ -43,7 +43,7 @@ export class EncapsulatedX509CertificateCollection extends XadesCollection<Encap
 export class CertificateValues extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

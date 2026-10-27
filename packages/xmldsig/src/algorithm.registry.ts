@@ -1,12 +1,12 @@
-import { IHashAlgorithmConstructable, ISignatureAlgorithmConstructable } from './algorithm.js';
+import { IHashAlgorithmConstructable, ISignatureAlgorithmConstructable } from "./algorithm.js";
 
 interface IHashAlgorithmRegistryItem {
-  type: 'hash';
+  type: "hash";
   algorithm: IHashAlgorithmConstructable;
 }
 
 interface ISignatureAlgorithmRegistryItem {
-  type: 'signature';
+  type: "signature";
   algorithm: ISignatureAlgorithmConstructable;
 }
 
@@ -65,129 +65,129 @@ import {
   RsaPssWithoutParamsSha256,
   RsaPssWithoutParamsSha384,
   RsaPssWithoutParamsSha512,
-} from './algorithms/index.js';
+} from "./algorithms/index.js";
 
 // Register RSA PKCS1 algorithms
 algorithmRegistry.set(RSA_PKCS1_SHA1_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPkcs1Sha1,
 });
 algorithmRegistry.set(RSA_PKCS1_SHA256_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPkcs1Sha256,
 });
 algorithmRegistry.set(RSA_PKCS1_SHA384_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPkcs1Sha384,
 });
 algorithmRegistry.set(RSA_PKCS1_SHA512_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPkcs1Sha512,
 });
 algorithmRegistry.set(RSA_PKCS1_SHA1_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPkcs1Sha1,
 });
 algorithmRegistry.set(RSA_PKCS1_SHA256_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPkcs1Sha256,
 });
 algorithmRegistry.set(RSA_PKCS1_SHA384_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPkcs1Sha384,
 });
 algorithmRegistry.set(RSA_PKCS1_SHA512_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPkcs1Sha512,
 });
 // Register RSA PSS algorithms with params
 algorithmRegistry.set(RSA_PSS_WITH_PARAMS_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPssWithParams,
 });
 // Register RSA PSS algorithms without params
 algorithmRegistry.set(RSA_PSS_SHA1_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPssWithoutParamsSha1,
 });
 algorithmRegistry.set(RSA_PSS_SHA256_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPssWithoutParamsSha256,
 });
 algorithmRegistry.set(RSA_PSS_SHA384_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPssWithoutParamsSha384,
 });
 algorithmRegistry.set(RSA_PSS_SHA512_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: RsaPssWithoutParamsSha512,
 });
 
 // ECDSA algorithms
 algorithmRegistry.set(ECDSA_SHA1_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: EcdsaSha1,
 });
 algorithmRegistry.set(ECDSA_SHA256_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: EcdsaSha256,
 });
 algorithmRegistry.set(ECDSA_SHA384_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: EcdsaSha384,
 });
 algorithmRegistry.set(ECDSA_SHA512_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: EcdsaSha512,
 });
 algorithmRegistry.set(ECDSA_SHA1_NAMESPACE.toUpperCase(), {
-  type: 'signature',
+  type: "signature",
   algorithm: EcdsaSha1,
 });
 algorithmRegistry.set(ECDSA_SHA256_NAMESPACE.toUpperCase(), {
-  type: 'signature',
+  type: "signature",
   algorithm: EcdsaSha256,
 });
 algorithmRegistry.set(ECDSA_SHA384_NAMESPACE.toUpperCase(), {
-  type: 'signature',
+  type: "signature",
   algorithm: EcdsaSha384,
 });
 algorithmRegistry.set(ECDSA_SHA512_NAMESPACE.toUpperCase(), {
-  type: 'signature',
+  type: "signature",
   algorithm: EcdsaSha512,
 });
 // HMAC algorithms
 algorithmRegistry.set(HMAC_SHA1_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: HmacSha1,
 });
 algorithmRegistry.set(HMAC_SHA256_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: HmacSha256,
 });
 algorithmRegistry.set(HMAC_SHA384_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: HmacSha384,
 });
 algorithmRegistry.set(HMAC_SHA512_NAMESPACE, {
-  type: 'signature',
+  type: "signature",
   algorithm: HmacSha512,
 });
 
 // SHA algorithms
 algorithmRegistry.set(SHA1_NAMESPACE, {
-  type: 'hash',
+  type: "hash",
   algorithm: Sha1,
 });
 algorithmRegistry.set(SHA256_NAMESPACE, {
-  type: 'hash',
+  type: "hash",
   algorithm: Sha256,
 });
 algorithmRegistry.set(SHA384_NAMESPACE, {
-  type: 'hash',
+  type: "hash",
   algorithm: Sha384,
 });
 algorithmRegistry.set(SHA512_NAMESPACE, {
-  type: 'hash',
+  type: "hash",
   algorithm: Sha512,
 });

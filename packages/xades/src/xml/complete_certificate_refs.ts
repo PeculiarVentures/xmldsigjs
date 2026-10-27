@@ -1,8 +1,8 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { CertIDList } from './signing_certificate.js';
-import { UnsignedSignatureProperty } from './unsigned_signature_properties.js';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { CertIDList } from "./signing_certificate.js";
+import { UnsignedSignatureProperty } from "./unsigned_signature_properties.js";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <CompleteCertificateRefs> element of an XML signature.
@@ -22,7 +22,7 @@ import { XadesObject } from './xml_base.js';
 export class CompleteCertificateRefs extends XadesObject implements UnsignedSignatureProperty {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

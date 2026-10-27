@@ -1,8 +1,8 @@
-import { XmlChildElement, XmlContent, XmlElement, IConverter } from 'xml-core';
-import { Any } from './any.js';
-import { ObjectIdentifier } from './object_identifier.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlChildElement, XmlContent, XmlElement, IConverter } from "xml-core";
+import { Any } from "./any.js";
+import { ObjectIdentifier } from "./object_identifier.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <CommitmentTypeIndication> element of an XML signature.
@@ -52,7 +52,7 @@ export class ObjectReference extends XadesObject {
 }
 
 @XmlElement({
-  localName: 'ObjectReferences',
+  localName: "ObjectReferences",
   parser: ObjectReference,
 })
 export class ObjectReferenceCollection extends XadesCollection<ObjectReference> {}

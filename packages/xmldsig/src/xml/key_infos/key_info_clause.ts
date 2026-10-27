@@ -1,4 +1,4 @@
-import { XmlSignatureObject } from '../xml_object.js';
+import { XmlSignatureObject } from "../xml_object.js";
 
 export abstract class KeyInfoClause extends XmlSignatureObject {
   public Key: CryptoKey | null;

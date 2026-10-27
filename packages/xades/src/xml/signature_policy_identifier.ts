@@ -1,10 +1,10 @@
-import { XmlChildElement, XmlContent, XmlElement, IConverter, XmlNumberConverter } from 'xml-core';
-import { Transforms } from 'xmldsigjs';
-import { AnyCollection } from './any.js';
-import { ObjectIdentifier } from './object_identifier.js';
-import { DigestAlgAndValueType } from './signing_certificate.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlChildElement, XmlContent, XmlElement, IConverter, XmlNumberConverter } from "xml-core";
+import { Transforms } from "xmldsigjs";
+import { AnyCollection } from "./any.js";
+import { ObjectIdentifier } from "./object_identifier.js";
+import { DigestAlgAndValueType } from "./signing_certificate.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <SignaturePolicyIdentifier> element of an XML signature.
@@ -61,7 +61,7 @@ export class SigPolicyHash extends DigestAlgAndValueType {}
 @XmlElement({ localName: XmlXades.ElementNames.SigPolicyQualifier })
 export class SigPolicyQualifier extends AnyCollection {}
 
-@XmlElement({ localName: 'int' })
+@XmlElement({ localName: "int" })
 export class Integer extends XadesObject {
   @XmlContent({
     converter: XmlNumberConverter,
@@ -71,7 +71,7 @@ export class Integer extends XadesObject {
 }
 
 @XmlElement({
-  localName: 'IntegerList',
+  localName: "IntegerList",
   parser: Integer,
 })
 export class IntegerList extends XadesCollection<Integer> {}
@@ -156,7 +156,7 @@ const XmlSignaturePolicyImpliedConverter: IConverter<boolean> = {
   },
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   get: (value: boolean) => {
-    return '';
+    return "";
   },
 };
 

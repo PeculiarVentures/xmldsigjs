@@ -1,9 +1,9 @@
-import { XmlAttribute, XmlBase64Converter, XmlChildElement, XmlElement } from 'xml-core';
+import { XmlAttribute, XmlBase64Converter, XmlChildElement, XmlElement } from "xml-core";
 
-import { DigestMethod } from './digest_method.js';
-import { Transforms } from './transform_collection.js';
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
+import { DigestMethod } from "./digest_method.js";
+import { Transforms } from "./transform_collection.js";
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureCollection, XmlSignatureObject } from "./xml_object.js";
 
 /**
  * Represents the <Reference> element of an XML signature.
@@ -34,7 +34,7 @@ export class Reference extends XmlSignatureObject {
    * Gets or sets the ID of the current Reference.
    */
   @XmlAttribute({
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 
@@ -51,7 +51,7 @@ export class Reference extends XmlSignatureObject {
    */
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Type,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Type: string;
 
@@ -90,7 +90,7 @@ export class Reference extends XmlSignatureObject {
 }
 
 @XmlElement({
-  localName: 'References',
+  localName: "References",
   parser: Reference,
 })
 export class References extends XmlSignatureCollection<Reference> {}

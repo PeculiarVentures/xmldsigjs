@@ -1,4 +1,4 @@
-import * as XmlCore from 'xml-core';
+import * as XmlCore from "xml-core";
 
 export enum XmlCanonicalizerState {
   BeforeDocElement,
@@ -16,11 +16,7 @@ export class XmlCanonicalizer {
   protected inclusiveNamespacesPrefixList: string[] = [];
   protected state = XmlCanonicalizerState.BeforeDocElement;
 
-  constructor(
-    withComments: boolean,
-    excC14N: boolean,
-    propagatedNamespaces: XmlCore.NamespaceManager = new XmlCore.NamespaceManager(),
-  ) {
+  constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: XmlCore.NamespaceManager = new XmlCore.NamespaceManager()) {
     this.withComments = withComments;
     this.exclusive = excC14N;
     this.propagatedNamespaces = propagatedNamespaces;
@@ -28,22 +24,22 @@ export class XmlCanonicalizer {
 
   // See xml-enc-c14n specification
   public get InclusiveNamespacesPrefixList(): string {
-    return this.inclusiveNamespacesPrefixList.join(' ');
+    return this.inclusiveNamespacesPrefixList.join(" ");
   }
 
   public set InclusiveNamespacesPrefixList(value: string) {
-    this.inclusiveNamespacesPrefixList = value.split(' ');
+    this.inclusiveNamespacesPrefixList = value.split(" ");
   }
 
   public Canonicalize(node: Node): string {
     if (!node) {
-      throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, 'Parameter 1 is not Node');
+      throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Parameter 1 is not Node");
     }
     this.WriteNode(node);
     // get nss from document
     // this.nsManager = new XmlNamespaceManager(this.document);
 
-    const res = this.result.join('');
+    const res = this.result.join("");
     return res;
   }
 
@@ -81,11 +77,11 @@ export class XmlCanonicalizer {
         }
         break;
       case XmlCore.XmlNodeType.Attribute:
-        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, 'Attribute node is impossible here');
+        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
       case XmlCore.XmlNodeType.EndElement:
-        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, 'Attribute node is impossible here');
+        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
       case XmlCore.XmlNodeType.EndEntity:
-        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, 'Attribute node is impossible here');
+        throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "Attribute node is impossible here");
       case XmlCore.XmlNodeType.DocumentType:
       case XmlCore.XmlNodeType.Entity:
       case XmlCore.XmlNodeType.Notation:
@@ -107,17 +103,17 @@ export class XmlCanonicalizer {
     // Console.WriteLine ("Debug: comment node");
     if (this.withComments) {
       if (this.state === XmlCanonicalizerState.AfterDocElement) {
-        this.result.push(String.fromCharCode(10) + '<!--');
+        this.result.push(String.fromCharCode(10) + "<!--");
       } else {
-        this.result.push('<!--');
+        this.result.push("<!--");
       }
 
       this.result.push(this.NormalizeString(node.nodeValue, XmlCore.XmlNodeType.Comment));
 
       if (this.state === XmlCanonicalizerState.BeforeDocElement) {
-        this.result.push('-->' + String.fromCharCode(10));
+        this.result.push("-->" + String.fromCharCode(10));
       } else {
-        this.result.push('-->');
+        this.result.push("-->");
       }
     }
   }
@@ -145,28 +141,26 @@ export class XmlCanonicalizer {
   protected WriteProcessingInstructionNode(node: Node): void {
     // console.log(`WriteProcessingInstructionNode: ${node.nodeName}`);
     const nodeName = node.nodeName || (node as Element).tagName;
-    if (nodeName === 'xml') {
+    if (nodeName === "xml") {
       return;
     }
 
     if (this.state === XmlCanonicalizerState.AfterDocElement) {
-      this.result.push('\u000A<?');
+      this.result.push("\u000A<?");
     } else {
-      this.result.push('<?');
+      this.result.push("<?");
     }
 
     this.result.push(nodeName);
     if (node.nodeValue) {
-      this.result.push(' ');
-      this.result.push(
-        this.NormalizeString(node.nodeValue, XmlCore.XmlNodeType.ProcessingInstruction),
-      );
+      this.result.push(" ");
+      this.result.push(this.NormalizeString(node.nodeValue, XmlCore.XmlNodeType.ProcessingInstruction));
     }
 
     if (this.state === XmlCanonicalizerState.BeforeDocElement) {
-      this.result.push('?>\u000A');
+      this.result.push("?>\u000A");
     } else {
-      this.result.push('?>');
+      this.result.push("?>");
     }
   }
 
@@ -179,13 +173,13 @@ export class XmlCanonicalizer {
     }
 
     // open tag
-    this.result.push('<');
+    this.result.push("<");
     this.result.push(node.nodeName);
     // namespaces
     let visibleNamespacesCount = this.WriteNamespacesAxis(node);
     // attributes
     this.WriteAttributesAxis(node);
-    this.result.push('>');
+    this.result.push(">");
 
     for (let n = node.firstChild; n != null; n = n.nextSibling) {
       // if (!(n.nodeType === XmlCore.XmlNodeType.Text && node.childNodes.length > 1))
@@ -193,9 +187,9 @@ export class XmlCanonicalizer {
     }
 
     // close tag
-    this.result.push('</');
+    this.result.push("</");
     this.result.push(node.nodeName);
-    this.result.push('>');
+    this.result.push(">");
 
     if (state === XmlCanonicalizerState.BeforeDocElement) {
       this.state = XmlCanonicalizerState.AfterDocElement;
@@ -215,10 +209,7 @@ export class XmlCanonicalizer {
 
       if (!IsNamespaceNode(attribute)) {
         // render namespace for attribute, if needed
-        if (
-          attribute.prefix &&
-          !this.IsNamespaceRendered(attribute.prefix, attribute.namespaceURI)
-        ) {
+        if (attribute.prefix && !this.IsNamespaceRendered(attribute.prefix, attribute.namespaceURI)) {
           const ns = { prefix: attribute.prefix, namespace: attribute.namespaceURI };
           list.push(ns);
           this.visibleNamespaces.Add(ns);
@@ -227,7 +218,7 @@ export class XmlCanonicalizer {
         continue;
       }
 
-      if (attribute.localName === 'xmlns' && !attribute.prefix && !attribute.nodeValue) {
+      if (attribute.localName === "xmlns" && !attribute.prefix && !attribute.nodeValue) {
         const ns = { prefix: attribute.prefix, namespace: attribute.nodeValue };
         list.push(ns);
         this.visibleNamespaces.Add(ns);
@@ -266,10 +257,7 @@ export class XmlCanonicalizer {
       }
     }
 
-    if (
-      !this.IsNamespaceRendered(node.prefix, node.namespaceURI) &&
-      node.namespaceURI !== 'http://www.w3.org/2000/xmlns/'
-    ) {
+    if (!this.IsNamespaceRendered(node.prefix, node.namespaceURI) && node.namespaceURI !== "http://www.w3.org/2000/xmlns/") {
       const ns = { prefix: node.prefix, namespace: node.namespaceURI };
       list.push(ns);
       this.visibleNamespaces.Add(ns);
@@ -285,12 +273,12 @@ export class XmlCanonicalizer {
         return;
       }
       prevPrefix = n.prefix;
-      this.result.push(' xmlns');
+      this.result.push(" xmlns");
       if (n.prefix) {
-        this.result.push(':' + n.prefix);
+        this.result.push(":" + n.prefix);
       }
       this.result.push('="');
-      this.result.push(n.namespace || ''); // TODO namespace can be null
+      this.result.push(n.namespace || ""); // TODO namespace can be null
       this.result.push('"');
     });
 
@@ -312,7 +300,7 @@ export class XmlCanonicalizer {
     list.sort(XmlDsigC14NTransformAttributesComparer);
     list.forEach((attribute) => {
       if (attribute != null) {
-        this.result.push(' ');
+        this.result.push(" ");
         this.result.push(attribute.nodeName);
         this.result.push('="');
         this.result.push(this.NormalizeString(attribute.nodeValue, XmlCore.XmlNodeType.Attribute));
@@ -326,30 +314,27 @@ export class XmlCanonicalizer {
     if (input) {
       for (let i = 0; i < input.length; i++) {
         const ch = input[i];
-        if (ch === '<' && (type === XmlCore.XmlNodeType.Attribute || this.IsTextNode(type))) {
-          sb.push('&lt;');
-        } else if (ch === '>' && this.IsTextNode(type)) {
-          sb.push('&gt;');
-        } else if (
-          ch === '&' &&
-          (type === XmlCore.XmlNodeType.Attribute || this.IsTextNode(type))
-        ) {
-          sb.push('&amp;');
+        if (ch === "<" && (type === XmlCore.XmlNodeType.Attribute || this.IsTextNode(type))) {
+          sb.push("&lt;");
+        } else if (ch === ">" && this.IsTextNode(type)) {
+          sb.push("&gt;");
+        } else if (ch === "&" && (type === XmlCore.XmlNodeType.Attribute || this.IsTextNode(type))) {
+          sb.push("&amp;");
         } else if (ch === '"' && type === XmlCore.XmlNodeType.Attribute) {
-          sb.push('&quot;');
-        } else if (ch === '\u0009' && type === XmlCore.XmlNodeType.Attribute) {
-          sb.push('&#x9;');
-        } else if (ch === '\u000A' && type === XmlCore.XmlNodeType.Attribute) {
-          sb.push('&#xA;');
-        } else if (ch === '\u000D') {
-          sb.push('&#xD;');
+          sb.push("&quot;");
+        } else if (ch === "\u0009" && type === XmlCore.XmlNodeType.Attribute) {
+          sb.push("&#x9;");
+        } else if (ch === "\u000A" && type === XmlCore.XmlNodeType.Attribute) {
+          sb.push("&#xA;");
+        } else if (ch === "\u000D") {
+          sb.push("&#xD;");
         } else {
           sb.push(ch);
         }
       }
     }
 
-    return sb.join('');
+    return sb.join("");
   }
 
   private IsTextNode(type: XmlCore.XmlNodeType): boolean {
@@ -368,16 +353,16 @@ export class XmlCanonicalizer {
     if (node.prefix === prefix2) {
       return false;
     }
-    return this.inclusiveNamespacesPrefixList.indexOf(prefix2 || '') !== -1; // && node.prefix === prefix;
+    return this.inclusiveNamespacesPrefixList.indexOf(prefix2 || "") !== -1; // && node.prefix === prefix;
   }
 
   private IsNamespaceRendered(prefix: string | null, uri: string | null): boolean {
-    prefix = prefix || '';
-    uri = uri || '';
+    prefix = prefix || "";
+    uri = uri || "";
     if (!prefix && !uri) {
       return true;
     }
-    if (prefix === 'xml' && uri === 'http://www.w3.org/XML/1998/namespace') {
+    if (prefix === "xml" && uri === "http://www.w3.org/XML/1998/namespace") {
       return true;
     }
     const ns = this.visibleNamespaces.GetPrefix(prefix);
@@ -417,8 +402,8 @@ function XmlDsigC14NTransformAttributesComparer(x: Attr, y: Attr): number {
     return 1;
   }
 
-  const left = (x.namespaceURI || '') + x.localName;
-  const right = (y.namespaceURI || '') + y.localName;
+  const left = (x.namespaceURI || "") + x.localName;
+  const right = (y.namespaceURI || "") + y.localName;
 
   if (left === right) {
     return 0;
@@ -458,11 +443,7 @@ function IsNamespaceUsed(node: Element, prefix: string | null, result = 0): numb
 
 function IsNamespaceNode(node: Node): boolean {
   const reg = /xmlns:/;
-  if (
-    node !== null &&
-    node.nodeType === XmlCore.XmlNodeType.Attribute &&
-    (node.nodeName === 'xmlns' || reg.test(node.nodeName))
-  ) {
+  if (node !== null && node.nodeType === XmlCore.XmlNodeType.Attribute && (node.nodeName === "xmlns" || reg.test(node.nodeName))) {
     return true;
   }
   return false;

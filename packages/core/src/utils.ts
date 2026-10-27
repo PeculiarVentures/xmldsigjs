@@ -1,16 +1,12 @@
-import { type AssocArray } from './types.js';
-import { APPLICATION_XML, XmlNodeType } from './xml.js';
+import { type AssocArray } from "./types.js";
+import { APPLICATION_XML, XmlNodeType } from "./xml.js";
 
 export type SelectNodes = (node: Node, xPath: string) => Node[];
 
 // Browser XPath implementation
 function SelectNodesEx(node: Node, xPath: string): Node[] {
   const doc: Document = node.ownerDocument == null ? (node as Document) : node.ownerDocument;
-  const nsResolver = document.createNSResolver(
-    node.ownerDocument == null
-      ? (node as Document).documentElement
-      : node.ownerDocument.documentElement,
-  );
+  const nsResolver = document.createNSResolver(node.ownerDocument == null ? (node as Document).documentElement : node.ownerDocument.documentElement);
   const personIterator = doc.evaluate(xPath, node, nsResolver, XPathResult.ANY_TYPE, null);
   const ns: Node[] = [];
   let n: Node | null;
@@ -22,25 +18,25 @@ function SelectNodesEx(node: Node, xPath: string): Node[] {
 
 // Node.js XPath implementation
 function SelectNodesNode(node: Node, xPath: string): Node[] {
-  const xpath = getNodeDependency<any>('xpath').select;
+  const xpath = getNodeDependency<any>("xpath").select;
   return xpath(xPath, node);
 }
 
-export const Select: SelectNodes = typeof self !== 'undefined' ? SelectNodesEx : SelectNodesNode;
+export const Select: SelectNodes = typeof self !== "undefined" ? SelectNodesEx : SelectNodesNode;
 
 export function Parse(xmlString: string) {
   // Strip UTF-8 BOM. Node's utf8 decoder preserves U+FEFF, and @xmldom/xmldom >= 0.9
   // treats content before the XML declaration as a fatal well-formedness error.
   xmlString = xmlString
-    .replace(/^\uFEFF/, '')
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n');
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n");
 
   let DOMParserCtor: typeof DOMParser;
-  if (typeof DOMParser !== 'undefined') {
+  if (typeof DOMParser !== "undefined") {
     DOMParserCtor = DOMParser;
   } else {
-    DOMParserCtor = getNodeDependency<any>('DOMParser');
+    DOMParserCtor = getNodeDependency<any>("DOMParser");
   }
 
   return new DOMParserCtor().parseFromString(xmlString, APPLICATION_XML);
@@ -48,10 +44,10 @@ export function Parse(xmlString: string) {
 
 export function Stringify(target: Node) {
   let XMLSerializerCtor: typeof XMLSerializer;
-  if (typeof XMLSerializer !== 'undefined') {
+  if (typeof XMLSerializer !== "undefined") {
     XMLSerializerCtor = XMLSerializer;
   } else {
-    XMLSerializerCtor = getNodeDependency<any>('XMLSerializer');
+    XMLSerializerCtor = getNodeDependency<any>("XMLSerializer");
   }
 
   return new XMLSerializerCtor().serializeToString(target);
@@ -75,12 +71,8 @@ export function SelectSingleNode(node: Node, path: string) {
 
 function _SelectNamespaces(node: Node, selectedNodes: AssocArray<string> = {}) {
   if (isElement(node)) {
-    if (
-      node.namespaceURI &&
-      node.namespaceURI !== 'http://www.w3.org/XML/1998/namespace' &&
-      !selectedNodes[node.prefix || '']
-    ) {
-      selectedNodes[node.prefix ? node.prefix : ''] = node.namespaceURI;
+    if (node.namespaceURI && node.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[node.prefix || ""]) {
+      selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
     }
     for (let i = 0; i < node.childNodes.length; i++) {
       const childNode = node.childNodes.item(i);
@@ -168,9 +160,7 @@ export function setNodeDependencies(deps: Record<string, any>) {
 export function getNodeDependency<T = any>(key: string): T {
   const dep = nodeDependencies.get(key);
   if (!dep) {
-    throw new Error(
-      `Node dependency not found: ${key}. Please use 'setNodeDependencies' to register it.`,
-    );
+    throw new Error(`Node dependency not found: ${key}. Please use 'setNodeDependencies' to register it.`);
   }
   return dep as T;
 }

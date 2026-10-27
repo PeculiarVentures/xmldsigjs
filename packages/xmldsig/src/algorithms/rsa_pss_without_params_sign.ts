@@ -1,11 +1,11 @@
-import { ISignatureAlgorithm, SignatureAlgorithm } from '../algorithm.js';
-import { SHA1, SHA256, SHA384, SHA512 } from './rsa_hash.js';
-import { RSA_PSS } from './rsa_pss_sign.js';
+import { ISignatureAlgorithm, SignatureAlgorithm } from "../algorithm.js";
+import { SHA1, SHA256, SHA384, SHA512 } from "./rsa_hash.js";
+import { RSA_PSS } from "./rsa_pss_sign.js";
 
-export const RSA_PSS_SHA1_NAMESPACE = 'http://www.w3.org/2007/05/xmldsig-more#sha1-rsa-MGF1';
-export const RSA_PSS_SHA256_NAMESPACE = 'http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1';
-export const RSA_PSS_SHA384_NAMESPACE = 'http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1';
-export const RSA_PSS_SHA512_NAMESPACE = 'http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1';
+export const RSA_PSS_SHA1_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#sha1-rsa-MGF1";
+export const RSA_PSS_SHA256_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1";
+export const RSA_PSS_SHA384_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1";
+export const RSA_PSS_SHA512_NAMESPACE = "http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1";
 
 interface RsaPssWithoutParamsAlgorithm extends Algorithm {
   name: typeof RSA_PSS;

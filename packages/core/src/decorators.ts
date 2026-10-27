@@ -1,11 +1,5 @@
-import * as CONST from './const.js';
-import {
-  XmlAttributeType,
-  XmlChildElementType,
-  XmlContentType,
-  XmlElementType,
-  XmlSchema,
-} from './types.js';
+import * as CONST from "./const.js";
+import { XmlAttributeType, XmlChildElementType, XmlContentType, XmlElementType, XmlSchema } from "./types.js";
 
 const MAX = 1e9;
 
@@ -74,8 +68,7 @@ export function XmlChildElement<T>(params: XmlChildElementType<T> = {}) {
     }
 
     // Set the localName for params
-    params.localName =
-      params.localName || (params.parser && (params.parser as any).localName) || key;
+    params.localName = params.localName || (params.parser && (params.parser as any).localName) || key;
 
     // Create the final item with all properties
     const items = t.items as NonNullable<typeof t.items>;
@@ -92,9 +85,7 @@ export function XmlChildElement<T>(params: XmlChildElementType<T> = {}) {
   };
 }
 
-export function XmlAttribute<T>(
-  params: XmlAttributeType<T> = { required: false, namespaceURI: null },
-) {
+export function XmlAttribute<T>(params: XmlAttributeType<T> = { required: false, namespaceURI: null }) {
   return (target: object, propertyKey: string) => {
     const t = target.constructor as XmlSchema;
     const key = propertyKey as string;

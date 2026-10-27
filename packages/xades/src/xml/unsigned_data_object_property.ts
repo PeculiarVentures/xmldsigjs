@@ -1,7 +1,7 @@
-import { XmlAttribute, XmlElement } from 'xml-core';
-import { Any } from './any.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection } from './xml_base.js';
+import { XmlAttribute, XmlElement } from "xml-core";
+import { Any } from "./any.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection } from "./xml_base.js";
 
 /**
  * Represents the <UnsignedDataObjectProperties> element of an XML signature.
@@ -27,7 +27,7 @@ export class UnsignedDataObjectProperty extends Any {}
 export class UnsignedDataObjectProperties extends XadesCollection<UnsignedDataObjectProperty> {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 }

@@ -1,25 +1,25 @@
-import { describe, it, assert } from 'vitest';
-import { Collection } from './index.js';
+import { describe, it, assert } from "vitest";
+import { Collection } from "./index.js";
 
-describe('Collection', () => {
-  it('New empty Collection', () => {
+describe("Collection", () => {
+  it("New empty Collection", () => {
     const col = new Collection();
     assert.equal(col.Count, 0);
   });
 
-  it('New Collection from Array', () => {
+  it("New Collection from Array", () => {
     const col = new Collection([1, 2, 3, 4, 5]);
     assert.equal(col.Count, 5);
   });
 
-  it('Get Item', () => {
+  it("Get Item", () => {
     const col = new Collection([1, 2, 3, 4, 5]);
     assert.equal(col.Item(0), 1);
     assert.equal(col.Item(4), 5);
     assert.equal(col.Item(5), null);
   });
 
-  it('Add Item', () => {
+  it("Add Item", () => {
     const col = new Collection();
     assert.equal(col.Count, 0);
     col.Add(1);
@@ -30,7 +30,7 @@ describe('Collection', () => {
     assert.equal(col.Item(1), 2);
   });
 
-  it('Pop', () => {
+  it("Pop", () => {
     const col = new Collection();
     col.Add(1);
     col.Add(2);
@@ -42,7 +42,7 @@ describe('Collection', () => {
     assert.equal(col.Item(1), 2);
   });
 
-  it('RemoveAt', () => {
+  it("RemoveAt", () => {
     const col = new Collection();
     col.Add(1);
     col.Add(2);
@@ -54,7 +54,7 @@ describe('Collection', () => {
     assert.equal(col.Item(1), 3);
   });
 
-  it('Clear', () => {
+  it("Clear", () => {
     const col = new Collection();
     col.Add(1);
     col.Add(2);
@@ -64,14 +64,14 @@ describe('Collection', () => {
     assert.equal(col.Count, 0);
   });
 
-  it('IsEmpty', () => {
+  it("IsEmpty", () => {
     const col = new Collection();
     assert.equal(col.IsEmpty(), true);
     col.Add(1);
     assert.equal(col.IsEmpty(), false);
   });
 
-  it('Get Iterator', () => {
+  it("Get Iterator", () => {
     const col = new Collection([1, 2, 3, 4, 5]);
     assert.equal(col.Count, 5);
     const array = col.GetIterator();
@@ -79,13 +79,13 @@ describe('Collection', () => {
     assert.equal(array.length, 5);
   });
 
-  it('Each', () => {
+  it("Each", () => {
     const col = new Collection([1, 2, 3, 4, 5]);
     assert.equal(col.Count, 5);
     col.ForEach((item, index) => assert.equal(item, index + 1));
   });
 
-  it('Map', () => {
+  it("Map", () => {
     const col = new Collection([1, 2, 3, 4, 5]);
     assert.equal(col.Count, 5);
     const array = col.Map((item, index) => item === index + 1).GetIterator();
@@ -95,7 +95,7 @@ describe('Collection', () => {
     );
   });
 
-  it('Filter', () => {
+  it("Filter", () => {
     const col = new Collection([1, 2, 1, 2, 1, 2, 1, 2]);
     assert.equal(col.Count, 8);
     const array = col.Filter((item) => item === 1).GetIterator();
@@ -106,7 +106,7 @@ describe('Collection', () => {
     assert.equal(array.length, 4);
   });
 
-  it('Sort', () => {
+  it("Sort", () => {
     const col = new Collection([1, 2, 3, 4, 5]);
     assert.equal(col.Count, 5);
     const array = col
@@ -120,7 +120,7 @@ describe('Collection', () => {
     array.forEach((item, index) => assert.equal(item === num - index, true));
   });
 
-  it('Every', () => {
+  it("Every", () => {
     const col = new Collection([1, 2, 3, 4, 5]);
     assert.equal(col.Count, 5);
     assert.equal(
@@ -133,7 +133,7 @@ describe('Collection', () => {
     );
   });
 
-  it('Some', () => {
+  it("Some", () => {
     const col = new Collection([1, 2, 3, 4, 5]);
     assert.equal(col.Count, 5);
     assert.equal(
@@ -150,7 +150,7 @@ describe('Collection', () => {
     );
   });
 
-  it('IsEmpty', () => {
+  it("IsEmpty", () => {
     const col = new Collection();
     assert.equal(col.IsEmpty(), true);
     col.Add(1);
