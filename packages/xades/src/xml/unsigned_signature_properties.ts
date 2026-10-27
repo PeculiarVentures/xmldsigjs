@@ -77,9 +77,9 @@ export class UnsignedSignatureProperties extends XadesCollection<UnsignedSignatu
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
-  public OnLoadXml(element: Element) {
+  public override OnLoadXml(element: Element) {
     for (let i = 0; i < element.childNodes.length; i++) {
       const node = element.childNodes.item(i);
 

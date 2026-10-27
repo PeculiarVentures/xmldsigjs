@@ -47,13 +47,13 @@ export class Include extends XadesObject {
     defaultValue: "",
     required: true,
   })
-  public Uri: string;
+  public Uri!: string;
 
   @XmlAttribute({
     localName: XmlXades.AttributeNames.ReferencedData,
     defaultValue: false,
   })
-  public ReferencedData: boolean;
+  public ReferencedData!: boolean;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.ReferenceInfo })
@@ -62,13 +62,13 @@ export class ReferenceInfo extends XadesObject {
     localName: XmlXades.AttributeNames.URI,
     defaultValue: "",
   })
-  public Uri: string;
+  public Uri!: string;
 
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   /**
    * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
@@ -89,7 +89,7 @@ export class ReferenceInfo extends XadesObject {
     prefix: XmlSignature.DefaultPrefix,
     converter: XmlBase64Converter,
   })
-  public DigestValue: Uint8Array;
+  public DigestValue!: Uint8Array;
 }
 
 @XmlElement({
@@ -122,29 +122,29 @@ export class GenericTimeStamp extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: Include })
-  public Include: Include;
+  public Include!: Include;
 
   @XmlChildElement({
     parser: ReferenceInfos,
     noRoot: true,
   })
-  public ReferenceInfo: ReferenceInfos;
+  public ReferenceInfo!: ReferenceInfos;
 
   @XmlChildElement({ parser: CanonicalizationMethod })
-  public CanonicalizationMethod: CanonicalizationMethod;
+  public CanonicalizationMethod!: CanonicalizationMethod;
 
   @XmlChildElement({
     parser: EncapsulatedTimeStampCollection,
     noRoot: true,
   })
-  public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
+  public EncapsulatedTimeStamp!: EncapsulatedTimeStampCollection;
 
   @XmlChildElement({
     parser: XMLTimeStampCollection,
     noRoot: true,
   })
-  public XMLTimeStamp: XMLTimeStampCollection;
+  public XMLTimeStamp!: XMLTimeStampCollection;
 }

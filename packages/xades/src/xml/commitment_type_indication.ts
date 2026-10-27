@@ -48,7 +48,7 @@ export class CommitmentTypeQualifiers extends XadesCollection<CommitmentTypeQual
 @XmlElement({ localName: XmlXades.ElementNames.ObjectReference })
 export class ObjectReference extends XadesObject {
   @XmlContent({ required: true })
-  public Value: string;
+  public Value!: string;
 }
 
 @XmlElement({
@@ -78,13 +78,13 @@ export class CommitmentTypeIndication extends XadesObject {
     prefix: XmlXades.DefaultPrefix,
     parser: ObjectIdentifier,
   })
-  public CommitmentTypeId: ObjectIdentifier;
+  public CommitmentTypeId!: ObjectIdentifier;
 
   @XmlChildElement({
     parser: ObjectReferenceCollection,
     noRoot: true,
   })
-  public ObjectReference: ObjectReferenceCollection;
+  public ObjectReference!: ObjectReferenceCollection;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.AllSignedDataObjects,
@@ -93,11 +93,11 @@ export class CommitmentTypeIndication extends XadesObject {
     converter: XmlAllSignedDataObjectsConverter,
     defaultValue: false,
   })
-  public AllSignedDataObjects: boolean;
+  public AllSignedDataObjects!: boolean;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.CommitmentTypeQualifiers,
     parser: CommitmentTypeQualifier,
   })
-  public CommitmentTypeQualifiers: CommitmentTypeQualifiers;
+  public CommitmentTypeQualifiers!: CommitmentTypeQualifiers;
 }

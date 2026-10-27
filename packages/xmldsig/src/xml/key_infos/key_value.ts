@@ -13,7 +13,7 @@ import { keyValueRegistry } from "./key_info_clause.registry.js";
   localName: XmlSignature.ElementNames.KeyValue,
 })
 export class KeyValue extends KeyInfoClause {
-  protected value: KeyInfoClause;
+  protected value!: KeyInfoClause;
 
   public set Value(v: KeyInfoClause) {
     this.element = null;
@@ -50,7 +50,7 @@ export class KeyValue extends KeyInfoClause {
     return this.Value.exportKey(alg);
   }
 
-  protected OnGetXml(element: Element) {
+  protected override OnGetXml(element: Element) {
     if (!this.Value) {
       throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "KeyValue has empty value");
     }
@@ -61,7 +61,7 @@ export class KeyValue extends KeyInfoClause {
     }
   }
 
-  protected OnLoadXml(element: Element) {
+  protected override OnLoadXml(element: Element) {
     for (let i = 0; i < element.childNodes.length; i++) {
       const nodeKey = element.childNodes.item(i);
       if (!XmlCore.isElement(nodeKey)) {

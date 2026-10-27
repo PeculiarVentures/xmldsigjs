@@ -21,7 +21,7 @@ export class RsaPssWithoutParamsBase extends SignatureAlgorithm {
 }
 
 export class RsaPssWithoutParamsSha1 extends RsaPssWithoutParamsBase {
-  public algorithm: RsaPssWithoutParamsAlgorithm = {
+  public override algorithm: RsaPssWithoutParamsAlgorithm = {
     name: RSA_PSS,
     hash: {
       name: SHA1,
@@ -29,11 +29,11 @@ export class RsaPssWithoutParamsSha1 extends RsaPssWithoutParamsBase {
     saltLength: 20,
   };
 
-  public namespaceURI = RSA_PSS_SHA1_NAMESPACE;
+  public override namespaceURI = RSA_PSS_SHA1_NAMESPACE;
 }
 
 export class RsaPssWithoutParamsSha256 extends RsaPssWithoutParamsBase {
-  public algorithm: RsaPssWithoutParamsAlgorithm = {
+  public override algorithm: RsaPssWithoutParamsAlgorithm = {
     name: RSA_PSS,
     hash: {
       name: SHA256,
@@ -41,11 +41,11 @@ export class RsaPssWithoutParamsSha256 extends RsaPssWithoutParamsBase {
     saltLength: 32,
   };
 
-  public namespaceURI = RSA_PSS_SHA256_NAMESPACE;
+  public override namespaceURI = RSA_PSS_SHA256_NAMESPACE;
 }
 
 export class RsaPssWithoutParamsSha384 extends RsaPssWithoutParamsBase {
-  public algorithm: RsaPssWithoutParamsAlgorithm = {
+  public override algorithm: RsaPssWithoutParamsAlgorithm = {
     name: RSA_PSS,
     hash: {
       name: SHA384,
@@ -53,11 +53,11 @@ export class RsaPssWithoutParamsSha384 extends RsaPssWithoutParamsBase {
     saltLength: 48,
   };
 
-  public namespaceURI = RSA_PSS_SHA384_NAMESPACE;
+  public override namespaceURI = RSA_PSS_SHA384_NAMESPACE;
 }
 
 export class RsaPssWithoutParamsSha512 extends RsaPssWithoutParamsBase {
-  public algorithm: RsaPssWithoutParamsAlgorithm = {
+  public override algorithm: RsaPssWithoutParamsAlgorithm = {
     name: RSA_PSS,
     hash: {
       name: SHA512,
@@ -65,5 +65,5 @@ export class RsaPssWithoutParamsSha512 extends RsaPssWithoutParamsBase {
     saltLength: 64,
   };
 
-  public namespaceURI = RSA_PSS_SHA512_NAMESPACE;
+  public override namespaceURI = RSA_PSS_SHA512_NAMESPACE;
 }

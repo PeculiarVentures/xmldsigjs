@@ -10,7 +10,7 @@ export class XmlCanonicalizer {
   protected withComments: boolean;
   protected exclusive: boolean;
   protected propagatedNamespaces = new XmlCore.NamespaceManager();
-  protected document: Document;
+  protected document!: Document;
   protected result: string[] = [];
   protected visibleNamespaces = new XmlCore.NamespaceManager();
   protected inclusiveNamespacesPrefixList: string[] = [];

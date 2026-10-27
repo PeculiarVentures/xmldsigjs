@@ -29,14 +29,14 @@ export class RsaPkcs1Sha1 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: any = {
+  public override algorithm: any = {
     name: RSA_PKCS1,
     hash: {
       name: SHA1,
     },
   };
 
-  public namespaceURI = RSA_PKCS1_SHA1_NAMESPACE;
+  public override namespaceURI = RSA_PKCS1_SHA1_NAMESPACE;
 }
 
 export class RsaPkcs1Sha256 extends SignatureAlgorithm {
@@ -44,14 +44,14 @@ export class RsaPkcs1Sha256 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: any = {
+  public override algorithm: any = {
     name: RSA_PKCS1,
     hash: {
       name: SHA256,
     },
   };
 
-  public namespaceURI = RSA_PKCS1_SHA256_NAMESPACE;
+  public override namespaceURI = RSA_PKCS1_SHA256_NAMESPACE;
 }
 
 export class RsaPkcs1Sha384 extends SignatureAlgorithm {
@@ -59,14 +59,14 @@ export class RsaPkcs1Sha384 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: any = {
+  public override algorithm: any = {
     name: RSA_PKCS1,
     hash: {
       name: SHA384,
     },
   };
 
-  public namespaceURI = RSA_PKCS1_SHA384_NAMESPACE;
+  public override namespaceURI = RSA_PKCS1_SHA384_NAMESPACE;
 }
 
 export class RsaPkcs1Sha512 extends SignatureAlgorithm {
@@ -74,12 +74,12 @@ export class RsaPkcs1Sha512 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: any = {
+  public override algorithm: any = {
     name: RSA_PKCS1,
     hash: {
       name: SHA512,
     },
   };
 
-  public namespaceURI = RSA_PKCS1_SHA512_NAMESPACE;
+  public override namespaceURI = RSA_PKCS1_SHA512_NAMESPACE;
 }

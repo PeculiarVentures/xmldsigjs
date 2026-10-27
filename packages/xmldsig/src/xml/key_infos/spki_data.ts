@@ -22,7 +22,7 @@ import { KeyInfoClause } from "./key_info_clause.js";
   localName: XmlSignature.ElementNames.SPKIData,
 })
 export class SPKIData extends KeyInfoClause {
-  public Key: CryptoKey;
+  public override Key!: CryptoKey;
 
   @XmlChildElement({
     localName: XmlSignature.ElementNames.SPKIexp,
@@ -31,7 +31,7 @@ export class SPKIData extends KeyInfoClause {
     required: true,
     converter: XmlBase64Converter,
   })
-  public SPKIexp: Uint8Array | null;
+  public SPKIexp!: Uint8Array | null;
 
   public async importKey(key: CryptoKey) {
     const spki = await Application.crypto.subtle.exportKey("spki", key);

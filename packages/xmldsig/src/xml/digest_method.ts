@@ -26,7 +26,7 @@ export class DigestMethod extends XmlSignatureObject {
     required: true,
     defaultValue: XmlSignature.DefaultDigestMethod,
   })
-  public Algorithm: string;
+  public Algorithm!: string;
 
   public constructor(hashNamespace?: string) {
     super();

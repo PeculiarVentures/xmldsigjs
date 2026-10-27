@@ -11,10 +11,10 @@ const crypto = xmldsig.Application.crypto;
  * SHAKE256 hash algorithm implementation
  */
 class Shake256 extends xmldsig.HashAlgorithm {
-  public algorithm: Algorithm = { name: "SHAKE256" };
-  public namespaceURI = SHAKE256_NAMESPACE;
+  public override algorithm: Algorithm = { name: "SHAKE256" };
+  public override namespaceURI = SHAKE256_NAMESPACE;
 
-  public async Digest(xml: BufferSource | string | Node): Promise<Uint8Array> {
+  public override async Digest(xml: BufferSource | string | Node): Promise<Uint8Array> {
     // For SHAKE256, we need to specify the output length
     // Using 256 bits (32 bytes) as default output length
     let buf: Uint8Array;
@@ -48,15 +48,15 @@ class Ed25519Signature extends xmldsig.SignatureAlgorithm {
     return null;
   }
 
-  public algorithm: Algorithm = { name: "Ed25519" };
-  public namespaceURI = ED25519_NAMESPACE;
+  public override algorithm: Algorithm = { name: "Ed25519" };
+  public override namespaceURI = ED25519_NAMESPACE;
 
-  public async Sign(signedInfo: string, signingKey: CryptoKey, _algorithm: Algorithm): Promise<ArrayBuffer> {
+  public override async Sign(signedInfo: string, signingKey: CryptoKey, _algorithm: Algorithm): Promise<ArrayBuffer> {
     const info = new TextEncoder().encode(signedInfo);
     return crypto.subtle.sign("Ed25519", signingKey, info);
   }
 
-  public async Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, _algorithm?: Algorithm): Promise<boolean> {
+  public override async Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, _algorithm?: Algorithm): Promise<boolean> {
     const info = new TextEncoder().encode(signedInfo);
     return crypto.subtle.verify("Ed25519", key, signatureValue, info);
   }
@@ -71,7 +71,7 @@ class Ed25519Signature extends xmldsig.SignatureAlgorithm {
   prefix: "dsig11",
 })
 class Ed25519KeyValue extends xmldsig.KeyInfoClause {
-  public static canImportCryptoKey(key: CryptoKey): boolean {
+  public static override canImportCryptoKey(key: CryptoKey): boolean {
     return key.algorithm.name === "Ed25519";
   }
 
@@ -80,7 +80,7 @@ class Ed25519KeyValue extends xmldsig.KeyInfoClause {
     namespaceURI: "http://www.w3.org/2021/04/xmldsig-more#",
     prefix: "dsig11",
   })
-  public PublicKey: Uint8Array;
+  public PublicKey!: Uint8Array;
 
   public async importKey(key: CryptoKey): Promise<this> {
     if (key.algorithm.name !== "Ed25519") {

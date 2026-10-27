@@ -33,11 +33,11 @@ export class UnsignedProperties extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: UnsignedSignatureProperties })
-  public UnsignedSignatureProperties: UnsignedSignatureProperties;
+  public UnsignedSignatureProperties!: UnsignedSignatureProperties;
 
   @XmlChildElement({ parser: UnsignedDataObjectProperties })
-  public UnsignedDataObjectProperties: UnsignedDataObjectProperties;
+  public UnsignedDataObjectProperties!: UnsignedDataObjectProperties;
 }

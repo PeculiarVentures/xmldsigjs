@@ -26,29 +26,29 @@ export class DataObjectFormat extends XadesObject {
     localName: XmlXades.AttributeNames.ObjectReference,
     required: true,
   })
-  public ObjectReference: string;
+  public ObjectReference!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.Description,
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public Description: string;
+  public Description!: string;
 
   @XmlChildElement({ parser: ObjectIdentifier })
-  public ObjectIdentifier: ObjectIdentifier;
+  public ObjectIdentifier!: ObjectIdentifier;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.MimeType,
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public MimeType: string;
+  public MimeType!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.Encoding,
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public Encoding: string;
+  public Encoding!: string;
 }

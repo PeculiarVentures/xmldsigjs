@@ -127,8 +127,9 @@ export class SignedXml implements IXmlSerializable {
       data = data.cloneNode(true) as Element;
     }
     const signingAlg = assign({}, algorithm, key.algorithm);
-    if (key.algorithm["hash"]) {
-      signingAlg.hash = key.algorithm["hash"];
+    const keyHash = (key.algorithm as Partial<RsaHashedKeyAlgorithm>).hash;
+    if (keyHash) {
+      signingAlg.hash = keyHash;
     }
 
     const alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);

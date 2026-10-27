@@ -23,7 +23,7 @@ function lookupParentNode(node: Node): Node {
  */
 
 export class XmlDsigXPathTransform extends Transform {
-  public Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigXPathTransform;
+  public override Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigXPathTransform;
 
   @XmlChildElement({
     localName: XmlSignature.ElementNames.XPath,
@@ -31,12 +31,12 @@ export class XmlDsigXPathTransform extends Transform {
     prefix: XmlSignature.DefaultPrefix,
     required: true,
   })
-  public XPath: string;
+  public override XPath!: string;
 
   /**
    * Returns the output of the current XmlDsigXPathTransform object
    */
-  public GetOutput(): any {
+  public override GetOutput(): any {
     if (!this.innerXml) {
       throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
     }

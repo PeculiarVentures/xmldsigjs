@@ -40,7 +40,7 @@ export class X509IssuerSerial extends XmlSignatureObject {
     prefix: XmlSignature.DefaultPrefix,
     required: true,
   })
-  public X509IssuerName: string;
+  public X509IssuerName!: string;
 
   @XmlChildElement({
     localName: XmlSignature.ElementNames.X509SerialNumber,
@@ -48,7 +48,7 @@ export class X509IssuerSerial extends XmlSignatureObject {
     prefix: XmlSignature.DefaultPrefix,
     required: true,
   })
-  public X509SerialNumber: string;
+  public X509SerialNumber!: string;
 }
 
 export enum X509IncludeOption {
@@ -71,10 +71,10 @@ export interface IX509IssuerSerial {
 })
 export class KeyInfoX509Data extends KeyInfoClause {
   private x509crl: Uint8Array | null = null;
-  private IssuerSerialList: IX509IssuerSerial[];
+  private IssuerSerialList!: IX509IssuerSerial[];
   private SubjectKeyIdList: Uint8Array[] = [];
-  private SubjectNameList: string[];
-  private X509CertificateList: X509Certificate[];
+  private SubjectNameList!: string[];
+  private X509CertificateList!: X509Certificate[];
 
   public constructor();
   public constructor(rgbCert: Uint8Array);
@@ -230,7 +230,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
    * Returns an XML representation of the KeyInfoX509Data object.
    * @returns Element
    */
-  public GetXml(): Element {
+  public override GetXml(): Element {
     const doc = this.CreateDocument();
     const xel = this.CreateElement(doc);
 
@@ -288,7 +288,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
    * @param  {Element} element
    * @returns void
    */
-  public LoadXml(element: Element): void {
+  public override LoadXml(element: Element): void {
     super.LoadXml(element);
 
     if (this.IssuerSerialList) {

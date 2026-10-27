@@ -5,5 +5,5 @@ import { QualifyingProperties } from "./qualifying_properties.js";
 @XmlElement({ localName: XmlSignature.ElementNames.Object })
 export class DataObject extends XmlDSigDataObject {
   @XmlChildElement({ parser: QualifyingProperties })
-  public QualifyingProperties: QualifyingProperties;
+  public QualifyingProperties!: QualifyingProperties;
 }

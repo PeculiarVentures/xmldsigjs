@@ -26,7 +26,7 @@ export class SignatureProductionPlace extends XadesObject {
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public City: string;
+  public City!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.StateOrProvince,
@@ -34,7 +34,7 @@ export class SignatureProductionPlace extends XadesObject {
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public StateOrProvince: string;
+  public StateOrProvince!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.PostalCode,
@@ -42,7 +42,7 @@ export class SignatureProductionPlace extends XadesObject {
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public PostalCode: string;
+  public PostalCode!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.CountryName,
@@ -50,5 +50,5 @@ export class SignatureProductionPlace extends XadesObject {
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public CountryName: string;
+  public CountryName!: string;
 }

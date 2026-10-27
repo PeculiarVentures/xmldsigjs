@@ -33,14 +33,14 @@ export class EcdsaSha1 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: any = {
+  public override algorithm: any = {
     name: ECDSA,
     hash: {
       name: SHA1,
     },
   };
 
-  public namespaceURI = ECDSA_SHA1_NAMESPACE;
+  public override namespaceURI = ECDSA_SHA1_NAMESPACE;
 }
 
 export class EcdsaSha256 extends SignatureAlgorithm {
@@ -48,14 +48,14 @@ export class EcdsaSha256 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: any = {
+  public override algorithm: any = {
     name: ECDSA,
     hash: {
       name: SHA256,
     },
   };
 
-  public namespaceURI = ECDSA_SHA256_NAMESPACE;
+  public override namespaceURI = ECDSA_SHA256_NAMESPACE;
 }
 
 export class EcdsaSha384 extends SignatureAlgorithm {
@@ -63,14 +63,14 @@ export class EcdsaSha384 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: any = {
+  public override algorithm: any = {
     name: ECDSA,
     hash: {
       name: SHA384,
     },
   };
 
-  public namespaceURI = ECDSA_SHA384_NAMESPACE;
+  public override namespaceURI = ECDSA_SHA384_NAMESPACE;
 }
 
 export class EcdsaSha512 extends SignatureAlgorithm {
@@ -78,12 +78,12 @@ export class EcdsaSha512 extends SignatureAlgorithm {
     return fromAlgorithm(alg);
   }
 
-  public algorithm: any = {
+  public override algorithm: any = {
     name: ECDSA,
     hash: {
       name: SHA512,
     },
   };
 
-  public namespaceURI = ECDSA_SHA512_NAMESPACE;
+  public override namespaceURI = ECDSA_SHA512_NAMESPACE;
 }

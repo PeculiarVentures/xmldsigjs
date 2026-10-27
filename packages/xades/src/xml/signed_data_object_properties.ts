@@ -80,29 +80,29 @@ export class SignedDataObjectProperties extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({
     parser: DataObjectFormatCollection,
     noRoot: true,
   })
-  public DataObjectFormats: DataObjectFormatCollection;
+  public DataObjectFormats!: DataObjectFormatCollection;
 
   @XmlChildElement({
     parser: CommitmentTypeIndicationCollection,
     noRoot: true,
   })
-  public CommitmentTypeIndications: CommitmentTypeIndicationCollection;
+  public CommitmentTypeIndications!: CommitmentTypeIndicationCollection;
 
   @XmlChildElement({
     parser: AllDataObjectsTimeStampCollection,
     noRoot: true,
   })
-  public AllDataObjectsTimeStamps: AllDataObjectsTimeStampCollection;
+  public AllDataObjectsTimeStamps!: AllDataObjectsTimeStampCollection;
 
   @XmlChildElement({
     parser: IndividualDataObjectsTimeStampCollection,
     noRoot: true,
   })
-  public IndividualDataObjectsTimeStamps: IndividualDataObjectsTimeStampCollection;
+  public IndividualDataObjectsTimeStamps!: IndividualDataObjectsTimeStampCollection;
 }

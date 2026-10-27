@@ -45,17 +45,17 @@ export class CertificateValues extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({
     parser: EncapsulatedX509CertificateCollection,
     noRoot: true,
   })
-  public EncapsulatedX509Certificates: EncapsulatedX509CertificateCollection;
+  public EncapsulatedX509Certificates!: EncapsulatedX509CertificateCollection;
 
   @XmlChildElement({
     parser: OtherCertificateCollection,
     noRoot: true,
   })
-  public OtherCertificates: OtherCertificateCollection;
+  public OtherCertificates!: OtherCertificateCollection;
 }

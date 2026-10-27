@@ -33,26 +33,26 @@ export class OtherTimeStamp extends XadesObject {
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({
     parser: ReferenceInfos,
     noRoot: true,
   })
-  public ReferenceInfo: ReferenceInfos;
+  public ReferenceInfo!: ReferenceInfos;
 
   @XmlChildElement({ parser: CanonicalizationMethod })
-  public CanonicalizationMethod: CanonicalizationMethod;
+  public CanonicalizationMethod!: CanonicalizationMethod;
 
   @XmlChildElement({
     parser: EncapsulatedTimeStampCollection,
     noRoot: true,
   })
-  public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
+  public EncapsulatedTimeStamp!: EncapsulatedTimeStampCollection;
 
   @XmlChildElement({
     parser: XMLTimeStampCollection,
     noRoot: true,
   })
-  public XMLTimeStamp: XMLTimeStampCollection;
+  public XMLTimeStamp!: XMLTimeStampCollection;
 }

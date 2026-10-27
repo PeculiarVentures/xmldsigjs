@@ -29,5 +29,5 @@ export class UnsignedDataObjectProperties extends XadesCollection<UnsignedDataOb
     localName: XmlXades.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 }

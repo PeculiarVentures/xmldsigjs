@@ -38,9 +38,9 @@ export class KeyInfo extends XmlSignatureCollection<KeyInfoClause> {
     localName: XmlSignature.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
-  protected OnLoadXml(element: Element) {
+  protected override OnLoadXml(element: Element) {
     for (let i = 0; i < element.childNodes.length; i++) {
       const node = element.childNodes.item(i);
       if (node.nodeType !== XmlNodeType.Element) {

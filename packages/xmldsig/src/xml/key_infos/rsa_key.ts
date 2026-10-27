@@ -32,7 +32,7 @@ export interface RsaPSSSignParams extends RsaPssParams, Algorithm {
   localName: XmlSignature.ElementNames.RSAKeyValue,
 })
 export class RsaKeyValue extends KeyInfoClause {
-  public static canImportCryptoKey(key: CryptoKey): boolean {
+  public static override canImportCryptoKey(key: CryptoKey): boolean {
     const name = key.algorithm.name.toUpperCase();
     return name === RSA_PKCS1.toUpperCase() || name === RSA_PSS.toUpperCase();
   }
@@ -47,7 +47,7 @@ export class RsaKeyValue extends KeyInfoClause {
     required: true,
     converter: XmlBase64Converter,
   })
-  public Modulus: Uint8Array | null;
+  public Modulus!: Uint8Array | null;
 
   /**
    * Gets the Exponent of the public key
@@ -59,7 +59,7 @@ export class RsaKeyValue extends KeyInfoClause {
     required: true,
     converter: XmlBase64Converter,
   })
-  public Exponent: Uint8Array | null;
+  public Exponent!: Uint8Array | null;
 
   protected key: CryptoKey | null = null;
   protected jwk: JsonWebKey | null = null;
@@ -146,7 +146,7 @@ export class RsaKeyValue extends KeyInfoClause {
    * @param  {Element | string} element
    * @returns void
    */
-  public LoadXml(node: Element | string): void {
+  public override LoadXml(node: Element | string): void {
     super.LoadXml(node);
     this.keyUsage = ["verify"];
   }
@@ -198,13 +198,13 @@ export class MaskGenerationFunction extends XmlObject {
   @XmlChildElement({
     parser: DigestMethod,
   })
-  public DigestMethod: DigestMethod;
+  public DigestMethod!: DigestMethod;
 
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Algorithm,
     defaultValue: "http://www.w3.org/2007/05/xmldsig-more#MGF1",
   })
-  public Algorithm: string;
+  public Algorithm!: string;
 }
 
 @XmlElement({
@@ -216,22 +216,22 @@ export class PssAlgorithmParams extends XmlObject {
   @XmlChildElement({
     parser: DigestMethod,
   })
-  public DigestMethod: DigestMethod;
+  public DigestMethod!: DigestMethod;
 
   @XmlChildElement({
     parser: MaskGenerationFunction,
   })
-  public MGF: MaskGenerationFunction;
+  public MGF!: MaskGenerationFunction;
 
   @XmlChildElement({
     converter: XmlNumberConverter,
     prefix: PREFIX,
     namespaceURI: NAMESPACE_URI,
   })
-  public SaltLength: number;
+  public SaltLength!: number;
 
   @XmlChildElement({
     converter: XmlNumberConverter,
   })
-  public TrailerField: number;
+  public TrailerField!: number;
 }

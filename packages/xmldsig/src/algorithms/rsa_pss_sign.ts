@@ -46,14 +46,14 @@ export class RsaPssWithParams extends SignatureAlgorithm {
     return null;
   }
 
-  public algorithm: RsaPSSSignParams = {
+  public override algorithm: RsaPSSSignParams = {
     name: RSA_PSS,
     hash: {
       name: SHA1,
     },
   };
 
-  public namespaceURI = RSA_PSS_WITH_PARAMS_NAMESPACE;
+  public override namespaceURI = RSA_PSS_WITH_PARAMS_NAMESPACE;
 
   public fromMethod(method: SignatureMethod): void {
     if (

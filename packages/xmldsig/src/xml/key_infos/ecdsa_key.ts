@@ -57,7 +57,7 @@ export class EcdsaPublicKey extends XmlObject {
     required: true,
     converter: XmlBase64Converter,
   })
-  public X: Uint8Array;
+  public X!: Uint8Array;
 
   @XmlChildElement({
     localName: XmlSignature.ElementNames.Y,
@@ -66,7 +66,7 @@ export class EcdsaPublicKey extends XmlObject {
     required: true,
     converter: XmlBase64Converter,
   })
-  public Y: Uint8Array;
+  public Y!: Uint8Array;
 }
 
 @XmlElement({
@@ -79,7 +79,7 @@ export class NamedCurve extends XmlObject {
     localName: XmlSignature.AttributeNames.URI,
     required: true,
   })
-  public Uri: string;
+  public Uri!: string;
 }
 
 @XmlElement({
@@ -91,7 +91,7 @@ export class DomainParameters extends XmlObject {
   @XmlChildElement({
     parser: NamedCurve,
   })
-  public NamedCurve: NamedCurve;
+  public NamedCurve!: NamedCurve;
 }
 
 /**
@@ -103,7 +103,7 @@ export class DomainParameters extends XmlObject {
   prefix: PREFIX,
 })
 export class EcdsaKeyValue extends KeyInfoClause {
-  public static canImportCryptoKey(key: CryptoKey): boolean {
+  public static override canImportCryptoKey(key: CryptoKey): boolean {
     const name = key.algorithm.name.toUpperCase();
     return name === ECDSA.toUpperCase();
   }
@@ -111,13 +111,13 @@ export class EcdsaKeyValue extends KeyInfoClause {
   @XmlChildElement({
     parser: DomainParameters,
   })
-  public DomainParameters: DomainParameters;
+  public DomainParameters!: DomainParameters;
 
   @XmlChildElement({
     parser: EcdsaPublicKey,
     required: true,
   })
-  public PublicKey: EcdsaPublicKey;
+  public PublicKey!: EcdsaPublicKey;
 
   protected name = XmlSignature.ElementNames.ECDSAKeyValue;
   protected key: CryptoKey | null = null;

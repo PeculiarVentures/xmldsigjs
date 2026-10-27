@@ -28,7 +28,7 @@ import { XmlSignatureCollection, XmlSignatureObject } from "./xml_object.js";
   localName: "Other",
 })
 export class SignatureMethodOther extends XmlSignatureCollection<XmlObject> {
-  public OnLoadXml(element: Element) {
+  public override OnLoadXml(element: Element) {
     for (let i = 0; i < element.childNodes.length; i++) {
       const node = element.childNodes.item(i) as Element;
       if (node.nodeType !== XmlCore.XmlNodeType.Element || node.nodeName === XmlSignature.ElementNames.HMACOutputLength) {
@@ -61,7 +61,7 @@ export class SignatureMethod extends XmlSignatureObject {
     required: true,
     defaultValue: "",
   })
-  public Algorithm: string;
+  public Algorithm!: string;
 
   /**
    * Parameters for the XML Signature HMAC Algorithm.
@@ -77,12 +77,12 @@ export class SignatureMethod extends XmlSignatureObject {
     prefix: XmlSignature.DefaultPrefix,
     converter: XmlNumberConverter,
   })
-  public HMACOutputLength: number;
+  public HMACOutputLength!: number;
 
   @XmlChildElement({
     parser: SignatureMethodOther,
     noRoot: true,
     minOccurs: 0,
   })
-  public Any: SignatureMethodOther;
+  public Any!: SignatureMethodOther;
 }

@@ -34,5 +34,5 @@ export class CanonicalizationMethod extends XmlSignatureObject {
     required: true,
     defaultValue: XmlSignature.DefaultCanonMethod,
   })
-  public Algorithm: string;
+  public Algorithm!: string;
 }

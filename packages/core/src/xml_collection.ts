@@ -20,7 +20,7 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
   // Collection
   protected items: I[] = [];
 
-  public HasChanged() {
+  public override HasChanged() {
     const res = super.HasChanged();
 
     const changed = this.Some((item) => item.HasChanged());
@@ -84,11 +84,11 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
     return this.GetIterator().some(cb);
   }
 
-  public IsEmpty() {
+  public override IsEmpty() {
     return this.Count === 0;
   }
 
-  protected OnGetXml(element: Element) {
+  protected override OnGetXml(element: Element) {
     for (const item of this.GetIterator()) {
       const el = item.GetXml();
       if (el) {
@@ -97,7 +97,7 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
     }
   }
 
-  protected OnLoadXml(element: Element) {
+  protected override OnLoadXml(element: Element) {
     const self = this.GetStatic();
     if (!self.parser) {
       throw new XmlError(XE.XML_EXCEPTION, `${self.localName} doesn't have required 'parser' in @XmlElement`);

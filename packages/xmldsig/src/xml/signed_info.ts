@@ -43,7 +43,7 @@ export class SignedInfo extends XmlSignatureObject {
     localName: XmlSignature.AttributeNames.Id,
     defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   /**
    * Gets or sets the canonicalization algorithm that is used before signing
@@ -53,7 +53,7 @@ export class SignedInfo extends XmlSignatureObject {
     parser: CanonicalizationMethod,
     required: true,
   })
-  public CanonicalizationMethod: CanonicalizationMethod;
+  public CanonicalizationMethod!: CanonicalizationMethod;
 
   /**
    * Gets or sets the name of the algorithm used for signature generation
@@ -63,12 +63,12 @@ export class SignedInfo extends XmlSignatureObject {
     parser: SignatureMethod,
     required: true,
   })
-  public SignatureMethod: SignatureMethod;
+  public SignatureMethod!: SignatureMethod;
 
   @XmlChildElement({
     parser: References,
     minOccurs: 1,
     noRoot: true,
   })
-  public References: References;
+  public References!: References;
 }

@@ -8,7 +8,7 @@ import { Transform } from "../transform.js";
  * as defined by the World Wide Web Consortium (W3C), without comments.
  */
 export class XmlDsigC14NTransform extends Transform {
-  public Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+  public override Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 
   protected xmlCanonicalizer = new XmlCanonicalizer(false, false);
 
@@ -16,7 +16,7 @@ export class XmlDsigC14NTransform extends Transform {
    * Returns the output of the current XmlDSigC14NTransform object.
    * @returns string
    */
-  public GetOutput(): string {
+  public override GetOutput(): string {
     if (!this.innerXml) {
       throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
     }
@@ -29,6 +29,6 @@ export class XmlDsigC14NTransform extends Transform {
  * as defined by the World Wide Web Consortium (W3C), with comments.
  */
 export class XmlDsigC14NWithCommentsTransform extends XmlDsigC14NTransform {
-  public Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";
-  protected xmlCanonicalizer = new XmlCanonicalizer(true, false);
+  public override Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";
+  protected override xmlCanonicalizer = new XmlCanonicalizer(true, false);
 }
