@@ -1,12 +1,12 @@
-import { XmlAttribute, XmlElement, XmlNodeType } from 'xml-core';
-import { CertificateValues } from './certificate_values.js';
-import { CompleteCertificateRefs } from './complete_certificate_refs.js';
-import { CompleteRevocationRefs } from './complete_revocation_refs.js';
-import { CounterSignature } from './counter_signature.js';
-import { RevocationValues } from './revocation_values.js';
-import { XAdESTimeStamp } from './xades_time_stamp.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlElement, XmlNodeType } from "xml-core";
+import { CertificateValues } from "./certificate_values.js";
+import { CompleteCertificateRefs } from "./complete_certificate_refs.js";
+import { CompleteRevocationRefs } from "./complete_revocation_refs.js";
+import { CounterSignature } from "./counter_signature.js";
+import { RevocationValues } from "./revocation_values.js";
+import { XAdESTimeStamp } from "./xades_time_stamp.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <UnsignedSignatureProperties> element of an XML signature.
@@ -48,24 +48,16 @@ export class RefsOnlyTimeStamp extends XAdESTimeStamp implements UnsignedSignatu
 export class ArchiveTimeStamp extends XAdESTimeStamp implements UnsignedSignatureProperty {}
 
 @XmlElement({ localName: XmlXades.ElementNames.AttributeCertificateRefs })
-export class AttributeCertificateRefs
-  extends CompleteCertificateRefs
-  implements UnsignedSignatureProperty {}
+export class AttributeCertificateRefs extends CompleteCertificateRefs implements UnsignedSignatureProperty {}
 
 @XmlElement({ localName: XmlXades.ElementNames.AttributeRevocationRefs })
-export class AttributeRevocationRefs
-  extends CompleteRevocationRefs
-  implements UnsignedSignatureProperty {}
+export class AttributeRevocationRefs extends CompleteRevocationRefs implements UnsignedSignatureProperty {}
 
 @XmlElement({ localName: XmlXades.ElementNames.AttrAuthoritiesCertValues })
-export class AttrAuthoritiesCertValues
-  extends CertificateValues
-  implements UnsignedSignatureProperty {}
+export class AttrAuthoritiesCertValues extends CertificateValues implements UnsignedSignatureProperty {}
 
 @XmlElement({ localName: XmlXades.ElementNames.AttributeRevocationValues })
-export class AttributeRevocationValues
-  extends RevocationValues
-  implements UnsignedSignatureProperty {}
+export class AttributeRevocationValues extends RevocationValues implements UnsignedSignatureProperty {}
 
 /**
  * Abstract class for UnsignedSignatureProperties
@@ -73,7 +65,7 @@ export class AttributeRevocationValues
  * @class UnsignedSignatureProperty
  * @extends {XadesObject}
  */
-@XmlElement({ localName: 'UnsignedSignatureProperty' })
+@XmlElement({ localName: "UnsignedSignatureProperty" })
 export class UnsignedSignatureProperty extends XadesObject {}
 
 @XmlElement({
@@ -83,7 +75,7 @@ export class UnsignedSignatureProperty extends XadesObject {}
 export class UnsignedSignatureProperties extends XadesCollection<UnsignedSignatureProperty> {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

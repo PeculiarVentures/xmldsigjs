@@ -1,12 +1,12 @@
-import { XE, XmlError } from 'xml-core';
-import { algorithmRegistry } from './algorithm.registry.js';
-import { SignatureMethod } from './xml/index.js';
-import { IHashAlgorithm, ISignatureAlgorithm } from './algorithm.js';
+import { XE, XmlError } from "xml-core";
+import { algorithmRegistry } from "./algorithm.registry.js";
+import { SignatureMethod } from "./xml/index.js";
+import { IHashAlgorithm, ISignatureAlgorithm } from "./algorithm.js";
 
 export class AlgorithmFactory {
   static createHashAlgorithmFromNamespace(namespace: string): IHashAlgorithm {
     for (const [uri, { type, algorithm }] of algorithmRegistry) {
-      if (type === 'hash' && uri === namespace) {
+      if (type === "hash" && uri === namespace) {
         return new algorithm();
       }
     }
@@ -15,7 +15,7 @@ export class AlgorithmFactory {
 
   static createSignatureAlgorithmFromMethod(method: SignatureMethod): ISignatureAlgorithm {
     for (const [namespaceURI, { type, algorithm: ctor }] of algorithmRegistry) {
-      if (type === 'signature' && method.Algorithm === namespaceURI) {
+      if (type === "signature" && method.Algorithm === namespaceURI) {
         const signatureAlgorithm = new ctor();
 
         if (signatureAlgorithm.fromMethod) {
@@ -30,7 +30,7 @@ export class AlgorithmFactory {
 
   static createHashAlgorithmFromAlgorithm(alg: Algorithm): IHashAlgorithm {
     for (const [, { type, algorithm: ctor }] of algorithmRegistry) {
-      if (type === 'hash') {
+      if (type === "hash") {
         const hashAlgorithm = new ctor();
         if (hashAlgorithm.algorithm.name.toUpperCase() === alg.name.toUpperCase()) {
           return hashAlgorithm;
@@ -43,7 +43,7 @@ export class AlgorithmFactory {
 
   static createSignatureAlgorithmFromAlgorithm(alg: Algorithm): ISignatureAlgorithm {
     for (const [, { type, algorithm: ctor }] of algorithmRegistry) {
-      if (type === 'signature') {
+      if (type === "signature") {
         const signatureAlgorithm = ctor.fromAlgorithm(alg);
         if (signatureAlgorithm) {
           return signatureAlgorithm;

@@ -1,34 +1,27 @@
-import { describe, it, assert } from 'vitest';
-import '../test/config.js';
-import {
-  XmlAttribute,
-  XmlElement,
-  XmlObject,
-  XmlBase64Converter,
-  XmlBooleanConverter,
-  XmlNumberConverter,
-} from './index.js';
+import { describe, it, assert } from "vitest";
+import "../test/config.js";
+import { XmlAttribute, XmlElement, XmlObject, XmlBase64Converter, XmlBooleanConverter, XmlNumberConverter } from "./index.js";
 
-describe('Convertors', () => {
-  it('String', () => {
-    @XmlElement({ localName: 'test' })
+describe("Convertors", () => {
+  it("String", () => {
+    @XmlElement({ localName: "test" })
     class XmlTest extends XmlObject {
       @XmlAttribute({})
       public Value!: string;
     }
 
     const test = new XmlTest();
-    test.Value = '';
+    test.Value = "";
     const xmlTest = test.toString();
     const xml = `<test Value=""/>`;
     assert.equal(xmlTest, xml);
 
     const test2 = XmlTest.LoadXml(xml);
-    assert.equal(test2.Value, '');
+    assert.equal(test2.Value, "");
   });
 
-  it('Number', () => {
-    @XmlElement({ localName: 'test' })
+  it("Number", () => {
+    @XmlElement({ localName: "test" })
     class XmlTest extends XmlObject {
       @XmlAttribute({ converter: XmlNumberConverter })
       public Value!: number;
@@ -44,8 +37,8 @@ describe('Convertors', () => {
     assert.equal(test2.Value, 15);
   });
 
-  it('Base64', () => {
-    @XmlElement({ localName: 'test' })
+  it("Base64", () => {
+    @XmlElement({ localName: "test" })
     class XmlTest extends XmlObject {
       @XmlAttribute({ converter: XmlBase64Converter })
       public Value!: Uint8Array;
@@ -64,8 +57,8 @@ describe('Convertors', () => {
     assert.equal(test2.Value[2], 1);
   });
 
-  it('Boolean', () => {
-    @XmlElement({ localName: 'test' })
+  it("Boolean", () => {
+    @XmlElement({ localName: "test" })
     class XmlTest extends XmlObject {
       @XmlAttribute({ converter: XmlBooleanConverter })
       public ValueTrue!: boolean;

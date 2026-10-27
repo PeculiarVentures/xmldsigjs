@@ -1,6 +1,6 @@
-import { XmlAttribute, XmlChildElement, XmlContent, XmlElement } from 'xml-core';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlContent, XmlElement } from "xml-core";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <ObjectIdentifier> element of an XML signature.
@@ -41,7 +41,7 @@ import { XadesCollection, XadesObject } from './xml_base.js';
  * ```
  */
 
-export type IdentifierQualifier = 'OIDAsURI' | 'OIDAsURN';
+export type IdentifierQualifier = "OIDAsURI" | "OIDAsURN";
 
 @XmlElement({ localName: XmlXades.ElementNames.Identifier })
 export class Identifier extends XadesObject {
@@ -49,7 +49,7 @@ export class Identifier extends XadesObject {
   public Qualifier: IdentifierQualifier;
 
   @XmlContent({
-    defaultValue: '',
+    defaultValue: "",
     required: true,
   })
   public Value: string;
@@ -58,7 +58,7 @@ export class Identifier extends XadesObject {
 @XmlElement({ localName: XmlXades.ElementNames.DocumentationReference })
 export class DocumentationReference extends XadesObject {
   @XmlContent({
-    defaultValue: '',
+    defaultValue: "",
     required: true,
   })
   public Uri: string;
@@ -94,7 +94,7 @@ export class ObjectIdentifier extends XadesObject {
     localName: XmlXades.ElementNames.Description,
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Description: string;
 

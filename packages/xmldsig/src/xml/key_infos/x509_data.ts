@@ -1,9 +1,9 @@
-import { XE, XmlError, Convert, XmlChildElement, XmlElement } from 'xml-core';
+import { XE, XmlError, Convert, XmlChildElement, XmlElement } from "xml-core";
 
-import { X509Certificate } from '../../pki/x509.js';
-import { XmlSignature } from '../xml_names.js';
-import { XmlSignatureObject } from '../xml_object.js';
-import { KeyInfoClause } from './key_info_clause.js';
+import { X509Certificate } from "../../pki/x509.js";
+import { XmlSignature } from "../xml_names.js";
+import { XmlSignatureObject } from "../xml_object.js";
+import { KeyInfoClause } from "./key_info_clause.js";
 
 /**
  * Represents the <X509Data> element of an XML signature.
@@ -166,7 +166,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
    */
   public AddCertificate(certificate: X509Certificate): void {
     if (!certificate) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'certificate');
+      throw new XmlError(XE.PARAM_REQUIRED, "certificate");
     }
     if (!this.X509CertificateList) {
       this.X509CertificateList = [];
@@ -182,7 +182,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
    */
   public AddIssuerSerial(issuerName: string, serialNumber: string): void {
     if (issuerName == null) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'issuerName');
+      throw new XmlError(XE.PARAM_REQUIRED, "issuerName");
     }
     if (this.IssuerSerialList == null) {
       this.IssuerSerialList = [];
@@ -202,7 +202,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
       this.SubjectKeyIdList = [];
     }
 
-    if (typeof subjectKeyId === 'string') {
+    if (typeof subjectKeyId === "string") {
       if (subjectKeyId != null) {
         const id = Convert.FromBase64(subjectKeyId);
         this.SubjectKeyIdList.push(id);
@@ -239,20 +239,11 @@ export class KeyInfoX509Data extends KeyInfoClause {
     // <X509IssuerSerial>
     if (this.IssuerSerialList != null && this.IssuerSerialList.length > 0) {
       this.IssuerSerialList.forEach((iser) => {
-        const isl = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509IssuerSerial,
-        );
-        const xin = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509IssuerName,
-        );
+        const isl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerSerial);
+        const xin = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerName);
         xin.textContent = iser.issuerName;
         isl.appendChild(xin);
-        const xsn = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509SerialNumber,
-        );
+        const xsn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SerialNumber);
         xsn.textContent = iser.serialNumber;
         isl.appendChild(xsn);
         xel.appendChild(isl);
@@ -261,10 +252,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
     // <X509SKI>
     if (this.SubjectKeyIdList != null && this.SubjectKeyIdList.length > 0) {
       this.SubjectKeyIdList.forEach((skid) => {
-        const ski = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509SKI,
-        );
+        const ski = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SKI);
         ski.textContent = Convert.ToBase64(skid);
         xel.appendChild(ski);
       });
@@ -272,10 +260,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
     // <X509SubjectName>
     if (this.SubjectNameList != null && this.SubjectNameList.length > 0) {
       this.SubjectNameList.forEach((subject) => {
-        const sn = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509SubjectName,
-        );
+        const sn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SubjectName);
         sn.textContent = subject;
         xel.appendChild(sn);
       });
@@ -283,20 +268,14 @@ export class KeyInfoX509Data extends KeyInfoClause {
     // <X509Certificate>
     if (this.X509CertificateList != null && this.X509CertificateList.length > 0) {
       this.X509CertificateList.forEach((x509) => {
-        const cert = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509Certificate,
-        );
+        const cert = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509Certificate);
         cert.textContent = Convert.ToBase64(x509.GetRaw());
         xel.appendChild(cert);
       });
     }
     // only one <X509CRL>
     if (this.x509crl != null) {
-      const crl = doc.createElementNS(
-        XmlSignature.NamespaceURI,
-        prefix + XmlSignature.ElementNames.X509CRL,
-      );
+      const crl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509CRL);
       crl.textContent = Convert.ToBase64(this.x509crl);
       xel.appendChild(crl);
     }
@@ -330,18 +309,8 @@ export class KeyInfoX509Data extends KeyInfoClause {
     let xnl = this.GetChildren(XmlSignature.ElementNames.X509IssuerSerial);
     if (xnl) {
       xnl.forEach((xel) => {
-        const issuer = XmlSignatureObject.GetChild(
-          xel,
-          XmlSignature.ElementNames.X509IssuerName,
-          XmlSignature.NamespaceURI,
-          true,
-        );
-        const serial = XmlSignatureObject.GetChild(
-          xel,
-          XmlSignature.ElementNames.X509SerialNumber,
-          XmlSignature.NamespaceURI,
-          true,
-        );
+        const issuer = XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509IssuerName, XmlSignature.NamespaceURI, true);
+        const serial = XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509SerialNumber, XmlSignature.NamespaceURI, true);
         if (issuer && issuer.textContent && serial && serial.textContent) {
           this.AddIssuerSerial(issuer.textContent, serial.textContent);
         }

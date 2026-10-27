@@ -1,8 +1,8 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { UnsignedDataObjectProperties } from './unsigned_data_object_property.js';
-import { UnsignedSignatureProperties } from './unsigned_signature_properties.js';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { UnsignedDataObjectProperties } from "./unsigned_data_object_property.js";
+import { UnsignedSignatureProperties } from "./unsigned_signature_properties.js";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <UnsignedProperties> element of an XML signature.
@@ -31,7 +31,7 @@ import { XadesObject } from './xml_base.js';
 export class UnsignedProperties extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

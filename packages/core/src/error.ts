@@ -2,17 +2,17 @@ function printf(text: string, ...args: any[]) {
   // Replace all %1, %2, ... with args[0], args[1], ...
   let msg = text.replace(/%([1-9]\d*)/g, (m, n) => {
     const idx = parseInt(n, 10) - 1;
-    return args[idx] !== undefined ? args[idx] : '';
+    return args[idx] !== undefined ? args[idx] : "";
   });
   // convert %% -> %
-  msg = msg.replace(/%%/g, '%');
+  msg = msg.replace(/%%/g, "%");
   return msg;
 }
 
 function padNum(num: number, size: number): string {
-  let s = num + '';
+  let s = num + "";
   while (s.length < size) {
-    s = '0' + s;
+    s = "0" + s;
   }
   return s;
 }
@@ -22,7 +22,7 @@ export class XmlError implements Error {
   public code: number;
   public name: string;
   public message: string;
-  protected readonly prefix = 'XMLJS';
+  protected readonly prefix = "XMLJS";
   constructor(code: XE, ...args: any[]) {
     this.code = code;
     this.name = (this.constructor as any).name;
@@ -58,23 +58,23 @@ export enum XE {
 type IXmlError = Record<number, string>;
 
 const xes: IXmlError = {};
-xes[XE.NONE] = 'No description';
-xes[XE.NULL_REFERENCE] = 'Null reference';
+xes[XE.NONE] = "No description";
+xes[XE.NULL_REFERENCE] = "Null reference";
 xes[XE.NULL_PARAM] = `'%1' has empty '%2' object`;
 xes[XE.DECORATOR_NULL_PARAM] = `Decorator '%1' has empty '%2' parameter`;
 xes[XE.COLLECTION_LIMIT] = `Collection of '%1' in element '%2' has wrong amount of items`;
-xes[XE.METHOD_NOT_IMPLEMENTED] = 'Method is not implemented';
-xes[XE.METHOD_NOT_SUPPORTED] = 'Method is not supported';
+xes[XE.METHOD_NOT_IMPLEMENTED] = "Method is not implemented";
+xes[XE.METHOD_NOT_SUPPORTED] = "Method is not supported";
 xes[XE.PARAM_REQUIRED] = `Required parameter is missing '%1'`;
-xes[XE.CONVERTER_UNSUPPORTED] = 'Converter is not supported';
+xes[XE.CONVERTER_UNSUPPORTED] = "Converter is not supported";
 xes[XE.ELEMENT_MALFORMED] = `Malformed element '%1'`;
 xes[XE.ELEMENT_MISSING] = `Element '%1' is missing in '%2'`;
 xes[XE.ATTRIBUTE_MISSING] = `Attribute '%1' is missing in '%2'`;
 xes[XE.CONTENT_MISSING] = `Content is missing in '%1'`;
-xes[XE.CRYPTOGRAPHIC] = 'Cryptographic error: %1';
-xes[XE.CRYPTOGRAPHIC_NO_MODULE] = 'WebCrypto module is not found';
-xes[XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM] = 'Unknown transform %1';
+xes[XE.CRYPTOGRAPHIC] = "Cryptographic error: %1";
+xes[XE.CRYPTOGRAPHIC_NO_MODULE] = "WebCrypto module is not found";
+xes[XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM] = "Unknown transform %1";
 xes[XE.ALGORITHM_NOT_SUPPORTED] = `Algorithm is not supported '%1'`;
 xes[XE.ALGORITHM_WRONG_NAME] = `Algorithm wrong name in use '%1'`;
-xes[XE.XML_EXCEPTION] = 'XML exception: %1';
+xes[XE.XML_EXCEPTION] = "XML exception: %1";
 xes[XE.KEY_INFO_CLAUSE_NOT_SUPPORTED] = `KeyInfoClause type '%1' is not supported`;

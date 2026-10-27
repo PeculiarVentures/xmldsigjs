@@ -1,11 +1,11 @@
-import { defineConfig } from 'tsdown';
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   workspace: {
-    include: ['packages/*'],
+    include: ["packages/*"],
   },
-  entry: 'src/index.ts',
-  format: ['esm', 'cjs'],
+  entry: "src/index.ts",
+  format: ["esm", "cjs"],
   dts: true,
   clean: true,
   deps: {
@@ -21,17 +21,15 @@ export default defineConfig({
     customExports(exports) {
       return Object.fromEntries(
         Object.entries(exports).map(([key, value]) =>
-          value && typeof value === 'object' && 'import' in value && 'require' in value
-            ? [key, { module: value.import, default: value.require }]
-            : [key, value],
+          value && typeof value === "object" && "import" in value && "require" in value ? [key, { module: value.import, default: value.require }] : [key, value],
         ),
       );
     },
   },
-  outDir: 'build',
-  tsconfig: 'tsconfig.compile.json',
+  outDir: "build",
+  tsconfig: "tsconfig.compile.json",
   attw: {
-    level: 'error',
-    profile: 'node16',
+    level: "error",
+    profile: "node16",
   },
 });

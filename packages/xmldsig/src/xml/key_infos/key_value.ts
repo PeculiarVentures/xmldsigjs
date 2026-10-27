@@ -1,10 +1,10 @@
-import * as XmlCore from 'xml-core';
-import { XE, XmlElement, XmlError } from 'xml-core';
+import * as XmlCore from "xml-core";
+import { XE, XmlElement, XmlError } from "xml-core";
 
-import { XmlSignature } from '../xml_names.js';
-import { KeyInfoClause } from './key_info_clause.js';
-import { KeyInfoClauseFactory } from './key_info_clause.factory.js';
-import { keyValueRegistry } from './key_info_clause.registry.js';
+import { XmlSignature } from "../xml_names.js";
+import { KeyInfoClause } from "./key_info_clause.js";
+import { KeyInfoClauseFactory } from "./key_info_clause.factory.js";
+import { keyValueRegistry } from "./key_info_clause.registry.js";
 
 /**
  * Represents the <KeyValue> element of an XML signature.
@@ -52,7 +52,7 @@ export class KeyValue extends KeyInfoClause {
 
   protected OnGetXml(element: Element) {
     if (!this.Value) {
-      throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, 'KeyValue has empty value');
+      throw new XmlCore.XmlError(XmlCore.XE.CRYPTOGRAPHIC, "KeyValue has empty value");
     }
 
     const node = this.Value.GetXml();
@@ -77,6 +77,6 @@ export class KeyValue extends KeyInfoClause {
         // Ignore errors and continue to find a valid KeyInfoClause
       }
     }
-    throw new XmlError(XE.CRYPTOGRAPHIC, 'Unsupported KeyValue in use');
+    throw new XmlError(XE.CRYPTOGRAPHIC, "Unsupported KeyValue in use");
   }
 }

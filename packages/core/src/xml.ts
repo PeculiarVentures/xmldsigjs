@@ -1,6 +1,6 @@
-export const APPLICATION_XML = 'application/xml';
-export const DEFAULT_PREFIX = '';
-export const DEFAULT_NAMESPACE_URI = '';
+export const APPLICATION_XML = "application/xml";
+export const DEFAULT_PREFIX = "";
+export const DEFAULT_NAMESPACE_URI = "";
 
 export enum XmlNodeType {
   None = 0, // Read method has not been

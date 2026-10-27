@@ -1,10 +1,10 @@
-import { XmlContent, XmlElement } from 'xml-core';
-import { dateFormat } from '../dateformat.js';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlContent, XmlElement } from "xml-core";
+import { dateFormat } from "../dateformat.js";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 @XmlElement({
-  localName: 'XadesDateTime',
+  localName: "XadesDateTime",
   namespaceURI: XmlXades.NamespaceURI,
   prefix: XmlXades.DefaultPrefix,
 })

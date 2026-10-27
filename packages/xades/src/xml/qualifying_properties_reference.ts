@@ -1,6 +1,6 @@
-import { XmlAttribute, XmlElement } from 'xml-core';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlElement } from "xml-core";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <QualifyingPropertiesReference> element of an XML signature.
@@ -24,7 +24,7 @@ export class QualifyingPropertiesReference extends XadesObject {
 
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 }

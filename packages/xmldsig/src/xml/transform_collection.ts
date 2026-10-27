@@ -1,9 +1,9 @@
-import { XE, XmlError, XmlElement } from 'xml-core';
+import { XE, XmlError, XmlElement } from "xml-core";
 
-import { CryptoConfig } from '../crypto_config.js';
-import { Transform } from './transform.js';
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureCollection } from './xml_object.js';
+import { CryptoConfig } from "../crypto_config.js";
+import { Transform } from "./transform.js";
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureCollection } from "./xml_object.js";
 
 /**
  * The Transforms element contains a collection of transformations
@@ -37,7 +37,7 @@ export class Transforms extends XmlSignatureCollection<Transform> {
           try {
             const customTransform = CryptoConfig.CreateFromName(item.Algorithm);
             if (!item.Element) {
-              throw new Error('Transform element is not defined');
+              throw new Error("Transform element is not defined");
             }
             customTransform.LoadXml(item.Element);
             return customTransform;
@@ -52,10 +52,10 @@ export class Transforms extends XmlSignatureCollection<Transform> {
 function ChangeTransform(t1: Transform, t2: typeof Transform) {
   const t = new t2();
   if (!t1.Element) {
-    throw new Error('Transform element is not defined');
+    throw new Error("Transform element is not defined");
   }
   t.LoadXml(t1.Element);
   return t;
 }
 
-import * as transforms from './transforms/index.js';
+import * as transforms from "./transforms/index.js";

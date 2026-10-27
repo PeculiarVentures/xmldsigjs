@@ -1,11 +1,11 @@
-import { ISignatureAlgorithm, SignatureAlgorithm } from '../algorithm.js';
-import { SHA1, SHA256, SHA384, SHA512 } from './rsa_hash.js';
+import { ISignatureAlgorithm, SignatureAlgorithm } from "../algorithm.js";
+import { SHA1, SHA256, SHA384, SHA512 } from "./rsa_hash.js";
 
-export const HMAC = 'HMAC';
-export const HMAC_SHA1_NAMESPACE = 'http://www.w3.org/2000/09/xmldsig#hmac-sha1';
-export const HMAC_SHA256_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#hmac-sha256';
-export const HMAC_SHA384_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#hmac-sha384';
-export const HMAC_SHA512_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#hmac-sha512';
+export const HMAC = "HMAC";
+export const HMAC_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
+export const HMAC_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
+export const HMAC_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
+export const HMAC_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
 
 function fromAlgorithm(alg: HmacKeyAlgorithm): ISignatureAlgorithm | null {
   if (alg.name.toUpperCase() === HMAC.toUpperCase()) {

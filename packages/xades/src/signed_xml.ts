@@ -1,9 +1,9 @@
-import * as XmlCore from 'xml-core';
-import * as XmlDSigJs from 'xmldsigjs';
-import { OptionsSign } from 'xmldsigjs';
-import * as XAdES from './xml/index.js';
+import * as XmlCore from "xml-core";
+import * as XmlDSigJs from "xmldsigjs";
+import { OptionsSign } from "xmldsigjs";
+import * as XAdES from "./xml/index.js";
 
-const XADES_REFERENCE_TYPE = 'http://uri.etsi.org/01903#SignedProperties';
+const XADES_REFERENCE_TYPE = "http://uri.etsi.org/01903#SignedProperties";
 
 export interface OptionsSignerRole {
   claimed?: string[];
@@ -94,7 +94,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
   get SignedProperties(): XAdES.SignedProperties {
     if (!this.Properties) {
-      throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, 'Properties is empty');
+      throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Properties is empty");
     }
 
     return this.Properties.SignedProperties;
@@ -102,7 +102,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
   get UnsignedProperties(): XAdES.UnsignedProperties {
     if (!this.Properties) {
-      throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, 'Properties is empty');
+      throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Properties is empty");
     }
 
     return this.Properties.UnsignedProperties;
@@ -127,10 +127,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         for (let i = 0; i < item.Element.childNodes.length; i++) {
           const node = item.Element.childNodes.item(i);
 
-          if (
-            node.nodeType === XmlCore.XmlNodeType.Element &&
-            (node as Element).localName === XAdES.XmlXades.ElementNames.QualifyingProperties
-          ) {
+          if (node.nodeType === XmlCore.XmlNodeType.Element && (node as Element).localName === XAdES.XmlXades.ElementNames.QualifyingProperties) {
             properties = XAdES.QualifyingProperties.LoadXml(node as Element);
 
             return true;
@@ -164,10 +161,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
   protected CreateQualifyingProperties() {
     if (this.Properties) {
-      throw new XmlCore.XmlError(
-        XmlCore.XE.XML_EXCEPTION,
-        'Cannot create QualifyingProperties cause current signature has got one. You must create CounterSignature',
-      );
+      throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot create QualifyingProperties cause current signature has got one. You must create CounterSignature");
     }
 
     const rnd = XmlDSigJs.Application.crypto.getRandomValues(new Uint8Array(6)) as Uint8Array;
@@ -183,12 +177,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     this.XmlSignature.ObjectList.Add(dataObject);
   }
 
-  protected async ApplySignOptions(
-    signature: XmlDSigJs.Signature,
-    algorithm: Algorithm,
-    key: CryptoKey,
-    options: OptionsXAdES,
-  ) {
+  protected async ApplySignOptions(signature: XmlDSigJs.Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsXAdES) {
     await super.ApplySignOptions(signature, algorithm, key, options);
     if (this.Properties) {
       const sigProps = this.Properties.SignedProperties.SignedSignatureProperties;
@@ -213,8 +202,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
       xadesRef.Type = XADES_REFERENCE_TYPE;
       xadesRef.Uri = `#${this.Properties.SignedProperties.Id}`;
-      xadesRef.DigestMethod.Algorithm =
-        XmlDSigJs.CryptoConfig.GetHashAlgorithm(xadesRefHash).namespaceURI;
+      xadesRef.DigestMethod.Algorithm = XmlDSigJs.CryptoConfig.GetHashAlgorithm(xadesRefHash).namespaceURI;
 
       signature.SignedInfo.References.Add(xadesRef);
 
@@ -228,11 +216,10 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
   protected async ApplySigningCertificate(value?: string | OptionsSigningCertificate) {
     if (this.Properties && value) {
-      const options: OptionsSigningCertificate =
-        typeof value === 'string' ? { certificate: value } : value;
+      const options: OptionsSigningCertificate = typeof value === "string" ? { certificate: value } : value;
 
       if (!options.digestAlgorithm) {
-        options.digestAlgorithm = 'SHA-256'; // set default alg if required
+        options.digestAlgorithm = "SHA-256"; // set default alg if required
       }
 
       const raw = XmlCore.Convert.FromBase64(options.certificate);
@@ -241,10 +228,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
 
       if (ssp.SigningCertificate.Count) {
-        throw new XmlCore.XmlError(
-          XmlCore.XE.XML_EXCEPTION,
-          'Signature can contain only one SigningCertificate',
-        );
+        throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Signature can contain only one SigningCertificate");
       }
 
       const signingCertificate = new XAdES.Cert();
@@ -255,23 +239,18 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.digestAlgorithm);
 
       signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
-      signingCertificate.CertDigest.DigestValue = new Uint8Array(
-        await cert.Thumbprint(alg.algorithm.name),
-      );
+      signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name));
 
-      this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Add(
-        signingCertificate,
-      );
+      this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Add(signingCertificate);
     }
   }
 
   protected async ApplySigningCertificateV2(value?: string | OptionsSigningCertificateV2) {
     if (this.Properties && value) {
-      const options: OptionsSigningCertificate =
-        typeof value === 'string' ? { certificate: value } : value;
+      const options: OptionsSigningCertificate = typeof value === "string" ? { certificate: value } : value;
 
       if (!options.digestAlgorithm) {
-        options.digestAlgorithm = 'SHA-256'; // set default alg if required
+        options.digestAlgorithm = "SHA-256"; // set default alg if required
       }
 
       const raw = XmlCore.Convert.FromBase64(options.certificate);
@@ -280,10 +259,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
 
       if (ssp.SigningCertificateV2.Count) {
-        throw new XmlCore.XmlError(
-          XmlCore.XE.XML_EXCEPTION,
-          'Signature can contain only one SigningCertificateV2',
-        );
+        throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Signature can contain only one SigningCertificateV2");
       }
 
       const signingCertificate = new XAdES.CertV2();
@@ -293,13 +269,9 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.digestAlgorithm);
 
       signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
-      signingCertificate.CertDigest.DigestValue = new Uint8Array(
-        await cert.Thumbprint(alg.algorithm.name),
-      );
+      signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name));
 
-      this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificateV2.Add(
-        signingCertificate,
-      );
+      this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificateV2.Add(signingCertificate);
     }
   }
 
@@ -307,7 +279,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     if (this.Properties) {
       const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
 
-      if (options && typeof options === 'object') {
+      if (options && typeof options === "object") {
         const policyId = new XAdES.SignaturePolicyId();
 
         policyId.SigPolicyId = new XAdES.SigPolicyId();
@@ -346,9 +318,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         if (options.digestValue) {
           policyId.SigPolicyHash.DigestValue = XmlCore.Convert.FromBase64(options.digestValue);
         } else {
-          const identifierDoc = policyId.SigPolicyId.Identifier.GetXml()?.cloneNode(
-            true,
-          ) as Element;
+          const identifierDoc = policyId.SigPolicyId.Identifier.GetXml()?.cloneNode(true) as Element;
 
           this.CopyNamespaces(identifierDoc, identifierDoc, true);
           this.InjectNamespaces(this.GetSignatureNamespaces(), identifierDoc, true);
@@ -371,7 +341,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
           options.qualifiers.forEach((qualifierValue) => {
             const container = new XAdES.SigPolicyQualifier();
 
-            if (typeof qualifierValue === 'string') {
+            if (typeof qualifierValue === "string") {
               const qualifier = new XAdES.SPURI();
 
               qualifier.Value = qualifierValue;
@@ -451,7 +421,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         options.certified.forEach((role) => {
           const certifiedRole = new XAdES.CertifiedRole();
 
-          certifiedRole.Encoding = 'der';
+          certifiedRole.Encoding = "der";
           certifiedRole.Value = XmlCore.Convert.FromBase64(role);
           ssp.SignerRole.CertifiedRoles.Add(certifiedRole);
         });
@@ -466,14 +436,11 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
 
       if (ssp.SigningCertificate.Count !== 1) {
-        throw new XmlCore.XmlError(
-          XmlCore.XE.XML_EXCEPTION,
-          'Signature has got wrong amount of SigningCertificate, MUST be one',
-        );
+        throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Signature has got wrong amount of SigningCertificate, MUST be one");
       }
 
       // find certificate by Thumbprint
-      const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm('SHA-256');
+      const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm("SHA-256");
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const signingCertificate = ssp.SigningCertificate.Item(0)!;
       const b64CertDigest = XmlCore.Convert.ToBase64(signingCertificate.CertDigest.DigestValue);
@@ -502,14 +469,8 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         }
       }
 
-      if (
-        !(
-          x509 &&
-          x509.Issuer === signingCertificate.IssuerSerial.X509IssuerName &&
-          x509.SerialNumber === signingCertificate.IssuerSerial.X509SerialNumber
-        )
-      ) {
-        throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, 'SigningCertificate not found');
+      if (!(x509 && x509.Issuer === signingCertificate.IssuerSerial.X509IssuerName && x509.SerialNumber === signingCertificate.IssuerSerial.X509SerialNumber)) {
+        throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "SigningCertificate not found");
       }
     }
 

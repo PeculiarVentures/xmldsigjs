@@ -1,9 +1,9 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { CommitmentTypeIndication } from './commitment_type_indication.js';
-import { DataObjectFormat } from './data_object_format.js';
-import { XAdESTimeStamp } from './xades_time_stamp.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { CommitmentTypeIndication } from "./commitment_type_indication.js";
+import { DataObjectFormat } from "./data_object_format.js";
+import { XAdESTimeStamp } from "./xades_time_stamp.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <SignedDataObjectProperties> element of an XML signature.
@@ -46,7 +46,7 @@ import { XadesCollection, XadesObject } from './xml_base.js';
 export class IndividualDataObjectsTimeStamp extends XAdESTimeStamp {}
 
 @XmlElement({
-  localName: 'IndividualDataObjectsTimeStampCollection',
+  localName: "IndividualDataObjectsTimeStampCollection",
   parser: IndividualDataObjectsTimeStamp,
 })
 
@@ -57,19 +57,19 @@ export class IndividualDataObjectsTimeStampCollection extends XadesCollection<In
 export class AllDataObjectsTimeStamp extends XAdESTimeStamp {}
 
 @XmlElement({
-  localName: 'DataObjectFormatCollection',
+  localName: "DataObjectFormatCollection",
   parser: DataObjectFormat,
 })
 export class DataObjectFormatCollection extends XadesCollection<DataObjectFormat> {}
 
 @XmlElement({
-  localName: 'CommitmentTypeIndicationCollection',
+  localName: "CommitmentTypeIndicationCollection",
   parser: CommitmentTypeIndication,
 })
 export class CommitmentTypeIndicationCollection extends XadesCollection<CommitmentTypeIndication> {}
 
 @XmlElement({
-  localName: 'AllDataObjectsTimeStampCollection',
+  localName: "AllDataObjectsTimeStampCollection",
   parser: AllDataObjectsTimeStamp,
 })
 export class AllDataObjectsTimeStampCollection extends XadesCollection<AllDataObjectsTimeStamp> {}
@@ -78,7 +78,7 @@ export class AllDataObjectsTimeStampCollection extends XadesCollection<AllDataOb
 export class SignedDataObjectProperties extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

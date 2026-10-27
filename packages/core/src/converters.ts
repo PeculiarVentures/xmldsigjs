@@ -1,5 +1,5 @@
-import { Convert } from './convert.js';
-import { IConverter } from './types.js';
+import { Convert } from "./convert.js";
+import { IConverter } from "./types.js";
 
 export const XmlBase64Converter: IConverter<Uint8Array> = {
   get: (value: Uint8Array) => {
@@ -18,7 +18,7 @@ export const XmlNumberConverter: IConverter<number> = {
     if (value) {
       return value.toString();
     }
-    return '0';
+    return "0";
   },
   set: (value: string) => {
     return Number(value);
@@ -30,10 +30,10 @@ export const XmlBooleanConverter: IConverter<boolean> = {
     if (value) {
       return value.toString();
     }
-    return 'false';
+    return "false";
   },
   set: (value: string) => {
-    if (value && value.toLowerCase() === 'true') {
+    if (value && value.toLowerCase() === "true") {
       return true;
     } else {
       return false;

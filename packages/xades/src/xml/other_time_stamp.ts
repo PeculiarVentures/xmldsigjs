@@ -1,12 +1,8 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { CanonicalizationMethod } from 'xmldsigjs';
-import {
-  EncapsulatedTimeStampCollection,
-  ReferenceInfos,
-  XMLTimeStampCollection,
-} from './generic_time_stamp.js';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { CanonicalizationMethod } from "xmldsigjs";
+import { EncapsulatedTimeStampCollection, ReferenceInfos, XMLTimeStampCollection } from "./generic_time_stamp.js";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <OtherTimeStamp> element of an XML signature.
@@ -35,7 +31,7 @@ import { XadesObject } from './xml_base.js';
 export class OtherTimeStamp extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

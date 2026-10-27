@@ -1,16 +1,16 @@
-import { Collection } from './collection.js';
-import { XmlNamespace } from './types.js';
+import { Collection } from "./collection.js";
+import { XmlNamespace } from "./types.js";
 
 export class NamespaceManager extends Collection<XmlNamespace> {
   public Add(item: XmlNamespace) {
-    item.prefix = item.prefix || '';
-    item.namespace = item.namespace || '';
+    item.prefix = item.prefix || "";
+    item.namespace = item.namespace || "";
     super.Add(item);
   }
 
   public GetPrefix(prefix: string, start: number = this.Count - 1): XmlNamespace | null {
     const lim = this.Count - 1;
-    prefix = prefix || '';
+    prefix = prefix || "";
     if (start > lim) {
       start = lim;
     }
@@ -25,7 +25,7 @@ export class NamespaceManager extends Collection<XmlNamespace> {
 
   public GetNamespace(namespaceUrl: string, start: number = this.Count - 1): XmlNamespace | null {
     const lim = this.Count - 1;
-    namespaceUrl = namespaceUrl || '';
+    namespaceUrl = namespaceUrl || "";
     if (start > lim) {
       start = lim;
     }

@@ -1,20 +1,10 @@
-import { describe, it, assert } from 'vitest';
-import '../test/config.js';
-import {
-  Parse,
-  XmlAttribute,
-  XmlBase64Converter,
-  XmlChildElement,
-  XmlCollection,
-  XmlContent,
-  XmlElement,
-  XmlNumberConverter,
-  XmlObject,
-} from './index.js';
+import { describe, it, assert } from "vitest";
+import "../test/config.js";
+import { Parse, XmlAttribute, XmlBase64Converter, XmlChildElement, XmlCollection, XmlContent, XmlElement, XmlNumberConverter, XmlObject } from "./index.js";
 
-describe('Decorators', () => {
-  it('malformed', () => {
-    @XmlElement({ localName: 'test' })
+describe("Decorators", () => {
+  it("malformed", () => {
+    @XmlElement({ localName: "test" })
     class XmlTest extends XmlObject {}
 
     const doc = Parse(`<wrongName/>`);
@@ -25,43 +15,43 @@ describe('Decorators', () => {
     });
   });
 
-  describe('Element', () => {
-    describe('GetXml', () => {
-      it('simple', () => {
+  describe("Element", () => {
+    describe("GetXml", () => {
+      it("simple", () => {
         // Need some changes for changing element to null, otherwise empty answer
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class Test extends XmlObject {
-          @XmlAttribute({ localName: 'id' })
+          @XmlAttribute({ localName: "id" })
           public Id!: string;
         }
 
         const test = new Test();
 
-        assert.equal(test.toString(), '');
+        assert.equal(test.toString(), "");
 
-        test.Id = '123';
+        test.Id = "123";
         assert.equal(test.toString(), `<test id="123"/>`);
       });
 
-      it('namespace', () => {
-        @XmlElement({ localName: 'test', namespaceURI: 'http://some.com' })
+      it("namespace", () => {
+        @XmlElement({ localName: "test", namespaceURI: "http://some.com" })
         class Test extends XmlObject {
-          @XmlAttribute({ localName: 'id', defaultValue: '1' })
-          public Id = 'test';
+          @XmlAttribute({ localName: "id", defaultValue: "1" })
+          public Id = "test";
         }
 
         const test = new Test();
 
         assert.equal(test.toString(), `<test id="test" xmlns="http://some.com"/>`);
-        test.Id = '1';
+        test.Id = "1";
         assert.equal(test.toString(), `<test xmlns="http://some.com"/>`);
       });
 
-      it('prefix with namespace', () => {
-        @XmlElement({ localName: 'test', prefix: 'sm', namespaceURI: 'http://some.com' })
+      it("prefix with namespace", () => {
+        @XmlElement({ localName: "test", prefix: "sm", namespaceURI: "http://some.com" })
         class Test extends XmlObject {
-          @XmlAttribute({ localName: 'id' })
-          public Id = 'test';
+          @XmlAttribute({ localName: "id" })
+          public Id = "test";
         }
 
         const test = new Test();
@@ -69,11 +59,11 @@ describe('Decorators', () => {
         assert.equal(test.toString(), `<sm:test id="test" xmlns:sm="http://some.com"/>`);
       });
 
-      it('prefix without namespace', () => {
-        @XmlElement({ localName: 'test', prefix: 'sm' })
+      it("prefix without namespace", () => {
+        @XmlElement({ localName: "test", prefix: "sm" })
         class Test extends XmlObject {
-          @XmlAttribute({ localName: 'id', defaultValue: '' })
-          public Id = 'test';
+          @XmlAttribute({ localName: "id", defaultValue: "" })
+          public Id = "test";
         }
 
         const test = new Test();
@@ -83,25 +73,25 @@ describe('Decorators', () => {
         }, /namespaceUri/i);
       });
 
-      describe('simple child', () => {
-        it('default value', () => {
-          @XmlElement({ localName: 'test' })
+      describe("simple child", () => {
+        it("default value", () => {
+          @XmlElement({ localName: "test" })
           class Test extends XmlObject {
-            @XmlChildElement({ defaultValue: '' })
+            @XmlChildElement({ defaultValue: "" })
             public Child!: string;
           }
 
           const test = new Test();
 
-          test.Child = 'Hello';
+          test.Child = "Hello";
           assert.equal(test.toString(), `<test><Child>Hello</Child></test>`);
         });
 
-        it('default value and required', () => {
-          @XmlElement({ localName: 'test' })
+        it("default value and required", () => {
+          @XmlElement({ localName: "test" })
           class Test extends XmlObject {
             @XmlChildElement({ required: true })
-            public Child = '1';
+            public Child = "1";
           }
 
           const test = new Test();
@@ -109,74 +99,71 @@ describe('Decorators', () => {
           assert.equal(test.toString(), `<test><Child>1</Child></test>`);
         });
 
-        it('changed name', () => {
-          @XmlElement({ localName: 'test' })
+        it("changed name", () => {
+          @XmlElement({ localName: "test" })
           class Test extends XmlObject {
-            @XmlChildElement({ localName: 'ch', defaultValue: '1' })
+            @XmlChildElement({ localName: "ch", defaultValue: "1" })
             public Child!: string;
           }
 
           const test = new Test();
 
-          test.Child = 'Hello';
+          test.Child = "Hello";
           assert.equal(test.toString(), `<test><ch>Hello</ch></test>`);
         });
 
-        it('namespace', () => {
-          @XmlElement({ localName: 'test' })
+        it("namespace", () => {
+          @XmlElement({ localName: "test" })
           class Test extends XmlObject {
             @XmlChildElement({
-              localName: 'ch',
-              defaultValue: '1',
-              namespaceURI: 'http://some.com',
+              localName: "ch",
+              defaultValue: "1",
+              namespaceURI: "http://some.com",
             })
             public Child!: string;
           }
 
           const test = new Test();
 
-          test.Child = 'Hello';
+          test.Child = "Hello";
           assert.equal(test.toString(), `<test><ch xmlns="http://some.com">Hello</ch></test>`);
         });
 
-        it('prefix', () => {
-          @XmlElement({ localName: 'test' })
+        it("prefix", () => {
+          @XmlElement({ localName: "test" })
           class Test extends XmlObject {
             @XmlChildElement({
-              localName: 'ch',
-              defaultValue: '1',
-              namespaceURI: 'http://some.com',
-              prefix: 'px',
+              localName: "ch",
+              defaultValue: "1",
+              namespaceURI: "http://some.com",
+              prefix: "px",
             })
             public Child!: string;
           }
 
           const test = new Test();
 
-          test.Child = 'Hello';
-          assert.equal(
-            test.toString(),
-            `<test><px:ch xmlns:px="http://some.com">Hello</px:ch></test>`,
-          );
+          test.Child = "Hello";
+          assert.equal(test.toString(), `<test><px:ch xmlns:px="http://some.com">Hello</px:ch></test>`);
         });
       });
 
-      describe('Child', () => {
-        @XmlElement({ localName: 'base' })
+      describe("Child", () => {
+        @XmlElement({ localName: "base" })
         class XmlBase extends XmlObject {
-          @XmlAttribute({ localName: 'id', defaultValue: '' })
+          @XmlAttribute({ localName: "id", defaultValue: "" })
           public Id!: string;
         }
 
-        @XmlElement({ localName: 'child1' })
+        @XmlElement({ localName: "child1" })
         class Child1 extends XmlBase {
-          @XmlChildElement({ localName: 'text', defaultValue: 5, converter: XmlNumberConverter })
+          @XmlChildElement({ localName: "text", defaultValue: 5, converter: XmlNumberConverter })
           public Value!: number;
         }
-        @XmlElement({ localName: 'child2', namespaceURI: 'http://number.com' })
+        @XmlElement({ localName: "child2", namespaceURI: "http://number.com" })
         class Child2 extends XmlBase {
           @XmlChildElement({
-            localName: 'text',
+            localName: "text",
             defaultValue: new Uint8Array([1, 0, 1]),
             converter: XmlBase64Converter,
             required: true,
@@ -184,9 +171,9 @@ describe('Decorators', () => {
           public Value!: Uint8Array;
         }
 
-        @XmlElement({ localName: 'root' })
+        @XmlElement({ localName: "root" })
         class Root extends XmlBase {
-          @XmlChildElement({ localName: 'name', required: true })
+          @XmlChildElement({ localName: "name", required: true })
           public Name!: string;
 
           @XmlChildElement({ parser: Child1 })
@@ -196,37 +183,31 @@ describe('Decorators', () => {
           public ChildRequired!: Child2;
         }
 
-        @XmlElement({ localName: 'Item' })
+        @XmlElement({ localName: "Item" })
         class Item extends XmlObject {
-          @XmlChildElement({ localName: 'Id' })
+          @XmlChildElement({ localName: "Id" })
           public id!: number;
 
-          @XmlChildElement({ localName: 'Name' })
+          @XmlChildElement({ localName: "Name" })
           public name!: string;
         }
-        it('default', () => {
+        it("default", () => {
           const root = new Root();
-          root.Name = 'MyName';
+          root.Name = "MyName";
 
           root.ChildRequired = new Child2();
 
-          assert.equal(
-            root.toString(),
-            `<root><name>MyName</name><child2 xmlns="http://number.com"><text>AQAB</text></child2></root>`,
-          );
+          assert.equal(root.toString(), `<root><name>MyName</name><child2 xmlns="http://number.com"><text>AQAB</text></child2></root>`);
 
-          root.ChildOptional.Id = '10';
+          root.ChildOptional.Id = "10";
           root.ChildOptional.Value = 12;
           root.ChildRequired.Value = new Uint8Array([1, 1, 1]);
 
-          assert.equal(
-            root.toString(),
-            `<root><name>MyName</name><child1 id="10"><text>12</text></child1><child2 xmlns="http://number.com"><text>AQEB</text></child2></root>`,
-          );
+          assert.equal(root.toString(), `<root><name>MyName</name><child1 id="10"><text>12</text></child1><child2 xmlns="http://number.com"><text>AQEB</text></child2></root>`);
         });
 
-        it('handle collection as simple array', () => {
-          @XmlElement({ localName: 'test' })
+        it("handle collection as simple array", () => {
+          @XmlElement({ localName: "test" })
           class Test extends XmlObject {
             @XmlChildElement({ defaultValue: [] })
             public Items!: Item[];
@@ -234,25 +215,18 @@ describe('Decorators', () => {
 
           const test = new Test();
 
-          test.Items = [
-            new Item({ id: 1, name: 'Item 1' }),
-            new Item({ id: 2, name: 'Item 2' }),
-            new Item({ id: 3, name: 'Item 3' }),
-          ];
-          assert.equal(
-            test.toString(),
-            `<test><Items><Item><Id>1</Id><Name>Item 1</Name></Item><Item><Id>2</Id><Name>Item 2</Name></Item><Item><Id>3</Id><Name>Item 3</Name></Item></Items></test>`,
-          );
+          test.Items = [new Item({ id: 1, name: "Item 1" }), new Item({ id: 2, name: "Item 2" }), new Item({ id: 3, name: "Item 3" })];
+          assert.equal(test.toString(), `<test><Items><Item><Id>1</Id><Name>Item 1</Name></Item><Item><Id>2</Id><Name>Item 2</Name></Item><Item><Id>3</Id><Name>Item 3</Name></Item></Items></test>`);
         });
       });
     });
 
-    describe('LoadXml', () => {
-      describe('simple', () => {
-        it('value', () => {
-          @XmlElement({ localName: 'test' })
+    describe("LoadXml", () => {
+      describe("simple", () => {
+        it("value", () => {
+          @XmlElement({ localName: "test" })
           class XmlTest extends XmlObject {
-            @XmlChildElement({ localName: 'value', defaultValue: '' })
+            @XmlChildElement({ localName: "value", defaultValue: "" })
             public Value!: string;
           }
 
@@ -261,13 +235,13 @@ describe('Decorators', () => {
           const test = new XmlTest();
           test.LoadXml(doc.documentElement);
 
-          assert.equal(test.Value, '123');
+          assert.equal(test.Value, "123");
         });
 
-        it('required with error', () => {
-          @XmlElement({ localName: 'test' })
+        it("required with error", () => {
+          @XmlElement({ localName: "test" })
           class XmlTest extends XmlObject {
-            @XmlChildElement({ localName: 'value', defaultValue: '', required: true })
+            @XmlChildElement({ localName: "value", defaultValue: "", required: true })
             public Value!: string;
           }
 
@@ -280,10 +254,10 @@ describe('Decorators', () => {
           });
         });
 
-        it('required', () => {
-          @XmlElement({ localName: 'test' })
+        it("required", () => {
+          @XmlElement({ localName: "test" })
           class XmlTest extends XmlObject {
-            @XmlChildElement({ localName: 'value', defaultValue: '', required: true })
+            @XmlChildElement({ localName: "value", defaultValue: "", required: true })
             public Value!: string;
           }
 
@@ -292,14 +266,14 @@ describe('Decorators', () => {
           const test = new XmlTest();
           test.LoadXml(doc.documentElement);
 
-          assert.equal(test.Value, '123');
+          assert.equal(test.Value, "123");
         });
 
-        it('converter', () => {
-          @XmlElement({ localName: 'test' })
+        it("converter", () => {
+          @XmlElement({ localName: "test" })
           class XmlTest extends XmlObject {
             @XmlChildElement({
-              localName: 'value',
+              localName: "value",
               defaultValue: null,
               converter: XmlBase64Converter,
             })
@@ -315,13 +289,13 @@ describe('Decorators', () => {
           assert.equal(test.Value?.length, 3);
         });
 
-        it('namespace', () => {
-          @XmlElement({ localName: 'test' })
+        it("namespace", () => {
+          @XmlElement({ localName: "test" })
           class XmlTest extends XmlObject {
             @XmlChildElement({
-              localName: 'value',
-              defaultValue: '',
-              namespaceURI: 'http://some.com',
+              localName: "value",
+              defaultValue: "",
+              namespaceURI: "http://some.com",
             })
             public Value!: string;
           }
@@ -331,19 +305,19 @@ describe('Decorators', () => {
           const test = new XmlTest();
           test.LoadXml(doc.documentElement);
 
-          assert.equal(test.Value, 'Text');
+          assert.equal(test.Value, "Text");
         });
       });
 
-      describe('child', () => {
-        it('simple', () => {
-          @XmlElement({ localName: 'value' })
+      describe("child", () => {
+        it("simple", () => {
+          @XmlElement({ localName: "value" })
           class XmlChild extends XmlObject {
-            @XmlAttribute({ localName: 'id', defaultValue: '' })
+            @XmlAttribute({ localName: "id", defaultValue: "" })
             public Id!: string;
           }
 
-          @XmlElement({ localName: 'test' })
+          @XmlElement({ localName: "test" })
           class XmlTest extends XmlObject {
             @XmlChildElement({ required: true, parser: XmlChild })
             public Value!: XmlChild;
@@ -352,17 +326,17 @@ describe('Decorators', () => {
           const test = new XmlTest();
           test.LoadXml(`<test><value id="123"/></test>`);
 
-          assert.equal(test.Value.Id, '123');
+          assert.equal(test.Value.Id, "123");
         });
 
-        it('required', () => {
-          @XmlElement({ localName: 'value' })
+        it("required", () => {
+          @XmlElement({ localName: "value" })
           class XmlChild extends XmlObject {
-            @XmlAttribute({ localName: 'id', defaultValue: '' })
+            @XmlAttribute({ localName: "id", defaultValue: "" })
             public Id!: string;
           }
 
-          @XmlElement({ localName: 'test' })
+          @XmlElement({ localName: "test" })
           class XmlTest extends XmlObject {
             @XmlChildElement({ required: true, parser: XmlChild })
             public Value!: XmlChild;
@@ -376,14 +350,14 @@ describe('Decorators', () => {
           });
         });
 
-        it('namespace', () => {
-          @XmlElement({ localName: 'value', namespaceURI: 'http://some.com' })
+        it("namespace", () => {
+          @XmlElement({ localName: "value", namespaceURI: "http://some.com" })
           class XmlChild extends XmlObject {
-            @XmlAttribute({ localName: 'id', defaultValue: '' })
+            @XmlAttribute({ localName: "id", defaultValue: "" })
             public Id!: string;
           }
 
-          @XmlElement({ localName: 'test' })
+          @XmlElement({ localName: "test" })
           class XmlTest extends XmlObject {
             @XmlChildElement({ required: true, parser: XmlChild })
             public Value!: XmlChild;
@@ -394,83 +368,83 @@ describe('Decorators', () => {
           const test = new XmlTest();
           test.LoadXml(doc.documentElement);
 
-          assert.equal(test.Value.Id, '123');
-          assert.equal(test.Value.Prefix, 'p');
-          assert.equal(test.Value.NamespaceURI, 'http://some.com');
+          assert.equal(test.Value.Id, "123");
+          assert.equal(test.Value.Prefix, "p");
+          assert.equal(test.Value.NamespaceURI, "http://some.com");
         });
       });
     });
   });
 
-  describe('Attribute', () => {
-    describe('GetXml', () => {
-      @XmlElement({ localName: 'test' })
+  describe("Attribute", () => {
+    describe("GetXml", () => {
+      @XmlElement({ localName: "test" })
       class Test extends XmlObject {
         @XmlAttribute()
         public Id?: string;
 
-        @XmlAttribute({ localName: 'num', defaultValue: 0, converter: XmlNumberConverter })
+        @XmlAttribute({ localName: "num", defaultValue: 0, converter: XmlNumberConverter })
         public ConvertNumber?: number;
 
-        @XmlAttribute({ localName: 'b64', converter: XmlBase64Converter })
+        @XmlAttribute({ localName: "b64", converter: XmlBase64Converter })
         public ConvertB64?: Uint8Array;
 
-        @XmlAttribute({ defaultValue: 'none' })
+        @XmlAttribute({ defaultValue: "none" })
         public Attr1?: string;
 
-        @XmlAttribute({ required: true, localName: 'required' })
+        @XmlAttribute({ required: true, localName: "required" })
         public Required!: string;
 
-        protected name = 'test';
+        protected name = "test";
       }
 
       const test = new Test();
 
-      it('with required empty attribute', () => {
-        assert.equal(test.toString(), '');
+      it("with required empty attribute", () => {
+        assert.equal(test.toString(), "");
       });
 
-      it('with filled empty attribute and lower case name', () => {
-        test.Required = 'some';
+      it("with filled empty attribute and lower case name", () => {
+        test.Required = "some";
         assert.equal(test.toString(), `<test required="some"/>`);
       });
 
-      it('with different default value', () => {
-        assert.equal(test.Attr1, 'none', `Doesn't have default value for decoration setting`);
-        test.Attr1 = 'wow';
-        assert.equal(test.Attr1, 'wow');
+      it("with different default value", () => {
+        assert.equal(test.Attr1, "none", `Doesn't have default value for decoration setting`);
+        test.Attr1 = "wow";
+        assert.equal(test.Attr1, "wow");
         assert.equal(test.toString(), `<test Attr1="wow" required="some"/>`);
       });
 
-      it('with default value', () => {
-        test.Attr1 = 'none';
-        assert.equal(test.Attr1, 'none');
+      it("with default value", () => {
+        test.Attr1 = "none";
+        assert.equal(test.Attr1, "none");
         assert.equal(test.toString(), `<test required="some"/>`);
       });
 
-      it('with number converter value', () => {
+      it("with number converter value", () => {
         test.ConvertNumber = 1;
         assert.equal(test.toString(), `<test num="1" required="some"/>`);
       });
 
-      it('with base64 converter value', () => {
+      it("with base64 converter value", () => {
         test.ConvertNumber = 0;
         test.ConvertB64 = new Uint8Array([1, 0, 1]);
         assert.equal(test.toString(), `<test b64="AQAB" required="some"/>`);
       });
 
-      it('witd Id', () => {
+      it("witd Id", () => {
         test.ConvertB64 = undefined; // remove value
-        test.Id = '123';
+        test.Id = "123";
         assert.equal(test.toString(), `<test Id="123" required="some"/>`);
       });
     });
 
-    describe('LoadXml', () => {
-      it('simple', () => {
-        @XmlElement({ localName: 'test' })
+    describe("LoadXml", () => {
+      it("simple", () => {
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
-          @XmlAttribute({ localName: 'id', defaultValue: '' })
+          @XmlAttribute({ localName: "id", defaultValue: "" })
           public Id!: string;
         }
 
@@ -479,13 +453,13 @@ describe('Decorators', () => {
         const test = new XmlTest();
         test.LoadXml(doc.documentElement);
 
-        assert.equal(test.Id, '123');
+        assert.equal(test.Id, "123");
       });
 
-      it('required with error', () => {
-        @XmlElement({ localName: 'test' })
+      it("required with error", () => {
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
-          @XmlAttribute({ localName: 'id', required: true })
+          @XmlAttribute({ localName: "id", required: true })
           public Id!: string;
         }
 
@@ -498,10 +472,10 @@ describe('Decorators', () => {
         });
       });
 
-      it('required', () => {
-        @XmlElement({ localName: 'test' })
+      it("required", () => {
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
-          @XmlAttribute({ localName: 'id', required: true })
+          @XmlAttribute({ localName: "id", required: true })
           public Id!: string;
         }
 
@@ -510,17 +484,17 @@ describe('Decorators', () => {
         const test = new XmlTest();
         test.LoadXml(doc.documentElement);
 
-        assert.equal(test.Id, '123');
+        assert.equal(test.Id, "123");
       });
 
-      it('namespace', () => {
-        @XmlElement({ localName: 'test' })
+      it("namespace", () => {
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlAttribute({
-            localName: 'id',
-            defaultValue: '',
+            localName: "id",
+            defaultValue: "",
             required: true,
-            namespaceURI: 'http://some.com',
+            namespaceURI: "http://some.com",
           })
           public Id!: string;
         }
@@ -532,7 +506,7 @@ describe('Decorators', () => {
           const test = new XmlTest();
           test.LoadXml(doc.documentElement);
 
-          assert.equal(test.Id, '123');
+          assert.equal(test.Id, "123");
         }
 
         {
@@ -546,10 +520,10 @@ describe('Decorators', () => {
         }
       });
 
-      it('converter', () => {
-        @XmlElement({ localName: 'test' })
+      it("converter", () => {
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
-          @XmlAttribute({ localName: 'value', defaultValue: null, converter: XmlBase64Converter })
+          @XmlAttribute({ localName: "value", defaultValue: null, converter: XmlBase64Converter })
           public Value!: Uint8Array | null;
         }
 
@@ -564,19 +538,19 @@ describe('Decorators', () => {
     });
   });
 
-  describe('Collection', () => {
-    describe('GetXml', () => {
-      it('simple', () => {
-        @XmlElement({ localName: 'transform' })
+  describe("Collection", () => {
+    describe("GetXml", () => {
+      it("simple", () => {
+        @XmlElement({ localName: "transform" })
         class XmlTransform extends XmlObject {
-          @XmlChildElement({ defaultValue: '' })
+          @XmlChildElement({ defaultValue: "" })
           public Value!: string;
         }
 
-        @XmlElement({ localName: 'transforms', parser: XmlTransform })
+        @XmlElement({ localName: "transforms", parser: XmlTransform })
         class XmlTransforms extends XmlCollection<XmlTransform> {}
 
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlChildElement({ minOccurs: 1, parser: XmlTransforms })
           public Transforms!: XmlTransforms;
@@ -586,26 +560,23 @@ describe('Decorators', () => {
 
         test.Transforms = new XmlTransforms();
         const t = new XmlTransform();
-        t.Value = 'Hello';
+        t.Value = "Hello";
         test.Transforms.Add(t);
 
-        assert.equal(
-          test.toString(),
-          `<test><transforms><transform><Value>Hello</Value></transform></transforms></test>`,
-        );
+        assert.equal(test.toString(), `<test><transforms><transform><Value>Hello</Value></transform></transforms></test>`);
       });
 
-      it('no root', () => {
-        @XmlElement({ localName: 'transform' })
+      it("no root", () => {
+        @XmlElement({ localName: "transform" })
         class XmlTransform extends XmlObject {
-          @XmlChildElement({ defaultValue: '' })
+          @XmlChildElement({ defaultValue: "" })
           public Value!: string;
         }
 
-        @XmlElement({ localName: 'transforms', parser: XmlTransform })
+        @XmlElement({ localName: "transforms", parser: XmlTransform })
         class XmlTransforms extends XmlCollection<XmlTransform> {}
 
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlChildElement({ minOccurs: 1, parser: XmlTransforms, noRoot: true })
           public Transforms!: XmlTransforms;
@@ -615,16 +586,16 @@ describe('Decorators', () => {
 
         test.Transforms = new XmlTransforms();
         const t = new XmlTransform();
-        t.Value = 'Hello';
+        t.Value = "Hello";
         test.Transforms.Add(t);
 
         assert.equal(test.toString(), `<test><transform><Value>Hello</Value></transform></test>`);
       });
 
-      it('no root occurs', () => {
-        @XmlElement({ localName: 'transform' })
+      it("no root occurs", () => {
+        @XmlElement({ localName: "transform" })
         class XmlTransform extends XmlObject {
-          @XmlChildElement({ defaultValue: '' })
+          @XmlChildElement({ defaultValue: "" })
           public Value!: string;
 
           constructor(value?: string) {
@@ -635,10 +606,10 @@ describe('Decorators', () => {
           }
         }
 
-        @XmlElement({ localName: 'transforms', parser: XmlTransform })
+        @XmlElement({ localName: "transforms", parser: XmlTransform })
         class XmlTransforms extends XmlCollection<XmlTransform> {}
 
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlChildElement({ minOccurs: 1, maxOccurs: 4, parser: XmlTransforms, noRoot: true })
           public Transforms!: XmlTransforms;
@@ -652,25 +623,25 @@ describe('Decorators', () => {
           test.toString();
         });
 
-        test.Transforms.Add(new XmlTransform('1'));
-        test.Transforms.Add(new XmlTransform('2'));
-        test.Transforms.Add(new XmlTransform('3'));
-        test.Transforms.Add(new XmlTransform('4'));
+        test.Transforms.Add(new XmlTransform("1"));
+        test.Transforms.Add(new XmlTransform("2"));
+        test.Transforms.Add(new XmlTransform("3"));
+        test.Transforms.Add(new XmlTransform("4"));
         assert.equal(
           test.toString(),
           `<test><transform><Value>1</Value></transform><transform><Value>2</Value></transform><transform><Value>3</Value></transform><transform><Value>4</Value></transform></test>`,
         );
 
-        test.Transforms.Add(new XmlTransform('4'));
+        test.Transforms.Add(new XmlTransform("4"));
         assert.throws(() => {
           test.toString();
         });
       });
 
-      it('occurs', () => {
-        @XmlElement({ localName: 'transform' })
+      it("occurs", () => {
+        @XmlElement({ localName: "transform" })
         class XmlTransform extends XmlObject {
-          @XmlChildElement({ defaultValue: '' })
+          @XmlChildElement({ defaultValue: "" })
           public Value!: string;
 
           constructor(value?: string) {
@@ -681,10 +652,10 @@ describe('Decorators', () => {
           }
         }
 
-        @XmlElement({ localName: 'transforms', parser: XmlTransform })
+        @XmlElement({ localName: "transforms", parser: XmlTransform })
         class XmlTransforms extends XmlCollection<XmlTransform> {}
 
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlChildElement({ minOccurs: 1, maxOccurs: 4, parser: XmlTransforms })
           public Transforms!: XmlTransforms;
@@ -698,115 +669,111 @@ describe('Decorators', () => {
           test.toString();
         });
 
-        test.Transforms.Add(new XmlTransform('1'));
-        test.Transforms.Add(new XmlTransform('2'));
-        test.Transforms.Add(new XmlTransform('3'));
-        test.Transforms.Add(new XmlTransform('4'));
+        test.Transforms.Add(new XmlTransform("1"));
+        test.Transforms.Add(new XmlTransform("2"));
+        test.Transforms.Add(new XmlTransform("3"));
+        test.Transforms.Add(new XmlTransform("4"));
         assert.equal(
           test.toString(),
           `<test><transforms><transform><Value>1</Value></transform><transform><Value>2</Value></transform><transform><Value>3</Value></transform><transform><Value>4</Value></transform></transforms></test>`,
         );
 
-        test.Transforms.Add(new XmlTransform('4'));
+        test.Transforms.Add(new XmlTransform("4"));
         assert.throws(() => {
           test.toString();
         });
       });
     });
 
-    describe('LoadXml', () => {
-      it('simple', () => {
-        @XmlElement({ localName: 'transform' })
+    describe("LoadXml", () => {
+      it("simple", () => {
+        @XmlElement({ localName: "transform" })
         class XmlTransform extends XmlObject {
-          @XmlChildElement({ defaultValue: '' })
+          @XmlChildElement({ defaultValue: "" })
           public Value!: string;
         }
 
-        @XmlElement({ localName: 'transforms', parser: XmlTransform })
+        @XmlElement({ localName: "transforms", parser: XmlTransform })
         class XmlTransforms extends XmlCollection<XmlTransform> {}
 
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlChildElement({ minOccurs: 1, parser: XmlTransforms })
           public Transforms!: XmlTransforms;
         }
 
-        const doc = Parse(
-          '<test><transforms><transform><Value>Hello</Value></transform></transforms></test>',
-        );
+        const doc = Parse("<test><transforms><transform><Value>Hello</Value></transform></transforms></test>");
         const test = new XmlTest();
         test.LoadXml(doc.documentElement);
 
         assert.equal(test.Transforms.Count, 1);
-        assert.equal(test.Transforms.Item(0)?.Value, 'Hello');
+        assert.equal(test.Transforms.Item(0)?.Value, "Hello");
       });
 
-      it('no root', () => {
-        @XmlElement({ localName: 'transform' })
+      it("no root", () => {
+        @XmlElement({ localName: "transform" })
         class XmlTransform extends XmlObject {
-          @XmlChildElement({ defaultValue: '' })
+          @XmlChildElement({ defaultValue: "" })
           public Value!: string;
         }
 
-        @XmlElement({ localName: 'transforms', parser: XmlTransform })
+        @XmlElement({ localName: "transforms", parser: XmlTransform })
         class XmlTransforms extends XmlCollection<XmlTransform> {}
 
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlChildElement({ minOccurs: 1, parser: XmlTransforms, noRoot: true })
           public Transforms!: XmlTransforms;
         }
 
-        const doc = Parse('<test><transform><Value>Hello</Value></transform></test>');
+        const doc = Parse("<test><transform><Value>Hello</Value></transform></test>");
         const test = new XmlTest();
         test.LoadXml(doc.documentElement);
 
         assert.equal(test.Transforms.Count, 1);
-        assert.equal(test.Transforms.Item(0)?.Value, 'Hello');
+        assert.equal(test.Transforms.Item(0)?.Value, "Hello");
       });
 
-      it('wrong min occurs', () => {
-        @XmlElement({ localName: 'transform' })
+      it("wrong min occurs", () => {
+        @XmlElement({ localName: "transform" })
         class XmlTransform extends XmlObject {
-          @XmlChildElement({ defaultValue: '' })
+          @XmlChildElement({ defaultValue: "" })
           public Value!: string;
         }
 
-        @XmlElement({ localName: 'transforms', parser: XmlTransform })
+        @XmlElement({ localName: "transforms", parser: XmlTransform })
         class XmlTransforms extends XmlCollection<XmlTransform> {}
 
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlChildElement({ minOccurs: 2, parser: XmlTransforms, noRoot: true })
           public Transforms!: XmlTransforms;
         }
 
-        const doc = Parse('<test><transform><Value>Hello</Value></transform></test>');
+        const doc = Parse("<test><transform><Value>Hello</Value></transform></test>");
         const test = new XmlTest();
 
         assert.throws(() => {
           test.LoadXml(doc.documentElement);
         });
       });
-      it('wrong max occurs', () => {
-        @XmlElement({ localName: 'transform' })
+      it("wrong max occurs", () => {
+        @XmlElement({ localName: "transform" })
         class XmlTransform extends XmlObject {
-          @XmlChildElement({ defaultValue: '' })
+          @XmlChildElement({ defaultValue: "" })
           public Value!: string;
         }
 
-        @XmlElement({ localName: 'transforms', parser: XmlTransform })
+        @XmlElement({ localName: "transforms", parser: XmlTransform })
         class XmlTransforms extends XmlCollection<XmlTransform> {}
 
-        @XmlElement({ localName: 'test' })
+        @XmlElement({ localName: "test" })
         class XmlTest extends XmlObject {
           @XmlChildElement({ maxOccurs: 1, parser: XmlTransforms, noRoot: true })
           public Transforms!: XmlTransforms;
         }
 
-        const doc = Parse(
-          '<test><transform><Value>Hello</Value></transform><transform><Value>Hello</Value></transform></test>',
-        );
+        const doc = Parse("<test><transform><Value>Hello</Value></transform><transform><Value>Hello</Value></transform></test>");
         const test = new XmlTest();
 
         assert.throws(() => {
@@ -816,11 +783,11 @@ describe('Decorators', () => {
     });
   });
 
-  it('extends', () => {
+  it("extends", () => {
     @XmlElement({
-      localName: 'first',
-      namespaceURI: 'http://some.com',
-      prefix: 'p',
+      localName: "first",
+      namespaceURI: "http://some.com",
+      prefix: "p",
     })
     class XmlFirst extends XmlObject {
       @XmlAttribute()
@@ -828,27 +795,27 @@ describe('Decorators', () => {
     }
 
     @XmlElement({
-      localName: 'second',
+      localName: "second",
     })
     class XmlSecond extends XmlFirst {}
 
     const first = new XmlFirst();
-    first.Id = '1';
+    first.Id = "1";
     assert.equal(first.toString(), `<p:first Id="1" xmlns:p="http://some.com"/>`);
 
     const second = new XmlSecond();
-    second.Id = '2';
+    second.Id = "2";
     assert.equal(second.toString(), `<p:second Id="2" xmlns:p="http://some.com"/>`);
     assert.equal((XmlFirst as any).prefix, (XmlSecond as any).prefix);
     assert.equal((XmlFirst as any).namespaceURI, (XmlSecond as any).namespaceURI);
   });
 
-  describe('XmlContent', () => {
-    it('Content', () => {
+  describe("XmlContent", () => {
+    it("Content", () => {
       @XmlElement({
-        localName: 'test',
-        namespaceURI: 'http://some.com',
-        prefix: 'p',
+        localName: "test",
+        namespaceURI: "http://some.com",
+        prefix: "p",
       })
       class XmlTest extends XmlObject {
         @XmlContent()
@@ -859,7 +826,7 @@ describe('Decorators', () => {
 
       assert.equal(test.Value, undefined);
 
-      test.Value = 'Test';
+      test.Value = "Test";
 
       const xml = test.toString();
       assert.equal(xml, `<p:test xmlns:p="http://some.com">Test</p:test>`);
@@ -868,11 +835,11 @@ describe('Decorators', () => {
       assert.equal(test2.Value, test.Value);
     });
 
-    it('Converter', () => {
+    it("Converter", () => {
       @XmlElement({
-        localName: 'test',
-        namespaceURI: 'http://some.com',
-        prefix: 'p',
+        localName: "test",
+        namespaceURI: "http://some.com",
+        prefix: "p",
       })
       class XmlTest extends XmlObject {
         @XmlContent({
@@ -895,11 +862,11 @@ describe('Decorators', () => {
       assert.equal(test2.Value, test.Value);
     });
 
-    it('Required', () => {
+    it("Required", () => {
       @XmlElement({
-        localName: 'test',
-        namespaceURI: 'http://some.com',
-        prefix: 'p',
+        localName: "test",
+        namespaceURI: "http://some.com",
+        prefix: "p",
       })
       class XmlTest extends XmlObject {
         @XmlAttribute()
@@ -915,11 +882,11 @@ describe('Decorators', () => {
 
       assert.equal(test.Value, undefined);
 
-      test.Id = '1';
+      test.Id = "1";
 
       assert.throws(() => test.GetXml());
 
-      test.Value = 'test';
+      test.Value = "test";
 
       const xml = test.toString();
       assert.equal(xml, `<p:test Id="1" xmlns:p="http://some.com">test</p:test>`);
@@ -931,11 +898,11 @@ describe('Decorators', () => {
       assert.equal(test2.Value, test.Value);
     });
 
-    it('Default value', () => {
+    it("Default value", () => {
       @XmlElement({
-        localName: 'test',
-        namespaceURI: 'http://some.com',
-        prefix: 'p',
+        localName: "test",
+        namespaceURI: "http://some.com",
+        prefix: "p",
       })
       class XmlTest extends XmlObject {
         @XmlAttribute()
@@ -943,16 +910,16 @@ describe('Decorators', () => {
 
         @XmlContent({
           required: true,
-          defaultValue: 'test',
+          defaultValue: "test",
         })
         public Value!: string;
       }
 
       const test = new XmlTest();
 
-      assert.equal(test.Value, 'test');
+      assert.equal(test.Value, "test");
 
-      test.Id = '1';
+      test.Id = "1";
 
       const xml = test.toString();
       assert.equal(xml, `<p:test Id="1" xmlns:p="http://some.com">test</p:test>`);

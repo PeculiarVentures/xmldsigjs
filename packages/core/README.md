@@ -24,15 +24,15 @@ npm install xml-core
 ## Quick Start
 
 ```typescript
-import { XmlObject, XmlElement, XmlAttribute, XmlChildElement } from 'xml-core';
+import { XmlObject, XmlElement, XmlAttribute, XmlChildElement } from "xml-core";
 
-@XmlElement({ localName: 'Person' })
+@XmlElement({ localName: "Person" })
 class Person extends XmlObject {
-  @XmlAttribute({ localName: 'id' })
-  public id: string = '';
+  @XmlAttribute({ localName: "id" })
+  public id: string = "";
 
-  @XmlChildElement({ localName: 'Name' })
-  public name: string = '';
+  @XmlChildElement({ localName: "Name" })
+  public name: string = "";
 }
 
 // Parse XML
@@ -42,8 +42,8 @@ console.log(person.id); // "123"
 console.log(person.name); // "John Doe"
 
 // Generate XML
-person.id = '456';
-person.name = 'Jane Smith';
+person.id = "456";
+person.name = "Jane Smith";
 console.log(person.toString()); // <Person id="456"><Name>Jane Smith</Name></Person>
 ```
 
@@ -108,9 +108,9 @@ Base class for all XML elements.
 To work with XML in Node.js, you need to register DOM and XPath dependencies:
 
 ```typescript
-import * as xmldom from '@xmldom/xmldom';
-import { setNodeDependencies } from 'xml-core';
-import xpath from 'xpath';
+import * as xmldom from "@xmldom/xmldom";
+import { setNodeDependencies } from "xml-core";
+import xpath from "xpath";
 
 setNodeDependencies({
   XMLSerializer: xmldom.XMLSerializer,

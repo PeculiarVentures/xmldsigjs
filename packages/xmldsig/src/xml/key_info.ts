@@ -1,8 +1,8 @@
-import { XmlNodeType, XmlAttribute, XmlElement } from 'xml-core';
+import { XmlNodeType, XmlAttribute, XmlElement } from "xml-core";
 
-import { KeyInfoClause, KeyInfoX509Data, KeyValue, SPKIData } from './key_infos/index.js';
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureCollection } from './xml_object.js';
+import { KeyInfoClause, KeyInfoX509Data, KeyValue, SPKIData } from "./key_infos/index.js";
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureCollection } from "./xml_object.js";
 
 /**
  * Represents the <KeyInfo> element of an XML signature.
@@ -35,7 +35,7 @@ import { XmlSignatureCollection } from './xml_object.js';
 export class KeyInfo extends XmlSignatureCollection<KeyInfoClause> {
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

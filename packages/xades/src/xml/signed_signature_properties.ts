@@ -1,12 +1,12 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { XadesDateTime } from './date_time.js';
-import { SignaturePolicyIdentifier } from './signature_policy_identifier.js';
-import { SignatureProductionPlace } from './signature_product_place.js';
-import { SignerRole } from './signer_role.js';
-import { SigningCertificate } from './signing_certificate.js';
-import { SigningCertificateV2 } from './signing_certificate_v2.js';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { XadesDateTime } from "./date_time.js";
+import { SignaturePolicyIdentifier } from "./signature_policy_identifier.js";
+import { SignatureProductionPlace } from "./signature_product_place.js";
+import { SignerRole } from "./signer_role.js";
+import { SigningCertificate } from "./signing_certificate.js";
+import { SigningCertificateV2 } from "./signing_certificate_v2.js";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <SignedSignatureProperties> element of an XML signature.
@@ -34,7 +34,7 @@ import { XadesObject } from './xml_base.js';
 export class SignedSignatureProperties extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

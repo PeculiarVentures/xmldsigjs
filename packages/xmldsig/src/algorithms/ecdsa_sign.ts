@@ -1,12 +1,12 @@
-import { ISignatureAlgorithm, SignatureAlgorithm } from '../algorithm.js';
-import { SHA1, SHA256, SHA384, SHA512 } from './rsa_hash.js';
+import { ISignatureAlgorithm, SignatureAlgorithm } from "../algorithm.js";
+import { SHA1, SHA256, SHA384, SHA512 } from "./rsa_hash.js";
 
-export const ECDSA = 'ECDSA';
+export const ECDSA = "ECDSA";
 
-export const ECDSA_SHA1_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1';
-export const ECDSA_SHA256_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256';
-export const ECDSA_SHA384_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384';
-export const ECDSA_SHA512_NAMESPACE = 'http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512';
+export const ECDSA_SHA1_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1";
+export const ECDSA_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
+export const ECDSA_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384";
+export const ECDSA_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";
 
 interface EcdsaHashedKeyAlgorithm extends Algorithm {
   hash: Algorithm;

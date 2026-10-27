@@ -1,7 +1,7 @@
-import { getNodeDependency, XmlChildElement, XmlError, XE } from 'xml-core';
+import { getNodeDependency, XmlChildElement, XmlError, XE } from "xml-core";
 
-import { Transform } from '../transform.js';
-import { XmlSignature } from '../xml_names.js';
+import { Transform } from "../transform.js";
+import { XmlSignature } from "../xml_names.js";
 
 function lookupParentNode(node: Node): Node {
   return node.parentNode ? lookupParentNode(node.parentNode) : node;
@@ -38,7 +38,7 @@ export class XmlDsigXPathTransform extends Transform {
    */
   public GetOutput(): any {
     if (!this.innerXml) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'innerXml');
+      throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
     }
 
     this.Filter(lookupParentNode(this.innerXml), this.XPath);
@@ -65,11 +65,11 @@ export class XmlDsigXPathTransform extends Transform {
   }
 
   protected GetEvaluator(node: Node): XPathEvaluator {
-    if (typeof self !== 'undefined') {
+    if (typeof self !== "undefined") {
       // Browser
       return (node.ownerDocument == null ? node : node.ownerDocument) as any;
     } else {
-      return getNodeDependency<XPathEvaluator>('xpath');
+      return getNodeDependency<XPathEvaluator>("xpath");
     }
   }
 
@@ -78,11 +78,11 @@ export class XmlDsigXPathTransform extends Transform {
       const evaluator = this.GetEvaluator(node);
       const xml = this.GetXml();
       if (!xml || !xml.firstChild) {
-        throw new Error('XML element or firstChild is not defined');
+        throw new Error("XML element or firstChild is not defined");
       }
       const xpathEl = xml.firstChild;
       const xPath = `boolean(${xpath})`;
-      const xpathModule = typeof self === 'undefined' ? getNodeDependency('xpath') : self;
+      const xpathModule = typeof self === "undefined" ? getNodeDependency("xpath") : self;
       const xpathResult = evaluator.evaluate(
         xPath,
         node,

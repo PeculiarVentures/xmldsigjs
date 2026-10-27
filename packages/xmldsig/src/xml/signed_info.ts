@@ -1,10 +1,10 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
-import { CanonicalizationMethod } from './canonicalization_method.js';
-import { References } from './reference.js';
-import { SignatureMethod } from './signature_method.js';
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureObject } from './xml_object.js';
+import { CanonicalizationMethod } from "./canonicalization_method.js";
+import { References } from "./reference.js";
+import { SignatureMethod } from "./signature_method.js";
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureObject } from "./xml_object.js";
 
 /**
  * Represents the <SignedInfo> element of an XML signature.
@@ -41,7 +41,7 @@ export class SignedInfo extends XmlSignatureObject {
    */
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

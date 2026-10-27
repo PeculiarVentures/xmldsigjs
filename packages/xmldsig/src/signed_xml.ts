@@ -1,21 +1,8 @@
-import {
-  IXmlSerializable,
-  XmlObject,
-  XmlNodeType,
-  isDocument,
-  isElement,
-  assign,
-  XmlError,
-  XE,
-  AssocArray,
-  Parse,
-  SelectNamespaces,
-  Stringify,
-} from 'xml-core';
+import { IXmlSerializable, XmlObject, XmlNodeType, isDocument, isElement, assign, XmlError, XE, AssocArray, Parse, SelectNamespaces, Stringify } from "xml-core";
 
-import { BufferSourceConverter, Convert } from 'pvtsutils';
-import * as Alg from './algorithms/index.js';
-import { CryptoConfig } from './crypto_config.js';
+import { BufferSourceConverter, Convert } from "pvtsutils";
+import * as Alg from "./algorithms/index.js";
+import { CryptoConfig } from "./crypto_config.js";
 import {
   KeyInfo,
   Reference,
@@ -25,27 +12,19 @@ import {
   Transforms as XmlTransforms,
   XmlDsigC14NWithCommentsTransform,
   XmlDsigExcC14NWithCommentsTransform,
-} from './xml/index.js';
-import { KeyInfoX509Data, KeyValue } from './xml/key_infos/index.js';
-import * as KeyInfos from './xml/key_infos/index.js';
-import * as Transforms from './xml/transforms/index.js';
-import { Application } from './application.js';
+} from "./xml/index.js";
+import { KeyInfoX509Data, KeyValue } from "./xml/key_infos/index.js";
+import * as KeyInfos from "./xml/key_infos/index.js";
+import * as Transforms from "./xml/transforms/index.js";
+import { Application } from "./application.js";
 
 export interface OptionsXPathSignTransform {
-  name: 'xpath';
+  name: "xpath";
   selector: string;
   namespaces?: Record<string, string>;
 }
 
-export type OptionsSignTransform =
-  | 'enveloped'
-  | 'c14n'
-  | 'exc-c14n'
-  | 'c14n-com'
-  | 'exc-c14n-com'
-  | 'base64'
-  | OptionsXPathSignTransform
-  | string; // Allow custom transform namespace URIs
+export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64" | OptionsXPathSignTransform | string; // Allow custom transform namespace URIs
 
 export type DigestReferenceSource = Element | BufferSource;
 
@@ -111,10 +90,7 @@ export class SignedXml implements IXmlSerializable {
     return this.signature;
   }
 
-  public contentHandler?: (
-    reference: Reference,
-    target: this,
-  ) => Promise<Document | DigestReferenceSource | null>;
+  public contentHandler?: (reference: Reference, target: this) => Promise<Document | DigestReferenceSource | null>;
 
   public Parent?: Element | XmlObject;
   public Key?: CryptoKey;
@@ -152,20 +128,15 @@ export class SignedXml implements IXmlSerializable {
     }
   }
 
-  public async Sign(
-    algorithm: Algorithm | EcdsaParams | RsaPssParams,
-    key: CryptoKey,
-    data: Document | DigestReferenceSource,
-    options: OptionsSign = {},
-  ) {
+  public async Sign(algorithm: Algorithm | EcdsaParams | RsaPssParams, key: CryptoKey, data: Document | DigestReferenceSource, options: OptionsSign = {}) {
     if (isDocument(data)) {
       data = (data.cloneNode(true) as Document).documentElement;
     } else if (isElement(data)) {
       data = data.cloneNode(true) as Element;
     }
     const signingAlg = assign({}, algorithm, key.algorithm);
-    if (key.algorithm['hash']) {
-      signingAlg.hash = key.algorithm['hash'];
+    if (key.algorithm["hash"]) {
+      signingAlg.hash = key.algorithm["hash"];
     }
 
     const alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);
@@ -188,15 +159,15 @@ export class SignedXml implements IXmlSerializable {
   }
 
   private async reimportKey(key: CryptoKey, alg: Algorithm) {
-    const spki = await Application.crypto.subtle.exportKey('spki', key);
-    return Application.crypto.subtle.importKey('spki', spki, alg, true, ['verify']);
+    const spki = await Application.crypto.subtle.exportKey("spki", key);
+    return Application.crypto.subtle.importKey("spki", spki, alg, true, ["verify"]);
   }
 
   public async Verify(params?: CryptoKey | OptionsVerify) {
     let content: DigestReferenceSource | undefined;
     let key: CryptoKey | undefined;
     if (params) {
-      if ('algorithm' in params && 'usages' in params && 'type' in params) {
+      if ("algorithm" in params && "usages" in params && "type" in params) {
         key = params;
       } else {
         key = params.key;
@@ -204,14 +175,14 @@ export class SignedXml implements IXmlSerializable {
       }
     }
 
-    if (key && key.type === 'public' && this.Algorithm) {
+    if (key && key.type === "public" && this.Algorithm) {
       key = await this.reimportKey(key, this.Algorithm);
     }
 
     if (!content) {
       const xml = this.document;
       if (!(xml && xml.documentElement)) {
-        throw new XmlError(XE.NULL_PARAM, 'SignedXml', 'document');
+        throw new XmlError(XE.NULL_PARAM, "SignedXml", "document");
       }
       content = xml.documentElement;
     }
@@ -243,30 +214,23 @@ export class SignedXml implements IXmlSerializable {
     this.signature = Signature.LoadXml(value);
 
     // Load signature algorithm
-    this.Algorithm = CryptoConfig.CreateSignatureAlgorithm(
-      this.XmlSignature.SignedInfo.SignatureMethod,
-    ).algorithm;
+    this.Algorithm = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod).algorithm;
   }
 
   public toString() {
     // Check for EnvelopedTransform
     const signature = this.XmlSignature;
     const enveloped =
-      signature.SignedInfo.References &&
-      signature.SignedInfo.References.Some(
-        (r) =>
-          r.Transforms &&
-          r.Transforms.Some((t) => t instanceof Transforms.XmlDsigEnvelopedSignatureTransform),
-      );
+      signature.SignedInfo.References && signature.SignedInfo.References.Some((r) => r.Transforms && r.Transforms.Some((t) => t instanceof Transforms.XmlDsigEnvelopedSignatureTransform));
 
     if (enveloped) {
       if (!this.document) {
-        throw new XmlError(XE.XML_EXCEPTION, 'Document is not defined');
+        throw new XmlError(XE.XML_EXCEPTION, "Document is not defined");
       }
       const doc = this.document.documentElement.cloneNode(true);
       const node = this.XmlSignature.GetXml();
       if (!node) {
-        throw new XmlError(XE.XML_EXCEPTION, 'Cannot get Xml element from Signature');
+        throw new XmlError(XE.XML_EXCEPTION, "Cannot get Xml element from Signature");
       }
       const sig = node.cloneNode(true);
       doc.appendChild(sig);
@@ -295,21 +259,15 @@ export class SignedXml implements IXmlSerializable {
       }
     }
 
-    if (alg.algorithm.name.startsWith('RSA')) {
+    if (alg.algorithm.name.startsWith("RSA")) {
       // Reimport RSA public keys. They should use the same hash algorithms like Signature.
       // Note: It's possible toe set hash algorithm for RSA key on key importing only
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        if (key.algorithm.name.startsWith('RSA')) {
+        if (key.algorithm.name.startsWith("RSA")) {
           // Reimport key
-          const spki = await Application.crypto.subtle.exportKey('spki', key);
-          const updatedKey = await Application.crypto.subtle.importKey(
-            'spki',
-            spki,
-            alg.algorithm,
-            true,
-            ['verify'],
-          );
+          const spki = await Application.crypto.subtle.exportKey("spki", key);
+          const updatedKey = await Application.crypto.subtle.importKey("spki", spki, alg.algorithm, true, ["verify"]);
 
           // Replace key
           keys[i] = updatedKey;
@@ -326,7 +284,7 @@ export class SignedXml implements IXmlSerializable {
   protected GetSignatureNamespaces(): AssocArray<string> {
     const namespaces: AssocArray<string> = {};
     if (this.XmlSignature.NamespaceURI) {
-      namespaces[this.XmlSignature.Prefix || ''] = this.XmlSignature.NamespaceURI;
+      namespaces[this.XmlSignature.Prefix || ""] = this.XmlSignature.NamespaceURI;
     }
     return namespaces;
   }
@@ -342,28 +300,20 @@ export class SignedXml implements IXmlSerializable {
   /**
    * Injects namespaces from dictionary to the target element
    */
-  protected InjectNamespaces(
-    namespaces: Record<string, string>,
-    target: Element,
-    ignoreDefault: boolean,
-  ): void {
+  protected InjectNamespaces(namespaces: Record<string, string>, target: Element, ignoreDefault: boolean): void {
     for (const i in namespaces) {
       const uri = namespaces[i];
-      if (ignoreDefault && i === '') {
+      if (ignoreDefault && i === "") {
         continue;
       }
-      target.setAttribute('xmlns' + (i ? ':' + i : ''), uri);
+      target.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
     }
   }
 
   // public getReferenceData(reference: Reference): Promise<ArrayBuffer | Element> {
   // }
 
-  protected async DigestReference(
-    source: DigestReferenceSource,
-    reference: Reference,
-    _checkHmac: boolean,
-  ) {
+  protected async DigestReference(source: DigestReferenceSource, reference: Reference, _checkHmac: boolean) {
     if (this.contentHandler) {
       const content = await this.contentHandler(reference, this);
       if (content) {
@@ -373,12 +323,12 @@ export class SignedXml implements IXmlSerializable {
 
     if (reference.Uri) {
       let objectName: string | undefined;
-      if (!reference.Uri.indexOf('#xpointer')) {
+      if (!reference.Uri.indexOf("#xpointer")) {
         let uri: string = reference.Uri;
-        uri = uri.substring(9).replace(/[\r\n\t\s]/g, '');
+        uri = uri.substring(9).replace(/[\r\n\t\s]/g, "");
         if (uri.length < 2 || uri[0] !== `(` || uri[uri.length - 1] !== `)`) {
           // FIXME: how to handle invalid xpointer?
-          uri = ''; // String.Empty
+          uri = ""; // String.Empty
         } else {
           uri = uri.substring(1, uri.length - 1);
         }
@@ -414,22 +364,13 @@ export class SignedXml implements IXmlSerializable {
         // Enforce uniqueness to prevent XSW ambiguity.
         // If the same Id is present in both the document and the signature objects, reject.
         if (documentCandidates.length && signatureCandidates.length) {
-          throw new XmlError(
-            XE.CRYPTOGRAPHIC,
-            `Duplicate Id '${objectName}' detected in both the signed document and Signature objects`,
-          );
+          throw new XmlError(XE.CRYPTOGRAPHIC, `Duplicate Id '${objectName}' detected in both the signed document and Signature objects`);
         }
         if (documentCandidates.length > 1) {
-          throw new XmlError(
-            XE.CRYPTOGRAPHIC,
-            `Duplicate Id '${objectName}' detected in the signed document`,
-          );
+          throw new XmlError(XE.CRYPTOGRAPHIC, `Duplicate Id '${objectName}' detected in the signed document`);
         }
         if (signatureCandidates.length > 1) {
-          throw new XmlError(
-            XE.CRYPTOGRAPHIC,
-            `Duplicate Id '${objectName}' detected in Signature objects`,
-          );
+          throw new XmlError(XE.CRYPTOGRAPHIC, `Duplicate Id '${objectName}' detected in Signature objects`);
         }
 
         const foundInDocument = documentCandidates[0] || null;
@@ -473,9 +414,7 @@ export class SignedXml implements IXmlSerializable {
     let canonOutput: any = null;
     if (reference.Transforms && reference.Transforms.Count) {
       if (BufferSourceConverter.isBufferSource(source)) {
-        throw new Error(
-          `Transformation for argument 'source' of type BufferSource is not implemented`,
-        );
+        throw new Error(`Transformation for argument 'source' of type BufferSource is not implemented`);
       }
       canonOutput = this.ApplyTransforms(reference.Transforms, source);
     } else {
@@ -484,7 +423,7 @@ export class SignedXml implements IXmlSerializable {
       if (reference.Uri && reference.Uri[0] !== `#`) {
         if (isElement(source)) {
           if (!source.ownerDocument) {
-            throw new Error('Cannot get ownerDocument from the XML document');
+            throw new Error("Cannot get ownerDocument from the XML document");
           }
           canonOutput = Stringify(source.ownerDocument);
         } else {
@@ -502,7 +441,7 @@ export class SignedXml implements IXmlSerializable {
     }
 
     if (!reference.DigestMethod.Algorithm) {
-      throw new XmlError(XE.NULL_PARAM, 'Reference', 'DigestMethod');
+      throw new XmlError(XE.NULL_PARAM, "Reference", "DigestMethod");
     }
     const digest = CryptoConfig.CreateHashAlgorithm(reference.DigestMethod.Algorithm);
     return digest.Digest(canonOutput);
@@ -526,13 +465,11 @@ export class SignedXml implements IXmlSerializable {
   }
 
   protected TransformSignedInfo(data?: Element | Document | BufferSource): string {
-    const t = CryptoConfig.CreateFromName(
-      this.XmlSignature.SignedInfo.CanonicalizationMethod.Algorithm,
-    );
+    const t = CryptoConfig.CreateFromName(this.XmlSignature.SignedInfo.CanonicalizationMethod.Algorithm);
 
     const xml = this.XmlSignature.SignedInfo.GetXml();
     if (!xml) {
-      throw new XmlError(XE.XML_EXCEPTION, 'Cannot get Xml element from SignedInfo');
+      throw new XmlError(XE.XML_EXCEPTION, "Cannot get Xml element from SignedInfo");
     }
 
     const node = xml.cloneNode(true) as Element;
@@ -565,7 +502,7 @@ export class SignedXml implements IXmlSerializable {
       if (i === node.prefix) {
         continue;
       }
-      node.setAttribute('xmlns' + (i ? ':' + i : ''), uri);
+      node.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
     }
     t.LoadInnerXml(node);
     const res = t.GetOutput();
@@ -573,19 +510,19 @@ export class SignedXml implements IXmlSerializable {
   }
 
   protected ResolveTransform(transform: OptionsSignTransform): XmlTransform {
-    if (typeof transform === 'string') {
+    if (typeof transform === "string") {
       switch (transform) {
-        case 'enveloped':
+        case "enveloped":
           return new Transforms.XmlDsigEnvelopedSignatureTransform();
-        case 'c14n':
+        case "c14n":
           return new Transforms.XmlDsigC14NTransform();
-        case 'c14n-com':
+        case "c14n-com":
           return new Transforms.XmlDsigC14NWithCommentsTransform();
-        case 'exc-c14n':
+        case "exc-c14n":
           return new Transforms.XmlDsigExcC14NTransform();
-        case 'exc-c14n-com':
+        case "exc-c14n-com":
           return new Transforms.XmlDsigExcC14NWithCommentsTransform();
-        case 'base64':
+        case "base64":
           return new Transforms.XmlDsigBase64Transform();
         default:
           // Try to create transform using CryptoConfig for custom transforms
@@ -598,7 +535,7 @@ export class SignedXml implements IXmlSerializable {
     }
 
     switch (transform.name) {
-      case 'xpath': {
+      case "xpath": {
         const xpathTransform = new Transforms.XmlDsigXPathTransform();
         xpathTransform.XPath = transform.selector;
 
@@ -607,11 +544,7 @@ export class SignedXml implements IXmlSerializable {
         if (transformEl && transform.namespaces) {
           for (const [prefix, namespace] of Object.entries(transform.namespaces)) {
             // xpathEl.setAttribute(`xmlns:${prefix}`, namespace);
-            (transformEl.firstChild as Element).setAttributeNS(
-              'http://www.w3.org/2000/xmlns/',
-              `xmlns:${prefix}`,
-              namespace,
-            );
+            (transformEl.firstChild as Element).setAttributeNS("http://www.w3.org/2000/xmlns/", `xmlns:${prefix}`, namespace);
           }
         }
 
@@ -627,12 +560,7 @@ export class SignedXml implements IXmlSerializable {
 
     transforms
       .Sort((a, b) => {
-        const c14nTransforms = [
-          Transforms.XmlDsigC14NTransform,
-          XmlDsigC14NWithCommentsTransform,
-          Transforms.XmlDsigExcC14NTransform,
-          XmlDsigExcC14NWithCommentsTransform,
-        ];
+        const c14nTransforms = [Transforms.XmlDsigC14NTransform, XmlDsigC14NWithCommentsTransform, Transforms.XmlDsigExcC14NTransform, XmlDsigExcC14NWithCommentsTransform];
         if (c14nTransforms.some((t) => a instanceof t)) {
           return 1;
         }
@@ -661,10 +589,7 @@ export class SignedXml implements IXmlSerializable {
         }
       });
     // Apply C14N transform if Reference has only one transform EnvelopedSignature
-    if (
-      transforms.Count === 1 &&
-      transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform
-    ) {
+    if (transforms.Count === 1 && transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
       const c14n = new Transforms.XmlDsigC14NTransform();
       c14n.LoadInnerXml(input);
       output = c14n.GetOutput();
@@ -673,12 +598,7 @@ export class SignedXml implements IXmlSerializable {
     return output;
   }
 
-  protected async ApplySignOptions(
-    signature: Signature,
-    algorithm: Algorithm,
-    key: CryptoKey,
-    options: OptionsSign,
-  ) {
+  protected async ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsSign) {
     // #region id
     if (options.id) {
       this.XmlSignature.Id = options.id;
@@ -759,7 +679,7 @@ export class SignedXml implements IXmlSerializable {
     for (const ref of this.XmlSignature.SignedInfo.References.GetIterator()) {
       const digest = await this.DigestReference(doc, ref, false);
       const b64Digest = Convert.ToBase64(digest);
-      const b64DigestValue = Convert.ToString(ref.DigestValue, 'base64');
+      const b64DigestValue = Convert.ToString(ref.DigestValue, "base64");
       if (b64Digest !== b64DigestValue) {
         const errText = `Invalid digest for uri '${ref.Uri}'. Calculated digest is ${b64Digest} but the xml to validate supplies digest ${b64DigestValue}`;
         throw new XmlError(XE.CRYPTOGRAPHIC, errText);
@@ -770,14 +690,12 @@ export class SignedXml implements IXmlSerializable {
 
   protected async ValidateSignatureValue(keys: CryptoKey[]) {
     const signedInfoCanon = this.TransformSignedInfo(this.document);
-    const signer = CryptoConfig.CreateSignatureAlgorithm(
-      this.XmlSignature.SignedInfo.SignatureMethod,
-    );
+    const signer = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
 
     // Verify signature for all exported keys
     for (const key of keys) {
       if (!this.Signature) {
-        throw new XmlError(XE.CRYPTOGRAPHIC, 'Signature is not defined');
+        throw new XmlError(XE.CRYPTOGRAPHIC, "Signature is not defined");
       }
       const ok = await signer.Verify(signedInfoCanon, key, this.Signature);
       if (ok) {
@@ -790,19 +708,14 @@ export class SignedXml implements IXmlSerializable {
 
 type ElementFinder = (element: Element, id: string, results: Element[]) => void;
 
-function findAllById(
-  element: Element,
-  id: string,
-  results: Element[] = [],
-  finder?: ElementFinder,
-): Element[] {
+function findAllById(element: Element, id: string, results: Element[] = [], finder?: ElementFinder): Element[] {
   if (element.nodeType !== XmlNodeType.Element) {
     return results;
   }
 
   // xmldsigjs historically accepts different ID attribute casings
   // (e.g. `Id` in XMLDSIG/XAdES, `id` in some XML payloads)
-  const idAttrNames = ['Id', 'ID', 'id'];
+  const idAttrNames = ["Id", "ID", "id"];
   for (const attrName of idAttrNames) {
     if (element.hasAttribute(attrName) && element.getAttribute(attrName) === id) {
       results.push(element);
@@ -826,10 +739,7 @@ function findAllById(
 function findAllByIdExcludingSignatures(element: Element, id: string, results: Element[] = []) {
   // Do not resolve IDs inside any ds:Signature when searching the signed document.
   // Those nodes must be resolved via Signature objects (KeyInfo/ds:Object) only.
-  if (
-    element.namespaceURI === 'http://www.w3.org/2000/09/xmldsig#' &&
-    (element.localName || element.nodeName) === 'Signature'
-  ) {
+  if (element.namespaceURI === "http://www.w3.org/2000/09/xmldsig#" && (element.localName || element.nodeName) === "Signature") {
     return results;
   }
   return findAllById(element, id, results, findAllByIdExcludingSignatures);
@@ -851,14 +761,14 @@ function addNamespace(selectedNodes: AssocArray<string>, name: string, namespace
 // TODO it can be moved to XmlCore
 function _SelectRootNamespaces(node: Node, selectedNodes: AssocArray<string> = {}) {
   if (isElement(node)) {
-    if (node.namespaceURI && node.namespaceURI !== 'http://www.w3.org/XML/1998/namespace') {
-      addNamespace(selectedNodes, node.prefix ? node.prefix : '', node.namespaceURI || '');
+    if (node.namespaceURI && node.namespaceURI !== "http://www.w3.org/XML/1998/namespace") {
+      addNamespace(selectedNodes, node.prefix ? node.prefix : "", node.namespaceURI || "");
     }
     // #region Select all xmlns attrs
     for (let i = 0; i < node.attributes.length; i++) {
       const attr = node.attributes.item(i);
-      if (attr && attr.prefix === 'xmlns') {
-        addNamespace(selectedNodes, attr.localName ? attr.localName : '', attr.value);
+      if (attr && attr.prefix === "xmlns") {
+        addNamespace(selectedNodes, attr.localName ? attr.localName : "", attr.value);
       }
     }
     // #endregion

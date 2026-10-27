@@ -1,10 +1,10 @@
-import { describe, it, assert, beforeAll } from 'vitest';
-import '../test/config.js';
-import { XmlAttribute, XmlElement, XmlObject } from './index.js';
+import { describe, it, assert, beforeAll } from "vitest";
+import "../test/config.js";
+import { XmlAttribute, XmlElement, XmlObject } from "./index.js";
 
-describe('XmlObject', () => {
-  it('IsEmpty', () => {
-    @XmlElement({ localName: 'test', namespaceURI: 'http://some.com' })
+describe("XmlObject", () => {
+  it("IsEmpty", () => {
+    @XmlElement({ localName: "test", namespaceURI: "http://some.com" })
     class Test extends XmlObject {
       @XmlAttribute()
       public Id!: string;
@@ -13,7 +13,7 @@ describe('XmlObject', () => {
     const test = new Test();
 
     assert.equal(test.IsEmpty(), true);
-    test.Id = '1';
+    test.Id = "1";
     assert.equal(test.IsEmpty(), false);
 
     const xml = test.toString();
@@ -21,12 +21,12 @@ describe('XmlObject', () => {
     assert.equal(test2.IsEmpty(), false);
   });
 
-  describe('Get xml Element', () => {
+  describe("Get xml Element", () => {
     const xml = `<root id="0"><first id="1"/><second Id="2"/><third ID="3"/><child/><n:child xmlns:n="html://n"/></root>`;
     let obj: Test;
 
     @XmlElement({
-      localName: 'root',
+      localName: "root",
     })
     class Test extends XmlObject {}
 
@@ -34,132 +34,132 @@ describe('XmlObject', () => {
       obj = Test.LoadXml(xml);
     });
 
-    describe('GetElement', () => {
-      it('required', () => {
+    describe("GetElement", () => {
+      it("required", () => {
         assert.throws(() => {
-          obj.GetElement('NotExit', true);
+          obj.GetElement("NotExit", true);
         });
       });
 
-      it('success', () => {
-        const node = obj.GetElement('third');
+      it("success", () => {
+        const node = obj.GetElement("third");
         assert.ok(node);
-        assert.equal(node.nodeName, 'third');
+        assert.equal(node.nodeName, "third");
       });
 
-      it('element not exist', () => {
+      it("element not exist", () => {
         const obj2 = new Test();
         assert.throws(() => {
-          obj2.GetElement('third');
+          obj2.GetElement("third");
         });
       });
     });
-    describe('GetChild', () => {
-      it('required', () => {
+    describe("GetChild", () => {
+      it("required", () => {
         assert.throws(() => {
-          obj.GetChild('NotExit', true);
+          obj.GetChild("NotExit", true);
         });
       });
 
-      it('success', () => {
-        const node = obj.GetChild('third');
+      it("success", () => {
+        const node = obj.GetChild("third");
         assert.ok(node);
-        assert.equal(node.nodeName, 'third');
+        assert.equal(node.nodeName, "third");
       });
 
-      it('element not exist', () => {
+      it("element not exist", () => {
         const obj2 = new Test();
         assert.throws(() => {
-          obj2.GetChild('third');
+          obj2.GetChild("third");
         });
       });
     });
-    describe('GetChildren', () => {
-      it('by name', () => {
-        const list = obj.GetChildren('child');
+    describe("GetChildren", () => {
+      it("by name", () => {
+        const list = obj.GetChildren("child");
         assert.equal(list.length, 2);
       });
 
-      it('by name and namespace', () => {
-        const list = obj.GetChildren('child', 'html://n');
+      it("by name and namespace", () => {
+        const list = obj.GetChildren("child", "html://n");
         assert.equal(list.length, 1);
       });
 
-      it('element not exist', () => {
+      it("element not exist", () => {
         const obj2 = new Test();
         assert.throws(() => {
-          obj2.GetChildren('child');
+          obj2.GetChildren("child");
         });
       });
     });
-    describe('GetFirstChild', () => {
-      it('by name', () => {
-        const node = obj.GetFirstChild('child');
+    describe("GetFirstChild", () => {
+      it("by name", () => {
+        const node = obj.GetFirstChild("child");
         assert.ok(node);
-        assert.equal(node.localName, 'child');
+        assert.equal(node.localName, "child");
       });
 
-      it('by name and namespace', () => {
-        const node = obj.GetFirstChild('child', 'html://n');
+      it("by name and namespace", () => {
+        const node = obj.GetFirstChild("child", "html://n");
         assert.ok(node);
-        assert.equal(node.localName, 'child');
-        assert.equal(node.namespaceURI, 'html://n');
+        assert.equal(node.localName, "child");
+        assert.equal(node.namespaceURI, "html://n");
       });
 
-      it('element not exist', () => {
+      it("element not exist", () => {
         const obj2 = new Test();
         assert.throws(() => {
-          obj2.GetFirstChild('child');
+          obj2.GetFirstChild("child");
         });
       });
     });
-    describe('GetAttribute', () => {
-      it('by name', () => {
-        const attr = obj.GetAttribute('id', '2');
-        assert.equal(attr, '0');
+    describe("GetAttribute", () => {
+      it("by name", () => {
+        const attr = obj.GetAttribute("id", "2");
+        assert.equal(attr, "0");
       });
 
-      it('by default', () => {
-        const attr = obj.GetAttribute('test', '3', false);
-        assert.equal(attr, '3');
+      it("by default", () => {
+        const attr = obj.GetAttribute("test", "3", false);
+        assert.equal(attr, "3");
       });
 
-      it('required', () => {
+      it("required", () => {
         assert.throws(() => {
-          obj.GetAttribute('test', null, true);
+          obj.GetAttribute("test", null, true);
         });
       });
 
-      it('element not exist', () => {
+      it("element not exist", () => {
         const obj2 = new Test();
         assert.throws(() => {
-          obj2.GetAttribute('id', '4');
+          obj2.GetAttribute("id", "4");
         });
       });
     });
-    describe('GetElementById', () => {
-      it('id', () => {
+    describe("GetElementById", () => {
+      it("id", () => {
         const el = obj.GetXml();
         assert.ok(el);
-        const f = XmlObject.GetElementById(el, '1');
+        const f = XmlObject.GetElementById(el, "1");
         assert.ok(f);
-        assert.equal(f.localName, 'first');
+        assert.equal(f.localName, "first");
       });
 
-      it('Id', () => {
+      it("Id", () => {
         const el = obj.GetXml();
         assert.ok(el);
-        const f = XmlObject.GetElementById(el, '2');
+        const f = XmlObject.GetElementById(el, "2");
         assert.ok(f);
-        assert.equal(f.localName, 'second');
+        assert.equal(f.localName, "second");
       });
 
-      it('ID', () => {
+      it("ID", () => {
         const el = obj.GetXml();
         assert.ok(el);
-        const f = XmlObject.GetElementById(el, '3');
+        const f = XmlObject.GetElementById(el, "3");
         assert.ok(f);
-        assert.equal(f.localName, 'third');
+        assert.equal(f.localName, "third");
       });
     });
   });

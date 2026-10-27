@@ -13,13 +13,12 @@
  */
 
 const token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZWN]|"[^"]*"|'[^']*'/g;
-const timezone =
-  /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g;
+const timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g;
 const timezoneClip = /[^-+\dA-Z]/g;
 
 export function dateFormat(date: any, mask: string, utc?: boolean, gmt?: boolean) {
   // You can't provide utc if you skip other args (use the 'UTC:' mask prefix)
-  if (arguments.length === 1 && kindOf(date) === 'string' && !/\d/.test(date)) {
+  if (arguments.length === 1 && kindOf(date) === "string" && !/\d/.test(date)) {
     mask = date;
     date = undefined;
   }
@@ -31,7 +30,7 @@ export function dateFormat(date: any, mask: string, utc?: boolean, gmt?: boolean
   }
 
   if (isNaN(date)) {
-    throw TypeError('Invalid date');
+    throw TypeError("Invalid date");
   }
 
   mask = String(masks[mask] || mask || masks.default);
@@ -39,23 +38,23 @@ export function dateFormat(date: any, mask: string, utc?: boolean, gmt?: boolean
   // Allow setting the utc/gmt argument via the mask
   const maskSlice = mask.slice(0, 4);
 
-  if (maskSlice === 'UTC:' || maskSlice === 'GMT:') {
+  if (maskSlice === "UTC:" || maskSlice === "GMT:") {
     mask = mask.slice(4);
     utc = true;
-    if (maskSlice === 'GMT:') {
+    if (maskSlice === "GMT:") {
       gmt = true;
     }
   }
 
-  const _ = utc ? 'getUTC' : 'get';
-  const d = date[_ + 'Date']();
-  const D = date[_ + 'Day']();
-  const m = date[_ + 'Month']();
-  const y = date[_ + 'FullYear']();
-  const H = date[_ + 'Hours']();
-  const M = date[_ + 'Minutes']();
-  const s = date[_ + 'Seconds']();
-  const L = date[_ + 'Milliseconds']();
+  const _ = utc ? "getUTC" : "get";
+  const d = date[_ + "Date"]();
+  const D = date[_ + "Day"]();
+  const m = date[_ + "Month"]();
+  const y = date[_ + "FullYear"]();
+  const H = date[_ + "Hours"]();
+  const M = date[_ + "Minutes"]();
+  const s = date[_ + "Seconds"]();
+  const L = date[_ + "Milliseconds"]();
   const o = utc ? 0 : date.getTimezoneOffset();
   const W = getWeek(date);
   const N = getDayOfWeek(date);
@@ -85,12 +84,8 @@ export function dateFormat(date: any, mask: string, utc?: boolean, gmt?: boolean
     T: H < 12 ? i18n.timeNames[4] : i18n.timeNames[5],
     TT: H < 12 ? i18n.timeNames[6] : i18n.timeNames[7],
     // eslint-disable-next-line no-nested-ternary
-    Z: gmt
-      ? 'GMT'
-      : utc
-        ? 'UTC'
-        : (String(date).match(timezone) || ['']).pop()?.replace(timezoneClip, ''),
-    o: (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + (Math.abs(o) % 60), 4),
+    Z: gmt ? "GMT" : utc ? "UTC" : (String(date).match(timezone) || [""]).pop()?.replace(timezoneClip, ""),
+    o: (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + (Math.abs(o) % 60), 4),
     // S: ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10],
     W,
     N,
@@ -106,72 +101,57 @@ export function dateFormat(date: any, mask: string, utc?: boolean, gmt?: boolean
 }
 
 const masks: Record<string, string> = {
-  default: 'ddd mmm dd yyyy HH:MM:ss',
-  shortDate: 'm/d/yy',
-  mediumDate: 'mmm d, yyyy',
-  longDate: 'mmmm d, yyyy',
-  fullDate: 'dddd, mmmm d, yyyy',
-  shortTime: 'h:MM TT',
-  mediumTime: 'h:MM:ss TT',
-  longTime: 'h:MM:ss TT Z',
-  isoDate: 'yyyy-mm-dd',
-  isoTime: 'HH:MM:ss',
+  default: "ddd mmm dd yyyy HH:MM:ss",
+  shortDate: "m/d/yy",
+  mediumDate: "mmm d, yyyy",
+  longDate: "mmmm d, yyyy",
+  fullDate: "dddd, mmmm d, yyyy",
+  shortTime: "h:MM TT",
+  mediumTime: "h:MM:ss TT",
+  longTime: "h:MM:ss TT Z",
+  isoDate: "yyyy-mm-dd",
+  isoTime: "HH:MM:ss",
   isoDateTime: `yyyy-mm-dd'T'HH:MM:sso`,
   isoUtcDateTime: `UTC:yyyy-mm-dd'T'HH:MM:ss'Z'`,
-  expiresHeaderFormat: 'ddd, dd mmm yyyy HH:MM:ss Z',
+  expiresHeaderFormat: "ddd, dd mmm yyyy HH:MM:ss Z",
 };
 
 // Internationalization strings
 const i18n = {
-  dayNames: [
-    'Sun',
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ],
+  dayNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
   monthNames: [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ],
-  timeNames: ['a', 'p', 'am', 'pm', 'A', 'P', 'AM', 'PM'],
+  timeNames: ["a", "p", "am", "pm", "A", "P", "AM", "PM"],
 };
 
 function pad(val: any, len = 2) {
   val = String(val);
   while (val.length < len) {
-    val = '0' + val;
+    val = "0" + val;
   }
 
   return val;
@@ -231,19 +211,19 @@ function getDayOfWeek(date: Date) {
  */
 function kindOf(val: any) {
   if (val === null) {
-    return 'null';
+    return "null";
   }
 
   if (val === undefined) {
-    return 'undefined';
+    return "undefined";
   }
 
-  if (typeof val !== 'object') {
+  if (typeof val !== "object") {
     return typeof val;
   }
 
   if (Array.isArray(val)) {
-    return 'array';
+    return "array";
   }
 
   return {}.toString.call(val).slice(8, -1).toLowerCase();

@@ -1,10 +1,10 @@
-import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
+import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from "xml-core";
 
-import { DataObjects } from './data_object.js';
-import { KeyInfo } from './key_info.js';
-import { SignedInfo } from './signed_info.js';
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureObject } from './xml_object.js';
+import { DataObjects } from "./data_object.js";
+import { KeyInfo } from "./key_info.js";
+import { SignedInfo } from "./signed_info.js";
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureObject } from "./xml_object.js";
 
 /**
  * Represents the <Signature> element of an XML signature.
@@ -35,7 +35,7 @@ export class Signature extends XmlSignatureObject {
    */
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
   public Id: string;
 

@@ -41,56 +41,56 @@ _Currently only XAdES-BES is fully supported._
 > **Note:** Both ESM (`import`) and CommonJS (`require`) are supported.
 
 ```javascript
-import * as xadesjs from 'xadesjs';
-import { Crypto } from '@peculiar/webcrypto';
+import * as xadesjs from "xadesjs";
+import { Crypto } from "@peculiar/webcrypto";
 
-xadesjs.Application.setEngine('NodeJS', new Crypto());
+xadesjs.Application.setEngine("NodeJS", new Crypto());
 ```
 
 ### Browser Setup
 
 ```html
 <script type="module">
-  import * as xadesjs from 'https://esm.sh/xadesjs';
+  import * as xadesjs from "https://esm.sh/xadesjs";
 </script>
 ```
 
 ### Creating XAdES-BES Signature
 
 ```javascript
-import * as xadesjs from 'xadesjs';
-import { Crypto } from '@peculiar/webcrypto';
+import * as xadesjs from "xadesjs";
+import { Crypto } from "@peculiar/webcrypto";
 
-xadesjs.Application.setEngine('NodeJS', new Crypto());
+xadesjs.Application.setEngine("NodeJS", new Crypto());
 
 async function signXAdES() {
   // Generate key pair
   const keys = await crypto.subtle.generateKey(
     {
-      name: 'RSASSA-PKCS1-v1_5',
+      name: "RSASSA-PKCS1-v1_5",
       modulusLength: 2048,
       publicExponent: new Uint8Array([1, 0, 1]),
-      hash: 'SHA-256',
+      hash: "SHA-256",
     },
     false,
-    ['sign', 'verify'],
+    ["sign", "verify"],
   );
 
   // Parse XML document
-  const xml = xadesjs.Parse('<root><data>Hello World</data></root>');
+  const xml = xadesjs.Parse("<root><data>Hello World</data></root>");
 
   // Create XAdES signature
   const signedXml = new xadesjs.SignedXml();
-  await signedXml.Sign({ name: 'RSASSA-PKCS1-v1_5' }, keys.privateKey, xml, {
+  await signedXml.Sign({ name: "RSASSA-PKCS1-v1_5" }, keys.privateKey, xml, {
     keyValue: keys.publicKey,
-    references: [{ hash: 'SHA-256', transforms: ['enveloped'] }],
+    references: [{ hash: "SHA-256", transforms: ["enveloped"] }],
     productionPlace: {
-      country: 'US',
-      state: 'California',
-      city: 'San Francisco',
+      country: "US",
+      state: "California",
+      city: "San Francisco",
     },
     signerRole: {
-      claimed: ['Developer'],
+      claimed: ["Developer"],
     },
   });
 
@@ -101,17 +101,17 @@ async function signXAdES() {
 ### Verifying XAdES Signature
 
 ```javascript
-import * as xadesjs from 'xadesjs';
+import * as xadesjs from "xadesjs";
 
 async function verifyXAdES(signedXmlString) {
   const doc = xadesjs.Parse(signedXmlString);
-  const signatures = doc.getElementsByTagNameNS('http://www.w3.org/2000/09/xmldsig#', 'Signature');
+  const signatures = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
   const signedXml = new xadesjs.SignedXml(doc);
   signedXml.LoadXml(signatures[0]);
 
   const isValid = await signedXml.Verify();
-  console.log('XAdES signature valid:', isValid);
+  console.log("XAdES signature valid:", isValid);
 }
 ```
 
@@ -166,9 +166,9 @@ Same as XMLDSIGjs:
 To work with XML in Node.js, you need to register DOM and XPath dependencies:
 
 ```typescript
-import * as xmldom from '@xmldom/xmldom';
-import { setNodeDependencies } from 'xadesjs';
-import xpath from 'xpath';
+import * as xmldom from "@xmldom/xmldom";
+import { setNodeDependencies } from "xadesjs";
+import xpath from "xpath";
 
 setNodeDependencies({
   XMLSerializer: xmldom.XMLSerializer,
@@ -183,9 +183,9 @@ setNodeDependencies({
 In Node.js >=19 the global `crypto.webcrypto` is available. For earlier versions or broader compatibility, install and set the engine:
 
 ```ts
-import { Crypto } from '@peculiar/webcrypto';
-import { Application } from 'xmldsigjs';
-Application.setEngine('NodeJS', new Crypto());
+import { Crypto } from "@peculiar/webcrypto";
+import { Application } from "xmldsigjs";
+Application.setEngine("NodeJS", new Crypto());
 ```
 
 ## License

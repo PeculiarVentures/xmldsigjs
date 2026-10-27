@@ -49,49 +49,49 @@ npm install xmldsigjs
 > **Note:** Both ESM (`import`) and CommonJS (`require`) are supported.
 
 ```javascript
-import * as xmldsigjs from 'xmldsigjs';
-import { Crypto } from '@peculiar/webcrypto';
+import * as xmldsigjs from "xmldsigjs";
+import { Crypto } from "@peculiar/webcrypto";
 
-xmldsigjs.Application.setEngine('NodeJS', new Crypto());
+xmldsigjs.Application.setEngine("NodeJS", new Crypto());
 ```
 
 ### Browser Setup
 
 ```html
 <script type="module">
-  import * as xmldsigjs from 'https://esm.sh/xmldsigjs';
+  import * as xmldsigjs from "https://esm.sh/xmldsigjs";
 </script>
 ```
 
 ### Signing XML
 
 ```javascript
-import * as xmldsigjs from 'xmldsigjs';
-import { Crypto } from '@peculiar/webcrypto';
+import * as xmldsigjs from "xmldsigjs";
+import { Crypto } from "@peculiar/webcrypto";
 
-xmldsigjs.Application.setEngine('NodeJS', new Crypto());
+xmldsigjs.Application.setEngine("NodeJS", new Crypto());
 
 async function signXML() {
   // Generate key pair
   const keys = await crypto.subtle.generateKey(
     {
-      name: 'RSASSA-PKCS1-v1_5',
+      name: "RSASSA-PKCS1-v1_5",
       modulusLength: 2048,
       publicExponent: new Uint8Array([1, 0, 1]),
-      hash: 'SHA-256',
+      hash: "SHA-256",
     },
     false,
-    ['sign', 'verify'],
+    ["sign", "verify"],
   );
 
   // Parse XML document
-  const xml = xmldsigjs.Parse('<root><data>Hello World</data></root>');
+  const xml = xmldsigjs.Parse("<root><data>Hello World</data></root>");
 
   // Create signature
   const signedXml = new xmldsigjs.SignedXml();
-  await signedXml.Sign({ name: 'RSASSA-PKCS1-v1_5' }, keys.privateKey, xml, {
+  await signedXml.Sign({ name: "RSASSA-PKCS1-v1_5" }, keys.privateKey, xml, {
     keyValue: keys.publicKey,
-    references: [{ hash: 'SHA-256', transforms: ['enveloped', 'c14n'] }],
+    references: [{ hash: "SHA-256", transforms: ["enveloped", "c14n"] }],
   });
 
   console.log(signedXml.toString());
@@ -101,17 +101,17 @@ async function signXML() {
 ### Verifying XML
 
 ```javascript
-import * as xmldsigjs from 'xmldsigjs';
+import * as xmldsigjs from "xmldsigjs";
 
 async function verifyXML(signedXmlString) {
   const doc = xmldsigjs.Parse(signedXmlString);
-  const signatures = doc.getElementsByTagNameNS('http://www.w3.org/2000/09/xmldsig#', 'Signature');
+  const signatures = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
   const signedXml = new xmldsigjs.SignedXml(doc);
   signedXml.LoadXml(signatures[0]);
 
   const isValid = await signedXml.Verify();
-  console.log('Signature valid:', isValid);
+  console.log("Signature valid:", isValid);
 }
 ```
 
@@ -150,9 +150,9 @@ Verify(key?: CryptoKey): Promise<boolean>
 To work with XML in Node.js, you need to register DOM and XPath dependencies:
 
 ```typescript
-import * as xmldom from '@xmldom/xmldom';
-import { setNodeDependencies } from 'xmldsigjs';
-import xpath from 'xpath';
+import * as xmldom from "@xmldom/xmldom";
+import { setNodeDependencies } from "xmldsigjs";
+import xpath from "xpath";
 
 setNodeDependencies({
   XMLSerializer: xmldom.XMLSerializer,
@@ -167,9 +167,9 @@ setNodeDependencies({
 Node.js >=19 ships a built‑in WebCrypto. For Node.js 16/18 or to ensure consistent behavior across environments, you can use:
 
 ```ts
-import { Crypto } from '@peculiar/webcrypto';
-import { Application } from 'xmldsigjs';
-Application.setEngine('NodeJS', new Crypto());
+import { Crypto } from "@peculiar/webcrypto";
+import { Application } from "xmldsigjs";
+Application.setEngine("NodeJS", new Crypto());
 ```
 
 ## License
