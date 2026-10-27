@@ -1,6 +1,6 @@
 import { type IXmlSerializable, XmlObject, XmlNodeType, isDocument, isElement, assign, XmlError, XE, type AssocArray, Parse, SelectNamespaces, Stringify } from "xml-core";
 
-import { BufferSourceConverter, Convert } from "pvtsutils";
+import { base64, isBufferSource, toArrayBuffer, utf8 } from "@peculiar/utils";
 import * as Alg from "./algorithms/index.js";
 import { CryptoConfig } from "./crypto_config.js";
 import type { Transform as XmlTransform } from "./xml/index.js";
@@ -406,7 +406,7 @@ export class SignedXml implements IXmlSerializable {
 
     let canonOutput: any = null;
     if (reference.Transforms && reference.Transforms.Count) {
-      if (BufferSourceConverter.isBufferSource(source)) {
+      if (isBufferSource(source)) {
         throw new Error(`Transformation for argument 'source' of type BufferSource is not implemented`);
       }
       canonOutput = this.ApplyTransforms(reference.Transforms, source);
@@ -420,13 +420,13 @@ export class SignedXml implements IXmlSerializable {
           }
           canonOutput = Stringify(source.ownerDocument);
         } else {
-          canonOutput = BufferSourceConverter.toArrayBuffer(source);
+          canonOutput = toArrayBuffer(source);
         }
       } else {
         // apply default C14N transformation
         const excC14N = new Transforms.XmlDsigC14NTransform();
-        if (BufferSourceConverter.isBufferSource(source)) {
-          source = Parse(Convert.ToUtf8String(source)).documentElement;
+        if (isBufferSource(source)) {
+          source = Parse(utf8.decode(source)).documentElement;
         }
         excC14N.LoadInnerXml(source);
         canonOutput = excC14N.GetOutput();
@@ -471,7 +471,7 @@ export class SignedXml implements IXmlSerializable {
     // Get xmlns from SignedInfo
     this.CopyNamespaces(xml, node, false);
 
-    if (data && !BufferSourceConverter.isBufferSource(data)) {
+    if (data && !isBufferSource(data)) {
       // Get xmlns from Document
       if (data.nodeType === XmlNodeType.Document) {
         this.CopyNamespaces((data as Document).documentElement, node, false);
@@ -617,7 +617,7 @@ export class SignedXml implements IXmlSerializable {
       }
       const keyInfo = signature.KeyInfo;
       options.x509.forEach((x509) => {
-        const raw = BufferSourceConverter.toUint8Array(Convert.FromBase64(x509));
+        const raw = base64.decode(x509);
         const x509Data = new KeyInfoX509Data(raw);
         keyInfo.Add(x509Data);
       });
@@ -671,8 +671,8 @@ export class SignedXml implements IXmlSerializable {
   protected async ValidateReferences(doc: DigestReferenceSource) {
     for (const ref of this.XmlSignature.SignedInfo.References.GetIterator()) {
       const digest = await this.DigestReference(doc, ref, false);
-      const b64Digest = Convert.ToBase64(digest);
-      const b64DigestValue = Convert.ToString(ref.DigestValue, "base64");
+      const b64Digest = base64.encode(digest);
+      const b64DigestValue = base64.encode(ref.DigestValue);
       if (b64Digest !== b64DigestValue) {
         const errText = `Invalid digest for uri '${ref.Uri}'. Calculated digest is ${b64Digest} but the xml to validate supplies digest ${b64DigestValue}`;
         throw new XmlError(XE.CRYPTOGRAPHIC, errText);

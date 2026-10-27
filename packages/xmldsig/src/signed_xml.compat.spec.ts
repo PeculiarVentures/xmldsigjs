@@ -2,7 +2,7 @@ import * as child_process from "node:child_process";
 import { promisify } from "node:util";
 import * as fs from "node:fs";
 import { describe, it, assert, beforeAll, afterAll } from "vitest";
-import { Convert } from "pvtsutils";
+import { binary, hex } from "@peculiar/utils";
 import { Stringify } from "xml-core";
 import * as xmldsig from "./index.js";
 import "../test/config.js";
@@ -143,8 +143,8 @@ describe("XML Signing + XMLSEC verification", () => {
       modulusLength: 2048,
     };
     const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
-    const dataHex = Convert.ToHex(crypto.getRandomValues(new Uint8Array(20)));
-    const data = Convert.FromBinary(dataHex);
+    const dataHex = hex.encode(crypto.getRandomValues(new Uint8Array(20)));
+    const data = binary.decode(dataHex) as Uint8Array<ArrayBuffer>;
     const dataHex2 = Buffer.from(crypto.getRandomValues(new Uint8Array(20))).toString("hex");
     const data2 = Buffer.from(dataHex2);
 
