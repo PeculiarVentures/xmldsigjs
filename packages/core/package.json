@@ -1,6 +1,6 @@
 {
   "name": "xml-core",
-  "version": "1.2.6",
+  "version": "3.0.0",
   "description": "A foundational library for working with XML in JavaScript/TypeScript with schema validation through decorators",
   "type": "module",
   "sideEffects": false,
