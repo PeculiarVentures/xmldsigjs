@@ -140,3 +140,32 @@ describe("SignedXml BufferSource content", () => {
     assert.instanceOf(error, TypeError);
   });
 });
+
+describe("SignedXml xml:id references", () => {
+  const hmac = { name: "HMAC", hash: "SHA-256" };
+
+  it("signs and verifies a reference to an xml:id element", async () => {
+    const key = (await xmldsig.Application.crypto.subtle.generateKey(hmac, false, ["sign", "verify"])) as CryptoKey;
+    const document = xmldsig.Parse('<root><item xml:id="36a01fc1-9497-4f9d-af2f-40ff8558e0c0">value</item></root>');
+    const signedXml = new xmldsig.SignedXml();
+    await signedXml.Sign(hmac, key, document, {
+      references: [{ hash: "SHA-256", uri: "#36a01fc1-9497-4f9d-af2f-40ff8558e0c0" }],
+    });
+    assert.isTrue(await signedXml.Verify({ key, content: document.documentElement }));
+  });
+
+  it("rejects a reference when multiple elements have the same xml:id", async () => {
+    const key = (await xmldsig.Application.crypto.subtle.generateKey(hmac, false, ["sign", "verify"])) as CryptoKey;
+    const document = xmldsig.Parse('<root><first xml:id="duplicate"/><second xml:id="duplicate"/></root>');
+    const signedXml = new xmldsig.SignedXml();
+    let error: unknown;
+    try {
+      await signedXml.Sign(hmac, key, document, {
+        references: [{ hash: "SHA-256", uri: "#duplicate" }],
+      });
+    } catch (e) {
+      error = e;
+    }
+    assert.match((error as { message: string }).message, /Duplicate Id 'duplicate' detected in the signed document/);
+  });
+});
