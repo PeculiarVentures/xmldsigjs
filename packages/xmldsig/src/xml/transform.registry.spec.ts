@@ -1,4 +1,5 @@
 import { describe, it, beforeAll, assert } from "vitest";
+import { isElement } from "xml-core";
 import * as xmldsig from "../index.js";
 import "../../test/config.js";
 
@@ -242,5 +243,50 @@ describe("Transform chaining", () => {
     verifier.LoadXml(doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature")[0]);
 
     assert.isTrue(await verifier.Verify(keys.publicKey));
+  });
+});
+
+describe("Transform chaining with built-in transforms", () => {
+  function apply(xml: string, ...items: xmldsig.Transform[]) {
+    const transforms = new xmldsig.Transforms();
+    items.forEach((item) => transforms.Add(item));
+    return new TransformsSignedXml().Apply(transforms, xmldsig.Parse(xml).documentElement);
+  }
+
+  function xpath(selector: string) {
+    const transform = new xmldsig.XmlDsigXPathTransform();
+    transform.XPath = selector;
+    return transform;
+  }
+
+  it("keeps base64 output when XPath follows it", () => {
+    const output = apply("<root>dGVzdA==</root>", new xmldsig.XmlDsigBase64Transform(), xpath("true()"));
+
+    assert.deepEqual(Array.from(output), [116, 101, 115, 116]);
+  });
+
+  it("canonicalizes the result of a single XPath transform", () => {
+    const output = apply("<root><data  a='1'/><secret/></root>", xpath("not(self::secret)"));
+
+    assert.equal(output, '<root><data a="1"></data></root>');
+  });
+
+  it("keeps the node for enveloped followed by XPath", () => {
+    const output = apply(
+      `<root><data/><secret/><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"/></root>`,
+      new xmldsig.XmlDsigEnvelopedSignatureTransform(),
+      xpath("not(self::secret)"),
+    );
+
+    // Digest serializes the node, as before
+    assert.isTrue(isElement(output));
+    assert.equal(xmldsig.Stringify(output), "<root><data/></root>");
+  });
+
+  it("canonicalizes after enveloped", () => {
+    const xml = `<root><data/><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"/></root>`;
+
+    assert.equal(apply(xml, new xmldsig.XmlDsigEnvelopedSignatureTransform()), "<root><data></data></root>");
+    assert.equal(apply(xml, new xmldsig.XmlDsigEnvelopedSignatureTransform(), new xmldsig.XmlDsigExcC14NTransform()), "<root><data></data></root>");
   });
 });
