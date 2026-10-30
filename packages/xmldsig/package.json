@@ -1,6 +1,6 @@
 {
   "name": "xmldsigjs",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "XML Digital Signature implementation in TypeScript/JavaScript using Web Crypto API",
   "type": "module",
   "sideEffects": false,
@@ -51,11 +51,11 @@
   "peerDependencies": {
     "asn1js": "^4.0.0",
     "pkijs": "^4.0.0",
-    "xml-core": "^3.0.0"
+    "xml-core": "^3.0.1"
   },
   "devDependencies": {
     "asn1js": "^4.0.0",
     "pkijs": "^4.0.1",
-    "xml-core": "^3.0.0"
+    "xml-core": "^3.0.1"
   }
 }
