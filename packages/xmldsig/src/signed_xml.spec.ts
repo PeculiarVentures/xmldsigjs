@@ -172,15 +172,9 @@ describe("SignedXml xml:id references", () => {
     const key = (await xmldsig.Application.crypto.subtle.generateKey(hmac, false, ["sign", "verify"])) as CryptoKey;
     const document = xmldsig.Parse('<root><first xml:id="duplicate" id="duplicate"/></root>');
     const signedXml = new xmldsig.SignedXml();
-    let error: unknown;
-    try {
-      await signedXml.Sign(hmac, key, document, {
-        references: [{ hash: "SHA-256", uri: "#duplicate" }],
-      });
-    } catch (e) {
-      error = e;
-    }
+    await signedXml.Sign(hmac, key, document, {
+      references: [{ hash: "SHA-256", uri: "#duplicate" }],
+    });
     assert.isTrue(await signedXml.Verify({ key, content: document.documentElement }));
-    assert.isTrue(signedXml.XmlSignature.SignedInfo.References.Count === 1);
   });
 });

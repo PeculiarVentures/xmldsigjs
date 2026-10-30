@@ -710,9 +710,7 @@ function findAllById(element: Element, id: string, results: Element[] = [], find
   const hasXmlId = element.getAttributeNS("http://www.w3.org/XML/1998/namespace", "id") === id;
   // xmldsigjs historically accepts different ID attribute casings
   // (e.g. `Id` in XMLDSIG/XAdES, `id` in some XML payloads)
-  const hasLegacyId = ["Id", "ID", "id"].some(
-    (name) => element.hasAttribute(name) && element.getAttribute(name) === id,
-  );
+  const hasLegacyId = ["Id", "ID", "id"].some((name) => element.hasAttribute(name) && element.getAttribute(name) === id);
 
   if (hasXmlId || hasLegacyId) {
     results.push(element);
