@@ -1,4 +1,5 @@
 import { describe, it, assert, beforeAll, expect } from "vitest";
+import { XE } from "xml-core";
 import * as xmldsig from "./index.js";
 import "../test/config.js";
 
@@ -102,8 +103,18 @@ describe("Signing options", () => {
     });
 
     it("Unknown", async () => {
-      await expect(Sign({ canonicalization: "unknown" })).rejects.toThrow(/unknown/i);
+      await expect(Sign({ canonicalization: "urn:unknown" })).rejects.toMatchObject({ code: XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM });
     });
+
+    it("Empty", async () => {
+      await expect(Sign({ canonicalization: "" })).rejects.toMatchObject({ code: XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM });
+    });
+
+    for (const value of ["base64", "enveloped", "http://www.w3.org/2000/09/xmldsig#base64", "http://www.w3.org/2000/09/xmldsig#enveloped-signature"]) {
+      it(`Not a canonicalization method: ${value}`, async () => {
+        await expect(Sign({ canonicalization: value })).rejects.toMatchObject({ code: XE.ALGORITHM_NOT_SUPPORTED });
+      });
+    }
   });
 
   describe("References", () => {
