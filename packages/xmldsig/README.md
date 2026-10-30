@@ -63,6 +63,8 @@ v3 is ESM-only and requires Node.js `^20.19.0 || >=22.12.0` (was `>=16`). xml-co
 
 > **Note:** The package is ESM-only. CommonJS code can `require()` it on Node.js `^20.19.0 || >=22.12.0`.
 
+xmldsigjs uses Node's built-in WebCrypto (`globalThis.crypto`) by default. To use another implementation, set it explicitly:
+
 ```javascript
 import * as xmldsigjs from "xmldsigjs";
 import { Crypto } from "@peculiar/webcrypto";
@@ -179,7 +181,7 @@ setNodeDependencies({
 
 ## WebCrypto Environment
 
-Node.js ships a built‑in WebCrypto (`globalThis.crypto`). To get the same behavior across environments, you can also use:
+Node.js ships a built‑in WebCrypto (`globalThis.crypto`), which xmldsigjs uses by default. To get the same behavior across environments, you can also use:
 
 ```ts
 import { Crypto } from "@peculiar/webcrypto";

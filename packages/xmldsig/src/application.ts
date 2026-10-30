@@ -34,10 +34,11 @@ export class Application {
   }
 }
 
-// set default w3 WebCrypto
+// set default WebCrypto: the browser's one, or the built-in one in Node.js
 function init() {
-  if (!Application.isNodePlugin()) {
-    Application.setEngine("W3 WebCrypto module", self.crypto);
+  const crypto = globalThis.crypto;
+  if (crypto?.subtle) {
+    Application.setEngine(Application.isNodePlugin() ? "NodeJS" : "W3 WebCrypto module", crypto);
   }
 }
 init();
