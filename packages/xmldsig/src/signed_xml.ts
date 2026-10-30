@@ -574,12 +574,12 @@ export class SignedXml implements IXmlSerializable {
             transform = new Transforms.XmlDsigC14NTransform();
           }
         }
-        transform.LoadInnerXml(input);
-        if (transform instanceof Transforms.XmlDsigXPathTransform) {
-          transform.GetOutput();
-        } else {
-          output = transform.GetOutput();
-        }
+        // Each transform takes the node returned by the previous one. Transforms
+        // that change the node in place (e.g. XPath) may return nothing.
+        const node = isElement(output) || isDocument(output) ? output : input;
+        transform.LoadInnerXml(node);
+        const result = transform.GetOutput();
+        output = result === undefined ? node : result;
       });
     // Apply C14N transform if Reference has only one transform EnvelopedSignature
     if (transforms.Count === 1 && transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {

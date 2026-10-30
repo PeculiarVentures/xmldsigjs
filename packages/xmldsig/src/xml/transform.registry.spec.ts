@@ -178,3 +178,69 @@ describe("Transform Registration", () => {
     assert.ok(isValid, "Signature with custom transform should be valid");
   });
 });
+
+const REMOVE_SECRET_NAMESPACE = "urn:custom:remove-secret";
+
+/**
+ * Returns a copy of the node without <secret> elements
+ */
+class RemoveSecretTransform extends xmldsig.Transform {
+  public override Algorithm = REMOVE_SECRET_NAMESPACE;
+
+  public override GetOutput(): any {
+    if (!this.innerXml) {
+      throw new Error("innerXml is required");
+    }
+
+    const copy = this.innerXml.cloneNode(true) as Element;
+    for (const secret of Array.from(copy.getElementsByTagName("secret"))) {
+      secret.parentNode?.removeChild(secret);
+    }
+    return copy;
+  }
+}
+
+class TransformsSignedXml extends xmldsig.SignedXml {
+  public Apply(transforms: xmldsig.Transforms, input: Element) {
+    return this.ApplyTransforms(transforms, input);
+  }
+}
+
+describe("Transform chaining", () => {
+  const algorithm = {
+    name: "RSASSA-PKCS1-v1_5",
+    hash: "SHA-256",
+    publicExponent: new Uint8Array([1, 0, 1]),
+    modulusLength: 2048,
+  };
+
+  beforeAll(() => {
+    xmldsig.CryptoConfig.RegisterTransform(REMOVE_SECRET_NAMESPACE, RemoveSecretTransform);
+  });
+
+  it("passes the node returned by a transform to the next one", () => {
+    const transforms = new xmldsig.Transforms();
+    transforms.Add(new RemoveSecretTransform());
+    transforms.Add(new xmldsig.XmlDsigC14NTransform());
+
+    const doc = xmldsig.Parse("<root><data>value</data><secret>1</secret></root>");
+    const output = new TransformsSignedXml().Apply(transforms, doc.documentElement);
+
+    assert.equal(output, "<root><data>value</data></root>");
+  });
+
+  it("signs and verifies with a custom transform before c14n", async () => {
+    const keys = await xmldsig.Application.crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
+    const signedXml = new xmldsig.SignedXml();
+    await signedXml.Sign(algorithm, keys.privateKey, xmldsig.Parse("<root><data>value</data><secret>1</secret></root>"), {
+      references: [{ hash: "SHA-256", transforms: ["enveloped", REMOVE_SECRET_NAMESPACE, "c14n"] }],
+    });
+
+    // The secret is not covered by the signature, so changing it keeps the signature valid
+    const doc = xmldsig.Parse(signedXml.toString().replace("<secret>1</secret>", "<secret>2</secret>"));
+    const verifier = new xmldsig.SignedXml(doc);
+    verifier.LoadXml(doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature")[0]);
+
+    assert.isTrue(await verifier.Verify(keys.publicKey));
+  });
+});
