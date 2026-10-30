@@ -18,6 +18,8 @@ export interface OptionsXPathSignTransform {
 
 export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64" | OptionsXPathSignTransform | string; // Allow custom transform namespace URIs
 
+export type OptionsSignCanonicalization = "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | (string & {}); // Allow canonicalization namespace URIs
+
 export type DigestReferenceSource = Element | BufferSource;
 
 export interface OptionsVerify {
@@ -72,6 +74,12 @@ export interface OptionsSign {
    * @memberOf OptionsSign
    */
   references?: OptionsSignReference[];
+  /**
+   * Canonicalization method of SignedInfo: c14n, exc-c14n, c14n-com, exc-c14n-com
+   * or the namespace URI of a canonicalization transform
+   * Default is c14n
+   */
+  canonicalization?: OptionsSignCanonicalization;
 }
 
 /**
@@ -502,6 +510,19 @@ export class SignedXml implements IXmlSerializable {
     return res;
   }
 
+  /**
+   * Returns the namespace URI of a canonicalization method.
+   * Other transforms (e.g. base64, enveloped) are not allowed: SignedInfo would not be canonicalized
+   * and the signature would not cover it
+   */
+  protected ResolveCanonicalization(canonicalization: OptionsSignCanonicalization): string {
+    const transform = this.ResolveTransform(canonicalization);
+    if (!(transform instanceof Transforms.XmlDsigC14NTransform || transform instanceof Transforms.XmlDsigExcC14NTransform)) {
+      throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, canonicalization);
+    }
+    return transform.Algorithm;
+  }
+
   protected ResolveTransform(transform: OptionsSignTransform): XmlTransform {
     if (typeof transform === "string") {
       switch (transform) {
@@ -595,6 +616,12 @@ export class SignedXml implements IXmlSerializable {
     // #region id
     if (options.id) {
       this.XmlSignature.Id = options.id;
+    }
+    // #endregion
+
+    // #region canonicalization
+    if (options.canonicalization !== undefined) {
+      signature.SignedInfo.CanonicalizationMethod.Algorithm = this.ResolveCanonicalization(options.canonicalization);
     }
     // #endregion
 

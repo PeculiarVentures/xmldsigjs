@@ -1,4 +1,5 @@
-import { describe, it, assert, beforeAll } from "vitest";
+import { describe, it, assert, beforeAll, expect } from "vitest";
+import { XE } from "xml-core";
 import * as xmldsig from "./index.js";
 import "../test/config.js";
 
@@ -63,6 +64,57 @@ describe("Signing options", () => {
         await Check("id-12345", "id-12345");
       });
     });
+  });
+
+  describe("Canonicalization", () => {
+    async function Check(value: xmldsig.OptionsSignCanonicalization | undefined, expectedValue: string) {
+      const signature = await SignParse({
+        canonicalization: value,
+        references: [
+          {
+            hash: "SHA-256",
+            transforms: ["enveloped"],
+          },
+        ],
+      });
+
+      assert.equal(signature.XmlSignature.SignedInfo.CanonicalizationMethod.Algorithm, expectedValue);
+      assert.isTrue(await signature.Verify(keys.publicKey));
+    }
+
+    it("Default", async () => {
+      await Check(undefined, "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
+    });
+
+    it("exc-c14n", async () => {
+      await Check("exc-c14n", "http://www.w3.org/2001/10/xml-exc-c14n#");
+    });
+
+    it("c14n-com", async () => {
+      await Check("c14n-com", "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments");
+    });
+
+    it("exc-c14n-com", async () => {
+      await Check("exc-c14n-com", "http://www.w3.org/2001/10/xml-exc-c14n#WithComments");
+    });
+
+    it("Namespace URI", async () => {
+      await Check("http://www.w3.org/2001/10/xml-exc-c14n#", "http://www.w3.org/2001/10/xml-exc-c14n#");
+    });
+
+    it("Unknown", async () => {
+      await expect(Sign({ canonicalization: "urn:unknown" })).rejects.toMatchObject({ code: XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM });
+    });
+
+    it("Empty", async () => {
+      await expect(Sign({ canonicalization: "" })).rejects.toMatchObject({ code: XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM });
+    });
+
+    for (const value of ["base64", "enveloped", "http://www.w3.org/2000/09/xmldsig#base64", "http://www.w3.org/2000/09/xmldsig#enveloped-signature"]) {
+      it(`Not a canonicalization method: ${value}`, async () => {
+        await expect(Sign({ canonicalization: value })).rejects.toMatchObject({ code: XE.ALGORITHM_NOT_SUPPORTED });
+      });
+    }
   });
 
   describe("References", () => {
