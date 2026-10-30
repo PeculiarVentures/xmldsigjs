@@ -168,4 +168,19 @@ describe("SignedXml xml:id references", () => {
     }
     assert.match((error as { message: string }).message, /Duplicate Id 'duplicate' detected in the signed document/);
   });
+  it("sign and verify function when both xml:id and id are declared in the same element only one reference is added.", async () => {
+    const key = (await xmldsig.Application.crypto.subtle.generateKey(hmac, false, ["sign", "verify"])) as CryptoKey;
+    const document = xmldsig.Parse('<root><first xml:id="duplicate" id="duplicate"/></root>');
+    const signedXml = new xmldsig.SignedXml();
+    let error: unknown;
+    try {
+      await signedXml.Sign(hmac, key, document, {
+        references: [{ hash: "SHA-256", uri: "#duplicate" }],
+      });
+    } catch (e) {
+      error = e;
+    }
+    assert.isTrue(await signedXml.Verify({ key, content: document.documentElement }));
+    assert.isTrue(signedXml.XmlSignature.SignedInfo.References.Count === 1);
+  });
 });

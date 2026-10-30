@@ -708,18 +708,14 @@ function findAllById(element: Element, id: string, results: Element[] = [], find
 
   //Support for xml:id as it is part of the xml namespace: http://www.w3.org/XML/1998/namespace
   const hasXmlId = element.getAttributeNS("http://www.w3.org/XML/1998/namespace", "id") === id;
-  if (hasXmlId) {
-    results.push(element);
-  }
-
   // xmldsigjs historically accepts different ID attribute casings
   // (e.g. `Id` in XMLDSIG/XAdES, `id` in some XML payloads)
-  const idAttrNames = ["Id", "ID", "id"];
-  for (const attrName of idAttrNames) {
-    if (element.hasAttribute(attrName) && element.getAttribute(attrName) === id) {
-      results.push(element);
-      break;
-    }
+  const hasLegacyId = ["Id", "ID", "id"].some(
+    (name) => element.hasAttribute(name) && element.getAttribute(name) === id,
+  );
+
+  if (hasXmlId || hasLegacyId) {
+    results.push(element);
   }
 
   finder ??= findAllById;
