@@ -18,6 +18,8 @@ export interface OptionsXPathSignTransform {
 
 export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64" | OptionsXPathSignTransform | string; // Allow custom transform namespace URIs
 
+export type OptionsSignCanonicalization = "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | string; // Allow custom canonicalization namespace URIs
+
 export type DigestReferenceSource = Element | BufferSource;
 
 export interface OptionsVerify {
@@ -72,6 +74,11 @@ export interface OptionsSign {
    * @memberOf OptionsSign
    */
   references?: OptionsSignReference[];
+  /**
+   * Canonicalization method of SignedInfo
+   * Default is c14n
+   */
+  canonicalization?: OptionsSignCanonicalization;
 }
 
 /**
@@ -595,6 +602,12 @@ export class SignedXml implements IXmlSerializable {
     // #region id
     if (options.id) {
       this.XmlSignature.Id = options.id;
+    }
+    // #endregion
+
+    // #region canonicalization
+    if (options.canonicalization) {
+      signature.SignedInfo.CanonicalizationMethod.Algorithm = this.ResolveTransform(options.canonicalization).Algorithm;
     }
     // #endregion
 
