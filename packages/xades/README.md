@@ -55,6 +55,8 @@ _Currently only XAdES-BES is fully supported._
 
 > **Note:** The package is ESM-only. CommonJS code can `require()` it on Node.js `^20.19.0 || >=22.12.0`.
 
+xadesjs uses Node's built-in WebCrypto (`globalThis.crypto`) by default. To use another implementation, set it explicitly:
+
 ```javascript
 import * as xadesjs from "xadesjs";
 import { Crypto } from "@peculiar/webcrypto";
@@ -74,9 +76,6 @@ xadesjs.Application.setEngine("NodeJS", new Crypto());
 
 ```javascript
 import * as xadesjs from "xadesjs";
-import { Crypto } from "@peculiar/webcrypto";
-
-xadesjs.Application.setEngine("NodeJS", new Crypto());
 
 async function signXAdES() {
   // Generate key pair
@@ -195,7 +194,7 @@ setNodeDependencies({
 
 ## WebCrypto Environment
 
-In Node.js >=19 the global `crypto.webcrypto` is available. For earlier versions or broader compatibility, install and set the engine:
+Node.js ships a built‑in WebCrypto (`globalThis.crypto`), which xadesjs uses by default. To use another implementation (e.g. `@peculiar/webcrypto` or an HSM through `node-webcrypto-p11`), set the engine:
 
 ```ts
 import { Crypto } from "@peculiar/webcrypto";

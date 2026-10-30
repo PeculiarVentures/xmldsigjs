@@ -84,9 +84,6 @@ xmldsigjs.Application.setEngine("NodeJS", new Crypto());
 
 ```javascript
 import * as xmldsigjs from "xmldsigjs";
-import { Crypto } from "@peculiar/webcrypto";
-
-xmldsigjs.Application.setEngine("NodeJS", new Crypto());
 
 async function signXML() {
   // Generate key pair

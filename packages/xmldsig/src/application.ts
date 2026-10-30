@@ -20,25 +20,21 @@ export class Application {
   }
 
   /**
-   * Gets the crypto module from the Application
+   * Gets the crypto module from the Application.
+   * Defaults to the global WebCrypto (the browser's one, or the built-in one in Node.js)
+   * when no engine has been set
    */
   public static get crypto(): CryptoEx {
-    if (!engineCrypto) {
+    // Don't call setEngine for the default: it would change the global crypto object
+    // and replace an engine the application has already set for pkijs
+    const crypto = engineCrypto ?? (globalThis.crypto as CryptoEx | undefined);
+    if (!crypto) {
       throw new XmlError(XE.CRYPTOGRAPHIC_NO_MODULE);
     }
-    return engineCrypto;
+    return crypto;
   }
 
   public static isNodePlugin(): boolean {
     return typeof self === "undefined" && typeof window === "undefined";
   }
 }
-
-// set default WebCrypto: the browser's one, or the built-in one in Node.js
-function init() {
-  const crypto = globalThis.crypto;
-  if (crypto?.subtle) {
-    Application.setEngine(Application.isNodePlugin() ? "NodeJS" : "W3 WebCrypto module", crypto);
-  }
-}
-init();
