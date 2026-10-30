@@ -64,6 +64,21 @@ export interface OptionsSigningCertificateV2 {
   digestAlgorithm?: AlgorithmIdentifier;
 }
 
+export interface OptionsSignedPropertiesReference {
+  /**
+   * Id of Reference
+   */
+  id?: string;
+  /**
+   * Hash algorithm. Default is the hash algorithm of the signing key
+   */
+  hash?: AlgorithmIdentifier;
+  /**
+   * List of transforms
+   */
+  transforms?: XmlDSigJs.OptionsSignTransform[];
+}
+
 export interface OptionsXAdES extends OptionsSign {
   /**
    * Sets a certificate of signer for signature. Optional
@@ -83,6 +98,11 @@ export interface OptionsXAdES extends OptionsSign {
   policy?: OptionsPolicyId | boolean;
   productionPlace?: OptionsProductionPlace;
   signerRole?: OptionsSignerRole;
+
+  /**
+   * Sets options of the Reference to SignedProperties
+   */
+  signedPropertiesReference?: OptionsSignedPropertiesReference;
 }
 
 export class SignedXml extends XmlDSigJs.SignedXml {
@@ -196,13 +216,24 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       // #endregion
 
       // Add reference for SignedProperties
+      const refOptions = options.signedPropertiesReference ?? {};
       const signingAlg = XmlCore.assign({}, algorithm, key.algorithm);
-      const xadesRefHash = signingAlg.hash;
+      const xadesRefHash = refOptions.hash ?? signingAlg.hash;
       const xadesRef = new XmlDSigJs.Reference();
 
+      if (refOptions.id) {
+        xadesRef.Id = refOptions.id;
+      }
       xadesRef.Type = XADES_REFERENCE_TYPE;
       xadesRef.Uri = `#${this.Properties.SignedProperties.Id}`;
       xadesRef.DigestMethod.Algorithm = XmlDSigJs.CryptoConfig.GetHashAlgorithm(xadesRefHash).namespaceURI;
+      if (refOptions.transforms && refOptions.transforms.length) {
+        const transforms = new XmlDSigJs.Transforms();
+        refOptions.transforms.forEach((transform) => {
+          transforms.Add(this.ResolveTransform(transform));
+        });
+        xadesRef.Transforms = transforms;
+      }
 
       signature.SignedInfo.References.Add(xadesRef);
 
