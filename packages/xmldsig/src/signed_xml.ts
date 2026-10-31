@@ -549,7 +549,10 @@ export class SignedXml implements IXmlSerializable {
   }
 
   protected ApplyTransforms(transforms: XmlTransforms, input: Element): any {
+    const isNode = (value: unknown): value is Element | Document => isElement(value) || isDocument(value);
     let output: any = null;
+    // Set when a transform returns a value instead of changing the node in place
+    let hasOutput = false;
 
     transforms
       .Sort((a, b) => {
@@ -574,17 +577,28 @@ export class SignedXml implements IXmlSerializable {
             transform = new Transforms.XmlDsigC14NTransform();
           }
         }
-        transform.LoadInnerXml(input);
-        if (transform instanceof Transforms.XmlDsigXPathTransform) {
-          transform.GetOutput();
-        } else {
-          output = transform.GetOutput();
+        // Each transform takes the node returned by the previous one. Transforms
+        // that change the node in place (e.g. XPath) may return nothing: the node
+        // is passed on, or the previous octets (e.g. from base64) are kept.
+        const node = isNode(output) ? output : input;
+        transform.LoadInnerXml(node);
+        const result = transform.GetOutput();
+        if (result !== undefined) {
+          output = result;
+          hasOutput = true;
+        } else if (output === null || isNode(output)) {
+          output = node;
         }
       });
-    // Apply C14N transform if Reference has only one transform EnvelopedSignature
     if (transforms.Count === 1 && transforms.Item(0) instanceof Transforms.XmlDsigEnvelopedSignatureTransform) {
+      // Apply C14N transform if Reference has only one transform EnvelopedSignature
       const c14n = new Transforms.XmlDsigC14NTransform();
       c14n.LoadInnerXml(input);
+      output = c14n.GetOutput();
+    } else if (!hasOutput && isNode(output)) {
+      // Only in-place transforms (e.g. a single XPath): convert the node-set to octets with C14N
+      const c14n = new Transforms.XmlDsigC14NTransform();
+      c14n.LoadInnerXml(output);
       output = c14n.GetOutput();
     }
 
