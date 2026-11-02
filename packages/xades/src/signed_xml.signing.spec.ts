@@ -1,4 +1,4 @@
-import { describe, it, assert, beforeAll } from "vitest";
+import { describe, it, assert, beforeAll, expect } from "vitest";
 import { Crypto } from "@peculiar/webcrypto";
 import * as XmlCore from "xml-core";
 import "../../core/test/config.js";
@@ -51,6 +51,80 @@ describe("XAdES signing", () => {
     assert.equal(xades.SignedProperties.SignedSignatureProperties.SignatureProductionPlace.IsEmpty(), true);
     const res = await xades.Verify();
     assert.equal(res, true, "XAdES signature is not valid");
+  });
+
+  describe("SignedProperties reference", () => {
+    function getXadesReference(signedXml: XAdES.SignedXml) {
+      const ref = signedXml.XmlSignature.SignedInfo.References.GetIterator().find((r) => r.Type === "http://uri.etsi.org/01903#SignedProperties");
+      assert.ok(ref);
+      return ref;
+    }
+
+    async function signAndLoad(options: XAdES.OptionsXAdES) {
+      const signature = new XAdES.SignedXml();
+      await signature.Sign(alg, keys.privateKey, XAdES.Parse(xml), {
+        keyValue: keys.publicKey,
+        references: [{ hash: "SHA-256", transforms: ["enveloped"] }],
+        ...options,
+      });
+      const doc = XAdES.Parse(signature.toString());
+      const signatureEl = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature")[0];
+      const xades = new XAdES.SignedXml(doc);
+      xades.LoadXml(signatureEl);
+      return xades;
+    }
+
+    it("Default has no Id and no transforms", async () => {
+      const xades = await signAndLoad({});
+      const ref = getXadesReference(xades);
+      assert.equal(ref.Id, "");
+      assert.equal(ref.Transforms.Count, 0);
+      assert.equal(ref.DigestMethod.Algorithm, "http://www.w3.org/2001/04/xmlenc#sha256");
+      assert.isTrue(await xades.Verify());
+    });
+
+    it("Id, hash and transforms", async () => {
+      const xades = await signAndLoad({
+        signedPropertiesReference: {
+          id: "SignedPropertiesRef",
+          hash: "SHA-512",
+          transforms: ["exc-c14n"],
+        },
+      });
+      const ref = getXadesReference(xades);
+      assert.equal(ref.Id, "SignedPropertiesRef");
+      assert.equal(ref.DigestMethod.Algorithm, "http://www.w3.org/2001/04/xmlenc#sha512");
+      assert.equal(ref.Transforms.Count, 1);
+      assert.equal(ref.Transforms.Item(0)?.Algorithm, "http://www.w3.org/2001/10/xml-exc-c14n#");
+      assert.isTrue(await xades.Verify());
+    });
+
+    it("Rejects non-canonicalization transforms", async () => {
+      await Promise.all(
+        ["base64", "enveloped"].map((transform) =>
+          expect(
+            signAndLoad({
+              signedPropertiesReference: { transforms: [transform as XAdES.OptionsSignedPropertiesTransform] },
+            }),
+          ).rejects.toThrow(/Unsupported transform/),
+        ),
+      );
+    });
+
+    it("Rejects an Id already used in the Signature", async () => {
+      await expect(
+        signAndLoad({
+          id: "SigId",
+          signedPropertiesReference: { id: "SigId" },
+        }),
+      ).rejects.toThrow(/already used/);
+      await expect(
+        signAndLoad({
+          references: [{ id: "DataRef", hash: "SHA-256", transforms: ["enveloped"] }],
+          signedPropertiesReference: { id: "DataRef" },
+        }),
+      ).rejects.toThrow(/already used/);
+    });
   });
 
   it("Default signing with explicit policy (SigningTime, SigningCertificateV2, SignaturePolicyIdentifier)", async () => {

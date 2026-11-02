@@ -165,6 +165,12 @@ interface OptionsXAdES {
     certified?: string[];
   };
   policy?: OptionsPolicyId;
+  // Reference to SignedProperties; hash defaults to the signing key's hash
+  signedPropertiesReference?: {
+    id?: string;
+    hash?: AlgorithmIdentifier;
+    transforms?: OptionsSignTransform[]; // e.g. ["exc-c14n"]
+  };
 }
 ```
 
