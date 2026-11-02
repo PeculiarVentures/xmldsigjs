@@ -20,6 +20,8 @@ export type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com
 
 export type OptionsSignCanonicalization = "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | (string & {}); // Allow canonicalization namespace URIs
 
+const SHORT_CANONICALIZATION_NAMES: ReadonlySet<string> = new Set(["c14n", "exc-c14n", "c14n-com", "exc-c14n-com"]);
+
 export type DigestReferenceSource = Element | BufferSource;
 
 export interface OptionsVerify {
@@ -520,7 +522,9 @@ export class SignedXml implements IXmlSerializable {
     if (!(transform instanceof Transforms.XmlDsigC14NTransform || transform instanceof Transforms.XmlDsigExcC14NTransform)) {
       throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, canonicalization);
     }
-    return transform.Algorithm;
+    // Short names map to the built-in URI; a namespace URI is kept as given, so a registered
+    // subclass that does not override Algorithm still resolves to itself when verifying
+    return SHORT_CANONICALIZATION_NAMES.has(canonicalization) ? transform.Algorithm : canonicalization;
   }
 
   protected ResolveTransform(transform: OptionsSignTransform): XmlTransform {

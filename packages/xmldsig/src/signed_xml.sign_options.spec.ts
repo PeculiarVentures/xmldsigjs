@@ -116,6 +116,14 @@ describe("Signing options", () => {
       await Check(CUSTOM_C14N_NAMESPACE, CUSTOM_C14N_NAMESPACE);
     });
 
+    it("Registered custom C14N transform without own Algorithm", async () => {
+      const CUSTOM_C14N_NAMESPACE = "urn:test:custom-c14n-inherited";
+      class CustomC14NTransform extends xmldsig.XmlDsigC14NTransform {}
+      xmldsig.CryptoConfig.RegisterTransform(CUSTOM_C14N_NAMESPACE, CustomC14NTransform);
+
+      await Check(CUSTOM_C14N_NAMESPACE, CUSTOM_C14N_NAMESPACE);
+    });
+
     describe("Comments in SignedInfo", () => {
       /**
        * Signs, then inserts a comment into SignedInfo and verifies the result.
