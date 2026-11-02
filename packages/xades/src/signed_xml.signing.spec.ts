@@ -1,4 +1,4 @@
-import { describe, it, assert, beforeAll } from "vitest";
+import { describe, it, assert, beforeAll, expect } from "vitest";
 import { Crypto } from "@peculiar/webcrypto";
 import * as XmlCore from "xml-core";
 import "../../core/test/config.js";
@@ -97,6 +97,33 @@ describe("XAdES signing", () => {
       assert.equal(ref.Transforms.Count, 1);
       assert.equal(ref.Transforms.Item(0)?.Algorithm, "http://www.w3.org/2001/10/xml-exc-c14n#");
       assert.isTrue(await xades.Verify());
+    });
+
+    it("Rejects non-canonicalization transforms", async () => {
+      await Promise.all(
+        ["base64", "enveloped"].map((transform) =>
+          expect(
+            signAndLoad({
+              signedPropertiesReference: { transforms: [transform as XAdES.OptionsSignedPropertiesTransform] },
+            }),
+          ).rejects.toThrow(/Unsupported transform/),
+        ),
+      );
+    });
+
+    it("Rejects an Id already used in the Signature", async () => {
+      await expect(
+        signAndLoad({
+          id: "SigId",
+          signedPropertiesReference: { id: "SigId" },
+        }),
+      ).rejects.toThrow(/already used/);
+      await expect(
+        signAndLoad({
+          references: [{ id: "DataRef", hash: "SHA-256", transforms: ["enveloped"] }],
+          signedPropertiesReference: { id: "DataRef" },
+        }),
+      ).rejects.toThrow(/already used/);
     });
   });
 

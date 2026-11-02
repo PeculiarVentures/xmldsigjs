@@ -4,6 +4,7 @@ import type { OptionsSign } from "xmldsigjs";
 import * as XAdES from "./xml/index.js";
 
 const XADES_REFERENCE_TYPE = "http://uri.etsi.org/01903#SignedProperties";
+const SIGNED_PROPERTIES_TRANSFORMS = [XmlDSigJs.XmlDsigC14NTransform, XmlDSigJs.XmlDsigC14NWithCommentsTransform, XmlDSigJs.XmlDsigExcC14NTransform, XmlDSigJs.XmlDsigExcC14NWithCommentsTransform];
 
 export interface OptionsSignerRole {
   claimed?: string[];
@@ -64,9 +65,14 @@ export interface OptionsSigningCertificateV2 {
   digestAlgorithm?: AlgorithmIdentifier;
 }
 
+/**
+ * Canonicalization transforms allowed on the SignedProperties Reference
+ */
+export type OptionsSignedPropertiesTransform = "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com";
+
 export interface OptionsSignedPropertiesReference {
   /**
-   * Id of Reference
+   * Id of Reference. Must be unique within the signature
    */
   id?: string;
   /**
@@ -74,9 +80,9 @@ export interface OptionsSignedPropertiesReference {
    */
   hash?: AlgorithmIdentifier;
   /**
-   * List of transforms
+   * List of canonicalization transforms
    */
-  transforms?: XmlDSigJs.OptionsSignTransform[];
+  transforms?: OptionsSignedPropertiesTransform[];
 }
 
 export interface OptionsXAdES extends OptionsSign {
@@ -197,6 +203,25 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     this.XmlSignature.ObjectList.Add(dataObject);
   }
 
+  /**
+   * Throws if the given Id is already used by the Signature or one of its child elements
+   */
+  protected AssertUniqueId(signature: XmlDSigJs.Signature, id: string) {
+    const used: string[] = [signature.Id, signature.SignedInfo.Id, signature.KeyInfo.Id];
+    if (this.Properties) {
+      used.push(this.Properties.Id, this.Properties.SignedProperties.Id);
+    }
+    signature.SignedInfo.References.ForEach((ref) => {
+      used.push(ref.Id);
+    });
+    signature.ObjectList.ForEach((obj) => {
+      used.push(obj.Id);
+    });
+    if (used.includes(id)) {
+      throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, `Id '${id}' is already used in the Signature`);
+    }
+  }
+
   protected override async ApplySignOptions(signature: XmlDSigJs.Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsXAdES) {
     await super.ApplySignOptions(signature, algorithm, key, options);
     if (this.Properties) {
@@ -222,6 +247,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       const xadesRef = new XmlDSigJs.Reference();
 
       if (refOptions.id) {
+        this.AssertUniqueId(signature, refOptions.id);
         xadesRef.Id = refOptions.id;
       }
       xadesRef.Type = XADES_REFERENCE_TYPE;
@@ -230,7 +256,11 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       if (refOptions.transforms && refOptions.transforms.length) {
         const transforms = new XmlDSigJs.Transforms();
         refOptions.transforms.forEach((transform) => {
-          transforms.Add(this.ResolveTransform(transform));
+          const resolved = this.ResolveTransform(transform);
+          if (!SIGNED_PROPERTIES_TRANSFORMS.some((t) => resolved instanceof t)) {
+            throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, `Unsupported transform '${transform}' for SignedProperties Reference. Only canonicalization transforms are allowed`);
+          }
+          transforms.Add(resolved);
         });
         xadesRef.Transforms = transforms;
       }
