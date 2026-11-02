@@ -151,6 +151,7 @@ interface OptionsSign {
   keyValue?: CryptoKey; // Public key for KeyInfo
   x509?: string[]; // X.509 certificates
   references?: OptionsSignReference[]; // Reference elements
+  canonicalization?: OptionsSignCanonicalization; // SignedInfo canonicalization: "c14n" (default), "exc-c14n", "c14n-com", "exc-c14n-com" or a C14N namespace URI; other transforms throw ALGORITHM_NOT_SUPPORTED
 }
 ```
 
