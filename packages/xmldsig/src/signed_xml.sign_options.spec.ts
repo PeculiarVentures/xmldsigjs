@@ -86,6 +86,10 @@ describe("Signing options", () => {
       await Check(undefined, "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
     });
 
+    it("c14n", async () => {
+      await Check("c14n", "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
+    });
+
     it("exc-c14n", async () => {
       await Check("exc-c14n", "http://www.w3.org/2001/10/xml-exc-c14n#");
     });
@@ -100,6 +104,51 @@ describe("Signing options", () => {
 
     it("Namespace URI", async () => {
       await Check("http://www.w3.org/2001/10/xml-exc-c14n#", "http://www.w3.org/2001/10/xml-exc-c14n#");
+    });
+
+    it("Registered custom C14N transform", async () => {
+      const CUSTOM_C14N_NAMESPACE = "urn:test:custom-c14n";
+      class CustomC14NTransform extends xmldsig.XmlDsigExcC14NTransform {
+        public override Algorithm = CUSTOM_C14N_NAMESPACE;
+      }
+      xmldsig.CryptoConfig.RegisterTransform(CUSTOM_C14N_NAMESPACE, CustomC14NTransform);
+
+      await Check(CUSTOM_C14N_NAMESPACE, CUSTOM_C14N_NAMESPACE);
+    });
+
+    describe("Comments in SignedInfo", () => {
+      /**
+       * Signs, then inserts a comment into SignedInfo and verifies the result.
+       * A comment is ignored by c14n/exc-c14n, but is part of the canonicalized
+       * SignedInfo for the *-com variants, so the signature must break
+       */
+      async function VerifyWithComment(value: xmldsig.OptionsSignCanonicalization) {
+        const signedXml = await Sign({
+          canonicalization: value,
+          references: [
+            {
+              hash: "SHA-256",
+              transforms: ["enveloped"],
+            },
+          ],
+        });
+        const xml = signedXml.toString().replace(/(<(?:ds:)?SignedInfo[^>]*>)/, "$1<!--comment-->");
+        assert.include(xml, "<!--comment-->");
+
+        return Parse(xml).Verify(keys.publicKey);
+      }
+
+      for (const value of ["c14n", "exc-c14n"] as const) {
+        it(`${value} ignores comments`, async () => {
+          assert.isTrue(await VerifyWithComment(value));
+        });
+      }
+
+      for (const value of ["c14n-com", "exc-c14n-com"] as const) {
+        it(`${value} keeps comments`, async () => {
+          assert.isFalse(await VerifyWithComment(value));
+        });
+      }
     });
 
     it("Unknown", async () => {
