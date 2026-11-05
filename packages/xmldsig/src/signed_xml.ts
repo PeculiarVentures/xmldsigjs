@@ -8,7 +8,7 @@ import { KeyInfo, Reference, References, Signature, Transforms as XmlTransforms,
 import { KeyInfoX509Data, KeyValue } from "./xml/key_infos/index.js";
 import * as KeyInfos from "./xml/key_infos/index.js";
 import * as Transforms from "./xml/transforms/index.js";
-import { Application } from "./application.js";
+import { resolveCrypto } from "./application.js";
 
 export interface OptionsXPathSignTransform {
   name: "xpath";
@@ -104,6 +104,10 @@ export class SignedXml implements IXmlSerializable {
   protected signature = new Signature();
   protected document?: Document;
   /**
+   * Crypto provider used when none is given to a method. Default is from Application.
+   */
+  protected crypto?: Crypto;
+  /**
    * If set to true, transformations with comments will be replaced with transformations
    * without comments.
    * This is a non-standard implementation to ensure compatibility with systems that do not support
@@ -115,10 +119,12 @@ export class SignedXml implements IXmlSerializable {
    * Creates an instance of SignedXml.
    *
    * @param {(Document | Element)} [node]
+   * @param {Crypto} [crypto] Crypto provider. Default is from Application
    *
    * @memberOf SignedXml
    */
-  constructor(node?: Document | Element) {
+  constructor(node?: Document | Element, crypto?: Crypto) {
+    this.crypto = crypto;
     // constructor();
     if (node && (node as Node).nodeType === XmlNodeType.Document) {
       // constructor(node: Document);
@@ -130,7 +136,12 @@ export class SignedXml implements IXmlSerializable {
     }
   }
 
-  public async Sign(algorithm: Algorithm | EcdsaParams | RsaPssParams, key: CryptoKey, data: Document | DigestReferenceSource, options: OptionsSign = {}) {
+  /**
+   * Signs the given data
+   * @param  {Crypto} crypto Crypto provider. Default is from the constructor or Application
+   */
+  public async Sign(algorithm: Algorithm | EcdsaParams | RsaPssParams, key: CryptoKey, data: Document | DigestReferenceSource, options: OptionsSign = {}, crypto?: Crypto) {
+    crypto ||= this.crypto;
     if (isDocument(data)) {
       data = (data.cloneNode(true) as Document).documentElement;
     } else if (isElement(data)) {
@@ -143,14 +154,14 @@ export class SignedXml implements IXmlSerializable {
     }
 
     const alg = CryptoConfig.GetSignatureAlgorithm(signingAlg);
-    await this.ApplySignOptions(this.XmlSignature, algorithm, key, options);
-    await this.DigestReferences(data);
+    await this.ApplySignOptions(this.XmlSignature, algorithm, key, options, crypto);
+    await this.DigestReferences(data, crypto);
 
     const signatureMethod = CryptoConfig.CreateSignatureMethod(alg);
     this.XmlSignature.SignedInfo.SignatureMethod = signatureMethod;
 
     const si = this.TransformSignedInfo(data);
-    const signature = await alg.Sign(si, key, signingAlg);
+    const signature = await alg.Sign(si, key, signingAlg, crypto);
 
     this.Key = key;
     this.Algorithm = algorithm;
@@ -161,12 +172,18 @@ export class SignedXml implements IXmlSerializable {
     return this.XmlSignature;
   }
 
-  private async reimportKey(key: CryptoKey, alg: Algorithm) {
-    const spki = await Application.crypto.subtle.exportKey("spki", key);
-    return Application.crypto.subtle.importKey("spki", spki, alg, true, ["verify"]);
+  private async reimportKey(key: CryptoKey, alg: Algorithm, crypto?: Crypto) {
+    const subtle = resolveCrypto(crypto).subtle;
+    const spki = await subtle.exportKey("spki", key);
+    return subtle.importKey("spki", spki, alg, true, ["verify"]);
   }
 
-  public async Verify(params?: CryptoKey | OptionsVerify) {
+  /**
+   * Verifies the signature
+   * @param  {Crypto} crypto Crypto provider. Default is from the constructor or Application
+   */
+  public async Verify(params?: CryptoKey | OptionsVerify, crypto?: Crypto) {
+    crypto ||= this.crypto;
     let content: DigestReferenceSource | undefined;
     let key: CryptoKey | undefined;
     if (params) {
@@ -179,7 +196,7 @@ export class SignedXml implements IXmlSerializable {
     }
 
     if (key && key.type === "public" && this.Algorithm) {
-      key = await this.reimportKey(key, this.Algorithm);
+      key = await this.reimportKey(key, this.Algorithm, crypto);
     }
 
     if (!content) {
@@ -193,12 +210,12 @@ export class SignedXml implements IXmlSerializable {
       content = content.cloneNode(true) as Element;
     }
 
-    const res = await this.ValidateReferences(content);
+    const res = await this.ValidateReferences(content, crypto);
 
     if (res) {
-      const keys: CryptoKey[] = key ? [key] : await this.GetPublicKeys();
+      const keys: CryptoKey[] = key ? [key] : await this.GetPublicKeys(crypto);
 
-      return this.ValidateSignatureValue(keys);
+      return this.ValidateSignatureValue(keys, crypto);
     } else {
       return false;
     }
@@ -245,19 +262,20 @@ export class SignedXml implements IXmlSerializable {
   // #region Protected methods
   /**
    * Returns the public key of a signature.
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    */
-  protected async GetPublicKeys() {
+  protected async GetPublicKeys(crypto?: Crypto) {
     const keys: CryptoKey[] = [];
 
     const alg = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
     for (const kic of this.XmlSignature.KeyInfo.GetIterator()) {
       if (kic instanceof KeyInfos.KeyInfoX509Data) {
         for (const cert of kic.Certificates) {
-          const key = await cert.exportKey(alg.algorithm);
+          const key = await cert.exportKey(alg.algorithm, crypto);
           keys.push(key);
         }
       } else {
-        const key = await kic.exportKey(alg.algorithm);
+        const key = await kic.exportKey(alg.algorithm, crypto);
         keys.push(key);
       }
     }
@@ -269,8 +287,7 @@ export class SignedXml implements IXmlSerializable {
         const key = keys[i];
         if (key.algorithm.name.startsWith("RSA")) {
           // Reimport key
-          const spki = await Application.crypto.subtle.exportKey("spki", key);
-          const updatedKey = await Application.crypto.subtle.importKey("spki", spki, alg.algorithm, true, ["verify"]);
+          const updatedKey = await this.reimportKey(key, alg.algorithm, crypto);
 
           // Replace key
           keys[i] = updatedKey;
@@ -316,7 +333,7 @@ export class SignedXml implements IXmlSerializable {
   // public getReferenceData(reference: Reference): Promise<ArrayBuffer | Element> {
   // }
 
-  protected async DigestReference(source: DigestReferenceSource, reference: Reference, _checkHmac: boolean) {
+  protected async DigestReference(source: DigestReferenceSource, reference: Reference, _checkHmac: boolean, crypto?: Crypto) {
     if (this.contentHandler) {
       const content = await this.contentHandler(reference, this);
       if (content) {
@@ -447,10 +464,10 @@ export class SignedXml implements IXmlSerializable {
       throw new XmlError(XE.NULL_PARAM, "Reference", "DigestMethod");
     }
     const digest = CryptoConfig.CreateHashAlgorithm(reference.DigestMethod.Algorithm);
-    return digest.Digest(canonOutput);
+    return digest.Digest(canonOutput, crypto);
   }
 
-  protected async DigestReferences(data: DigestReferenceSource) {
+  protected async DigestReferences(data: DigestReferenceSource, crypto?: Crypto) {
     // we must tell each reference which hash algorithm to use
     // before asking for the SignedInfo XML !
     for (const ref of this.XmlSignature.SignedInfo.References.GetIterator()) {
@@ -462,7 +479,7 @@ export class SignedXml implements IXmlSerializable {
       if (!ref.DigestMethod.Algorithm) {
         ref.DigestMethod.Algorithm = new Alg.Sha256().namespaceURI;
       }
-      const hash = await this.DigestReference(data, ref, false);
+      const hash = await this.DigestReference(data, ref, false, crypto);
       ref.DigestValue = hash;
     }
   }
@@ -616,7 +633,7 @@ export class SignedXml implements IXmlSerializable {
     return output;
   }
 
-  protected async ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsSign) {
+  protected async ApplySignOptions(signature: Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsSign, crypto?: Crypto) {
     // #region id
     if (options.id) {
       this.XmlSignature.Id = options.id;
@@ -637,7 +654,7 @@ export class SignedXml implements IXmlSerializable {
       const keyInfo = signature.KeyInfo;
       const keyValue = new KeyValue();
       keyInfo.Add(keyValue);
-      await keyValue.importKey(options.keyValue);
+      await keyValue.importKey(options.keyValue, crypto);
     }
     // #endregion
 
@@ -699,9 +716,9 @@ export class SignedXml implements IXmlSerializable {
     // #endregion
   }
 
-  protected async ValidateReferences(doc: DigestReferenceSource) {
+  protected async ValidateReferences(doc: DigestReferenceSource, crypto?: Crypto) {
     for (const ref of this.XmlSignature.SignedInfo.References.GetIterator()) {
-      const digest = await this.DigestReference(doc, ref, false);
+      const digest = await this.DigestReference(doc, ref, false, crypto);
       const b64Digest = base64.encode(digest);
       const b64DigestValue = base64.encode(ref.DigestValue);
       if (b64Digest !== b64DigestValue) {
@@ -712,7 +729,7 @@ export class SignedXml implements IXmlSerializable {
     return true;
   }
 
-  protected async ValidateSignatureValue(keys: CryptoKey[]) {
+  protected async ValidateSignatureValue(keys: CryptoKey[], crypto?: Crypto) {
     const signedInfoCanon = this.TransformSignedInfo(this.document);
     const signer = CryptoConfig.CreateSignatureAlgorithm(this.XmlSignature.SignedInfo.SignatureMethod);
 
@@ -721,7 +738,7 @@ export class SignedXml implements IXmlSerializable {
       if (!this.Signature) {
         throw new XmlError(XE.CRYPTOGRAPHIC, "Signature is not defined");
       }
-      const ok = await signer.Verify(signedInfoCanon, key, this.Signature);
+      const ok = await signer.Verify(signedInfoCanon, key, this.Signature, crypto);
       if (ok) {
         return true;
       }
