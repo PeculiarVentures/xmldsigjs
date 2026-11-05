@@ -487,6 +487,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
   }
 
   protected async VerifySigningCertificate(crypto?: Crypto) {
+    crypto ||= this.crypto;
     let x509: XmlDSigJs.X509Certificate | null = null;
 
     if (this.XmlSignature && this.Properties) {

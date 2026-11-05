@@ -5,6 +5,12 @@ import { Crypto } from "@peculiar/webcrypto";
 import "../../core/test/config.js";
 import * as XAdES from "./index.js";
 
+class SignedXml extends XAdES.SignedXml {
+  public override VerifySigningCertificate() {
+    return super.VerifySigningCertificate();
+  }
+}
+
 describe("XAdES crypto provider", () => {
   const cert =
     "MIIEHjCCAwagAwIBAgIBATANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UEBwwMU2FudGEgTW9uaWNhMREwDwYDVQQKDAhPbmVMb2dpbjEZMBcGA1UEAwwQYXBwLm9uZWxvZ2luLmNvbTAeFw0xMzA1MjcwODU1MTNaFw0xODA1MjcwODU1MTNaMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRUwEwYDVQQHDAxTYW50YSBNb25pY2ExETAPBgNVBAoMCE9uZUxvZ2luMRkwFwYDVQQDDBBhcHAub25lbG9naW4uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoXoc7IFZQRv+SwJ15zjIl9touwY5e6b7H4vn3OtOUByjOKHUX8VX0TpbAV2ctZE2GSALx1AGuQAv6O4MVUH+qn/2IAiBY3a7zKN07UBsya7xFMQVHuGE6EiBAs9jpA9wjvYMPRkS5wYZcwjpTQSZK7zFPPtobG8K/1vDbm/tWZjNLmZmQePmXpwrQAuC0+NlzlmnjoQYB2xp2NaTUK9JnnmuB5qev3dpUwlYGSJpf+HUIoxuo8IpxAXOymq1d6tEEJgU1kR2sa7o1sSRFo31YeW/qYCP/gcLJZo3MRUDFe0g5MHeliFue9DsKYUsC6qwAD3gc+MI47buiD6Msu11cwIDAQABo4HUMIHRMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFAAJFJRIlpQQSFsuNdeq7FkTJIH4MIGRBgNVHSMEgYkwgYaAFAAJFJRIlpQQSFsuNdeq7FkTJIH4oWukaTBnMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UEBwwMU2FudGEgTW9uaWNhMREwDwYDVQQKDAhPbmVMb2dpbjEZMBcGA1UEAwwQYXBwLm9uZWxvZ2luLmNvbYIBATAOBgNVHQ8BAf8EBAMCBPAwDQYJKoZIhvcNAQEFBQADggEBAB9zN+g6N4sUBE61RaMUH2LSHWwOtfhL64i7pjHjvZa47/qcV/S0Yyd4IE44ho9i2N+AM79d34mThc30oK5aVxOKphKf+xM/cOyVaWIeqr+dCbkY/0OpLEwWOh9VSgOizRO3evLMurbtR892LbSK/Td3hG5jfwoHD23nHH87Dv/3KyZox9MkJdY2DXOHGGIcsqoIifaTyNZyhW6RgwEujQ6LjsaolP1YoeV85TZFKTLa1Ta7ZLUVUC2UJWqz+kRlsyGxf+E/ZmJ7hSq0ZBVHrVOyXjCcFn6X0/W5SrpOmN3fZYcj8Bp6vhB0cJk9qpjgWOP2RCuBdHZVawjCjIaE+bc=";
@@ -44,6 +50,23 @@ describe("XAdES crypto provider", () => {
 
     assert.equal(xades.SignedProperties.SignedSignatureProperties.SigningCertificate.IsEmpty(), false);
     assert.equal(await xades.Verify(), true, "XAdES signature is not valid");
+  });
+
+  it("verifies the signing certificate with the provider from the constructor", async () => {
+    const signature = new XAdES.SignedXml(undefined, crypto);
+
+    await signature.Sign(alg, keys.privateKey, XAdES.Parse(xml), {
+      x509: [cert],
+      signingCertificate: cert,
+      references: [{ hash: "SHA-256", transforms: ["enveloped"] }],
+    });
+
+    const xades = new SignedXml(XAdES.Parse(signature.toString()), crypto);
+    const xmlSignature = signature.XmlSignature.GetXml();
+    assert.ok(xmlSignature);
+    xades.LoadXml(xmlSignature);
+
+    assert.ok(await xades.VerifySigningCertificate());
   });
 
   it("signs with a provider given per call", async () => {
