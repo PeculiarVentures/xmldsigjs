@@ -1,7 +1,7 @@
 import { Convert, XE, XmlAttribute, XmlBase64Converter, XmlChildElement, XmlElement, XmlError, XmlNumberConverter, XmlObject } from "xml-core";
 
 import { RSA_PKCS1, RSA_PSS, SHA1, SHA256, SHA384, SHA512 } from "../../algorithms/index.js";
-import { Application } from "../../application.js";
+import { resolveCrypto } from "../../application.js";
 import { DigestMethod } from "../digest_method.js";
 import { XmlSignature } from "../xml_names.js";
 import { KeyInfoClause } from "./key_info_clause.js";
@@ -68,15 +68,16 @@ export class RsaKeyValue extends KeyInfoClause {
   /**
    * Imports key to the RSAKeyValue object
    * @param  {CryptoKey} key
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    * @returns Promise
    */
-  public async importKey(key: CryptoKey) {
+  public async importKey(key: CryptoKey, crypto?: Crypto) {
     const algName = key.algorithm.name ? key.algorithm.name.toUpperCase() : "";
     if (algName !== RSA_PKCS1.toUpperCase() && algName !== RSA_PSS.toUpperCase()) {
       throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
     }
     this.key = key;
-    const jwk = await Application.crypto.subtle.exportKey("jwk", key);
+    const jwk = await resolveCrypto(crypto).subtle.exportKey("jwk", key);
 
     this.jwk = jwk;
     this.Modulus = Convert.FromBase64Url(jwk.n || "");
@@ -89,9 +90,10 @@ export class RsaKeyValue extends KeyInfoClause {
   /**
    * Exports key from the RSAKeyValue object
    * @param  {Algorithm} alg
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    * @returns Promise
    */
-  public async exportKey(alg: Algorithm = DEFAULT_ALGORITHM) {
+  public async exportKey(alg: Algorithm = DEFAULT_ALGORITHM, crypto?: Crypto) {
     if (this.key) {
       return this.key;
     }
@@ -138,7 +140,7 @@ export class RsaKeyValue extends KeyInfoClause {
       e: exponent,
       ext: true,
     };
-    return Application.crypto.subtle.importKey("jwk", jwk as any, alg as any, true, this.keyUsage as KeyUsage[]);
+    return resolveCrypto(crypto).subtle.importKey("jwk", jwk as any, alg as any, true, this.keyUsage as KeyUsage[]);
   }
 
   /**

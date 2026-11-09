@@ -56,7 +56,7 @@ class Ed25519Signature extends xmldsig.SignatureAlgorithm {
     return crypto.subtle.sign("Ed25519", signingKey, info);
   }
 
-  public override async Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array, _algorithm?: Algorithm): Promise<boolean> {
+  public override async Verify(signedInfo: string, key: CryptoKey, signatureValue: Uint8Array): Promise<boolean> {
     const info = new TextEncoder().encode(signedInfo);
     return crypto.subtle.verify("Ed25519", key, signatureValue as Uint8Array<ArrayBuffer>, info);
   }
